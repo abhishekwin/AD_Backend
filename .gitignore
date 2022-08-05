@@ -1,0 +1,12 @@
+/node_modules
+/public
+.env
+.env.testnet
+.env.local
+.env.staging
+.env.producation
+# package-lock.json (use yarn.lock instead)
+package-lock.json
+.idea
+
+angeldust.txt
