@@ -1,30 +1,21 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const { objectId } = require('./custom.validation');
 
-const addNotificationMessage = {
+const createCollectionValidation = {
   body: Joi.object().keys({
-    key: Joi.string().required(),
-    value: Joi.string().required(),
-  }),
-};
-
-const addAppMessage = {
-  body: Joi.object().keys({
-    key: Joi.string().required(),
-    value: Joi.string().required(),
-  }),
-};
-
-const addSuccessMessage = {
-  body: Joi.object().keys({
-    key: Joi.string().required(),
-    value: Joi.string().required(),
+    contractName: Joi.string().required(),
+    collectionName: Joi.string().required(),
+    symbol: Joi.string().required(),
+    launchCollectionLater: Joi.boolean().strict().required(),
+    addWhitelist: Joi.boolean().strict().required(),
+    baseArtName: Joi.string().required(),
+    nftDescription: Joi.string().required(),
+    mintCost: Joi.number().strict().required(),
+    royalties: Joi.number().strict().required(),
   }),
 };
 
 
 module.exports = {
-  addNotificationMessage,
-  addAppMessage,
-  addSuccessMessage
+  createCollectionValidation
 };

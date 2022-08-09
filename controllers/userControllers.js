@@ -1008,6 +1008,8 @@ module.exports = {
   verifySignatureController: async (req, res) => {
     try {
       const { nonce, signature } = req.body;
+      
+
       // get user by nonce
       let user = await Users.findOne({ nonce: nonce });
       // check user existance or block field

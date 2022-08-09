@@ -44,7 +44,7 @@ const collectionSchema = mongoose.Schema(
         trim: true,
         default: null,
     },
-    miniCost: {
+    mintCost: {
         type: Number,
         trim: true,
         default: 0,
