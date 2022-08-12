@@ -15,18 +15,16 @@ let WEB3_URL = process.env.WEB3_URL;
 let SUB_GRAPH_URL = process.env.SUB_GRAPH_URL;
 const specialCharacter = require("../helpers/RegexHelper");
 const jwt_decode = require("jwt-decode");
-const {
-  getMoralisInfo,
-} = require("../middleware/moralisApi");
+const { getMoralisInfo } = require("../middleware/moralisApi");
 const { getAdminAddress } = require("../helpers/adminHelper");
 const { customPagination } = require("../helpers/pagination");
 //const { auctionEndQuery, marketSolds } = require("../services/graphql");
 const userfollower = require("../config/usersBleufi.json");
-const {getQueryString} = require('../utils/commanFunction')
+const { getQueryString } = require("../utils/commanFunction");
 
 loginUserDataFunaction = (req) => {
   // let loginuserdata = req.userData;
-  let loginuserdata
+  let loginuserdata;
   const bearerHeaders = req.headers["authorization"];
   if (typeof bearerHeaders !== "undefined") {
     const bearer = bearerHeaders.split(" ");
@@ -121,13 +119,13 @@ module.exports = {
         /\b(gte|gt|lte|lt)\b/g,
         (match) => `$${match}`
       );
-      let query =  Nfts.find(JSON.parse(queryString));
+      let query = Nfts.find(JSON.parse(queryString));
       // process.exit()
       count = await Nfts.countDocuments(query);
       // 2) Sorting
       if (req.query.sort) {
         const sortBy = req.query.sort.split(",").join(" ");
-        query =  query.sort(sortBy);
+        query = query.sort(sortBy);
       } else {
         query = query.sort("-createdAt");
       }
@@ -147,20 +145,20 @@ module.exports = {
       query = query.find({ isActive: true });
       count = await Nfts.countDocuments(query);
       let response = [];
-      if(req.query.sort && req.query.sort == "-likes"){
+      if (req.query.sort && req.query.sort == "-likes") {
         response = await query;
-        response = response.sort((a,b)=>b.likes.length-a.likes.length);
+        response = response.sort((a, b) => b.likes.length - a.likes.length);
         response = response.slice((page - 1) * limit, page * limit);
-      }else if(req.query.sort && req.query.sort == "likes"){
+      } else if (req.query.sort && req.query.sort == "likes") {
         response = await query;
-        response = response.sort((a,b)=>a.likes.length-b.likes.length);
+        response = response.sort((a, b) => a.likes.length - b.likes.length);
         response = response.slice((page - 1) * limit, page * limit);
-      }else{
+      } else {
         response = await query
-        .limit(limit > 0 ? limit * 1 : 0)
-        .skip(page > 0 ? (page - 1) * limit : 0);
+          .limit(limit > 0 ? limit * 1 : 0)
+          .skip(page > 0 ? (page - 1) * limit : 0);
       }
-      
+
       // const count = await Nfts.countDocuments();
       if (response.length) {
         return res.status(200).send({
@@ -508,7 +506,7 @@ module.exports = {
       const existingUser = await Users.findOne({
         account: account.toLowerCase(),
       });
-      if (existingUser?._doc?.account.toLowerCase() === account.toLowerCase()) {
+      if (existingUser._doc.account.toLowerCase() === account.toLowerCase()) {
         return res.status(400).json({
           status: 400,
           success: false,
@@ -1008,7 +1006,6 @@ module.exports = {
   verifySignatureController: async (req, res) => {
     try {
       const { nonce, signature } = req.body;
-      
 
       // get user by nonce
       let user = await Users.findOne({ nonce: nonce });
@@ -1161,17 +1158,19 @@ module.exports = {
     const body = req.body;
     try {
       const resMoralisData = await getMoralisInfo(body);
-      if(resMoralisData){
-        const newArray = []
+      if (resMoralisData) {
+        const newArray = [];
         for (const iterator of resMoralisData.result) {
-          const myNfts = await Nfts.findOne({owner:body.account, collectionAddress:iterator.token_address,
-            tokenId:  iterator.token_id
-          }).select('id owner tokenId collectionAddress')
-          if(!myNfts){
-            newArray.push(iterator)
+          const myNfts = await Nfts.findOne({
+            owner: body.account,
+            collectionAddress: iterator.token_address,
+            tokenId: iterator.token_id,
+          }).select("id owner tokenId collectionAddress");
+          if (!myNfts) {
+            newArray.push(iterator);
           }
         }
-        resMoralisData.result = newArray
+        resMoralisData.result = newArray;
         if (resMoralisData.result && resMoralisData.result.length) {
           return res.status(200).json({
             data: resMoralisData,
@@ -1185,13 +1184,13 @@ module.exports = {
             success: false,
           });
         }
-        }else{
-          return res.status(404).json({
-            data: "No Data Found",
-            status: 404,
-            success: false,
-          });
-        }      
+      } else {
+        return res.status(404).json({
+          data: "No Data Found",
+          status: 404,
+          success: false,
+        });
+      }
     } catch (error) {
       return res.status(400).json({
         data: null,
@@ -1258,15 +1257,17 @@ module.exports = {
       let query = Nfts.find(JSON.parse(queryString));
       count = await Nfts.countDocuments(query);
       // 2) Sorting
-      if (req?.query?.sort) {
+      if (req.query.sort) {
         const sortBy = req.query.sort.split(",").join(" ");
         query = query.sort(sortBy);
       } else {
         query = query.sort("-createdAt");
       }
-      if (req?.query?.search) {
+      if (req.query.search) {
         //const searchBy = req.query.search.split(",").join(" ");
-        const search = await specialCharacter.specialCharacter(req.query.search);
+        const search = await specialCharacter.specialCharacter(
+          req.query.search
+        );
         const searchBy = new RegExp(".*" + search + ".*", "i");
         query = query.find({
           $or: [{ name: searchBy }, { description: searchBy }],
@@ -1276,12 +1277,12 @@ module.exports = {
         count = await Nfts.countDocuments({
           $or: [{ name: searchBy }, { description: searchBy }],
         });
-      } 
+      }
       query = query.find({
-        creator:userdata.account.toLowerCase(),
+        creator: userdata.account.toLowerCase(),
         isActive: false,
         tokenId: { $ne: "0" },
-        isCustodyByClaimed:false
+        isCustodyByClaimed: false,
       });
       count = await Nfts.countDocuments(query);
       const response = await query
@@ -1319,13 +1320,15 @@ module.exports = {
   updatedNftPutOffSale: async (req, res) => {
     try {
       const { nftId } = req.body;
-      const getNftData = await Nfts.findOne({_id: nftId})
-      let getCollection = await CollectionNFTs.findOne({collectionAddress: getNftData.collectionAddress})
-      getCollection.maxSupply = getCollection.maxSupply - 1
-      await getCollection.save()
+      const getNftData = await Nfts.findOne({ _id: nftId });
+      let getCollection = await CollectionNFTs.findOne({
+        collectionAddress: getNftData.collectionAddress,
+      });
+      getCollection.maxSupply = getCollection.maxSupply - 1;
+      await getCollection.save();
       await Nfts.updateOne(
         { _id: nftId },
-        {$set: { isCustodyByClaimed:true } }
+        { $set: { isCustodyByClaimed: true } }
       );
       return res.status(200).json({
         data: [],
@@ -1346,8 +1349,10 @@ module.exports = {
     try {
       req.body.isMoralisesCollection = true;
       req.body.isMoralisesDataStatus = "pending";
-      const checkCollectionAddress = await CollectionNFTs.findOne({collectionAddress:req.body.collectionAddress})
-      if(checkCollectionAddress){
+      const checkCollectionAddress = await CollectionNFTs.findOne({
+        collectionAddress: req.body.collectionAddress,
+      });
+      if (checkCollectionAddress) {
         return res.status(400).json({
           error: true,
           status: 400,
@@ -1375,19 +1380,21 @@ module.exports = {
   getMyCollectionListController: async (req, res) => {
     const { page, limit } = req.body;
     try {
-      let userdata = req.userData
+      let userdata = req.userData;
       const getNftList = await Nfts.find({
-        creator:userdata.account.toLowerCase(),
+        creator: userdata.account.toLowerCase(),
       });
-      const getCollectionAddress = getNftList.map(nft => nft.collectionAddress);
-      const getUniqueCollectionAddress = [...new Set(getCollectionAddress)]
-      const filter = { collectionAddress : getUniqueCollectionAddress }
+      const getCollectionAddress = getNftList.map(
+        (nft) => nft.collectionAddress
+      );
+      const getUniqueCollectionAddress = [...new Set(getCollectionAddress)];
+      const filter = { collectionAddress: getUniqueCollectionAddress };
       const response = await CollectionNFTs.find(filter);
       const count = await CollectionNFTs.countDocuments(filter);
       let data = customPagination(response, page, limit, count);
       if (response.length) {
         return res.status(200).send({
-          data:data,    
+          data: data,
           message: "Get All My Collections Successfully",
         });
       } else {
@@ -1410,31 +1417,33 @@ module.exports = {
   getCollectionHeaders: async (req, res) => {
     const { collection_address } = req.body;
     try {
-      const filter = {collectionAddress:collection_address, isActive:true}
+      const filter = { collectionAddress: collection_address, isActive: true };
       const nftsCount = await Nfts.count(filter);
-      const nftsOwner = await Nfts.find(filter).select('owner price');
-      const nftLowestPrice = await Nfts.findOne(filter).sort({ "price": 1 }).limit(1)
-      
-      let nftsOwnerIds = []
-      let nftsOwnerCount = 0
-      let totalVolume = 0
+      const nftsOwner = await Nfts.find(filter).select("owner price");
+      const nftLowestPrice = await Nfts.findOne(filter)
+        .sort({ price: 1 })
+        .limit(1);
+
+      let nftsOwnerIds = [];
+      let nftsOwnerCount = 0;
+      let totalVolume = 0;
       for (const iterator of nftsOwner) {
-        if(!nftsOwnerIds.includes(iterator.owner)){
-          nftsOwnerIds.push(iterator.owner)
-          nftsOwnerCount +=1;
+        if (!nftsOwnerIds.includes(iterator.owner)) {
+          nftsOwnerIds.push(iterator.owner);
+          nftsOwnerCount += 1;
         }
-        totalVolume += iterator.price
+        totalVolume += iterator.price;
       }
-      response  = {
+      response = {
         items: nftsCount,
         owners: nftsOwnerCount,
-        floorPrice:nftLowestPrice?nftLowestPrice.price:0,
-        volumeTraded:totalVolume
-      }
+        floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
+        volumeTraded: totalVolume,
+      };
       return res.status(200).send({
-        data:response, 
+        data: response,
         status: 200,
-        success: true,   
+        success: true,
         message: "Collections Headers Successfully",
       });
     } catch (err) {
