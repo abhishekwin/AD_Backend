@@ -5,7 +5,7 @@ const {
   createCollectionValidation,
 } = require("../validations/collection.validation");
 // const manageMessageValidation = require('./validations/collection.validation');
-const {createWhiteListUser} = require('../controllers/index')
+const {createWhiteListUser, verifyMinter} = require('../controllers/index')
 const collectionController = require("../controllers/collection.controller");
 //const secretkey = require('../../middlewares/secretkey');
 
@@ -19,5 +19,9 @@ router
 router
   .route("/create-whiteListedUser")
   .post( createWhiteListUser);
+
+router
+  .route("/verifyMinter")
+  .post(verifyMinter);
 
 module.exports = router;
