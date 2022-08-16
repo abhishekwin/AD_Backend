@@ -12,14 +12,6 @@ const createCollection = catchAsync(async (req, res) => {
   ));
 });
 
-
-const uploadFileToPinata = catchAsync(async (req, res) => {
-  const result = await Collection.createCollectionService(req.body);
-  res.status(200).send(new ResponseObject(200,  "Collection create successfully",
-    result
-  ));
-});
-
 module.exports = {
   createCollection
 };

@@ -7,7 +7,7 @@ const fs = require("fs");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 
-const { IMAGE_URL } = process.env;
+const IMAGE_URL = process.env.PINTA_IMAGE_DOMAIN;
 
 const uploadFileAtLocal = (uploadedFile, uploadPath) => {
   return new Promise((resolve, reject) => {

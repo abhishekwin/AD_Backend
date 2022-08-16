@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Collection } = require('../models');
+const { LaunchPadCollection } = require('../models');
 
 // const CustomPaginationHelper = require('../../../Helpers/CustomPagination');
 
@@ -9,7 +9,7 @@ const { Collection } = require('../models');
  * @returns {Promise<User>}
  */
 const createCollectionService = async (reqBody) => {
-  const createpost = await Collection.create(reqBody);
+  const createpost = await LaunchPadCollection.create(reqBody);
   return createpost;
 };
 

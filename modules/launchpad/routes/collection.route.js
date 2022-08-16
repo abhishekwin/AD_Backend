@@ -23,8 +23,6 @@ router
 
 router.route("/create-whiteListedUser").post(createWhiteListUser);
 
-router.route("/upload-file").post(uploadFile);
-
 router
   .route("/verifyMinter")
   .post(verifyMinter);
