@@ -13,6 +13,7 @@ const { LaunchPadNft, LaunchPadCollection } = require('../models');
 const createNft = catchAsync(async (req, res) => {
   try {
     const { files } = req.files;
+    const { collectionId } = req.body;
     const publicdir = appDir+'/public';
     if (!fs.existsSync(publicdir)) {
       fs.mkdirSync(publicdir, 0744);                  
@@ -21,17 +22,24 @@ const createNft = catchAsync(async (req, res) => {
     if(!fs.existsSync(uploaddir)){
       fs.mkdirSync(uploaddir, 0744);
     }
-    const launchPadCollection = await LaunchPadCollection.create({nftName:"test"})
-    await LaunchPadNft.create({nftName:"test"})
+    const launchPadCollection = await LaunchPadCollection.findOne({_id:collectionId})
+    if(!launchPadCollection){
+      res.status(204).send(new ResponseObject(204,  "Collection not found",
+        []
+      ));
+    }
+    
+    console.log("launchPadCollection", launchPadCollection)
+    // await LaunchPadNft.create()
     // const result = await fileUpload(files, true);
     res.status(200).send(new ResponseObject(200,  "Nft create success",
       []
     ));
-    } catch (error) {
-      res.status(500).send(new ResponseObject(200,  "Somthing went wrong",
-        error
-      ));
-    }
+  } catch (error) {
+    res.status(500).send(new ResponseObject(500,  "Somthing went wrong",
+      error
+    ));
+  }
   
 });
 module.exports = {
