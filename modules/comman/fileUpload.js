@@ -8,6 +8,9 @@ const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 
 const IMAGE_URL = process.env.PINTA_IMAGE_DOMAIN;
+const appRoot = require('app-root-path');
+const path = require('path');
+const {uploadDir} = require("./pinata");
 
 const uploadFileAtLocal = (uploadedFile, uploadPath) => {
   return new Promise((resolve, reject) => {
@@ -20,52 +23,68 @@ const uploadFileAtLocal = (uploadedFile, uploadPath) => {
   });
 };
 
-const uploadFileAtPinata = async (file, localFileUnsync) => {
-  try {
-    const uploadpathurl = `/uploads/${new Date().getTime()}_${file.name}`;
-    const uploadPath = `${appDir}/public${uploadpathurl}`;
-    await uploadFileAtLocal(file, uploadPath);
-    const readableStreamForFile = fs.createReadStream(uploadPath);
-    const result = await pinata.pinFileToIPFS(readableStreamForFile);
-    if (result && localFileUnsync) {
-      fs.unlinkSync(uploadPath);
-    }
-    return `${IMAGE_URL}/${result.IpfsHash}`;
-  } catch (err) {
-    console.error(err);
-    throw new Error("issue on uploading file");
-  }
+const uploadFileToPinata = async (file) => {
+  const readableStreamForFile = fs.createReadStream(file.path);
+  // console.log("readableStreamForFile", readableStreamForFile)
+  return new Promise((resolve, reject) => {
+      pinata.pinFileToIPFS(readableStreamForFile).then((result) => {
+          resolve(result);
+      }).catch((err) => {
+          //handle error here
+          reject(err);
+      });
+  })  
 };
 
-module.exports.fileUpload = async (files, localFileUnsync = false) => {
+const fileUpload = async (files, localFileUnsync = false) => {
   try {
     if (!files) {
       throw new Error("file is required");
     }
     const images = [];
     if (Array.isArray(files) && files.length > 0) {
-      for (file of files) {
-        const uploadedUrl = await uploadFileAtPinata(file, localFileUnsync);
-        images.push({ url: uploadedUrl });
+      for (let file of files) {
+        const uploadedUrl = await uploadFileToPinata(file);
+        if(uploadedUrl){
+          images.push({ url: "https://bleufi.mypinata.cloud/ipfs/"+uploadedUrl.IpfsHash });
+        }
       }
-    } else if (typeof files === "object") {
-      const uploadedUrl = await uploadFileAtPinata(files, localFileUnsync);
-      images.push({ url: uploadedUrl });
     } else {
       throw new Error("File isn't valid");
     }
-    return {
-      data: images,
-      status: 200,
-      success: true,
-      message: "File Uploaded successfully",
-    };
+    return images
   } catch (error) {
-    return {
-      data: null,
-      message: error.message,
-      status: 400,
-      success: false,
-    };
+    console.log("pinata upload error", error)
   }
 };
+
+async function uploadMultiJsonData (filedatas) { 
+  try{
+    let count = 1
+    let randomNum = (Math.random() + 1).toString(36).substring(7);
+    fs.mkdir(path.join('./public/', randomNum), (err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Directory created successfully!');
+    });
+    
+    let folderPath = appRoot.path+`/public/${randomNum}`;
+    for (const data of filedatas) {
+      let fileUploadPath = `./public/${randomNum}/` + count + '.json';
+      fs.writeFile(fileUploadPath, JSON.stringify(data), function (err) {
+      });
+      count++;
+    }    
+    let result = await uploadDir(folderPath)   
+    fs.rmSync(folderPath, { recursive: true, force: true });
+    return result;
+  }catch(error){
+    console.error("error.message", error)
+  }   
+}
+
+module.exports = {
+  fileUpload,
+  uploadMultiJsonData
+}

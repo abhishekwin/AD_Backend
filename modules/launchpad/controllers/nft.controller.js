@@ -4,15 +4,16 @@ const httpStatus = require('http-status');
 const catchAsync = require('../../../utils/catchAsync');
 const ResponseObject = require('../../../utils/ResponseObject');
 const { Collection } = require('../services');
-const { fileUpload } = require("../../comman/fileUpload");
+const { fileUpload, uploadMultiJsonData } = require("../../comman/fileUpload");
 const { dirname } = require('path');
 const appDir = dirname(require.main.filename);
 const fs = require('fs');
 const { LaunchPadNft, LaunchPadCollection } = require('../models');
+const path = require('path');
 
-const createNft = catchAsync(async (req, res) => {
+const createNft = async (req, res) => {
   try {
-    const { files } = req.files;
+    const { files } = req;
     const { collectionId } = req.body;
     const publicdir = appDir+'/public';
     if (!fs.existsSync(publicdir)) {
@@ -28,13 +29,7 @@ const createNft = catchAsync(async (req, res) => {
         []
       ));
     }
-    //const results = await fileUpload(files, true);
-    const results = [{
-      url:"test"
-    },{
-      url:"test1"
-    }]
-
+    const results = await fileUpload(files, true);
     let nftDetails = [];
     let baseArtName = launchPadCollection.baseArtName
     let nftDescription = launchPadCollection.nftDescription
@@ -43,20 +38,19 @@ const createNft = catchAsync(async (req, res) => {
       nftName = baseArtName + " #"+ nftCount
       let nftObj = {
         nftName:nftName,
-        nftImage:image,
+        nftImage:image.url,
         nftDescription:nftDescription.replace("{name}", nftName),
         mintCost:launchPadCollection.mintCost,
         royalties:launchPadCollection.royalties,
         status:"Active"
       }
+      await LaunchPadNft.create({...nftObj});
       nftDetails.push(nftObj)
       nftCount++
     }
-
-    console.log("launchPadCollection", launchPadCollection)
-    // await LaunchPadNft.create()
+    const result = await uploadMultiJsonData(nftDetails);
     res.status(200).send(new ResponseObject(200,  "Nft create success",
-      nftDetails
+      result
     ));
   } catch (error) {
     res.status(500).send(new ResponseObject(500,  "Somthing went wrong",
@@ -64,7 +58,9 @@ const createNft = catchAsync(async (req, res) => {
     ));
   }
   
-});
+};
+
+
 module.exports = {
     createNft
 };
