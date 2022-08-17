@@ -6,7 +6,11 @@ const {
 } = require("../validations/collection.validation");
 // const manageMessageValidation = require('./validations/collection.validation');
 
-const {createWhiteListUser, verifyMinter, uploadFile} = require('../controllers/index')
+const {
+  createWhiteListUser,
+  verifyMinter,
+  uploadFile,
+} = require("../controllers/index");
 
 const collectionController = require("../controllers/collection.controller");
 //const secretkey = require('../../middlewares/secretkey');
@@ -23,8 +27,10 @@ router
 
 router.route("/create-whiteListedUser").post(createWhiteListUser);
 
-router
-  .route("/verifyMinter")
-  .post(verifyMinter);
+router.route("/verifyMinter").post(verifyMinter);
+
+router.route("/update-collection").patch(collectionController.updateCollection);
+router.route("/delete-collection/:id").delete(collectionController.deleteCollection);
+router.route("/get-collection/:id").get(collectionController.getCollection);
 
 module.exports = router;

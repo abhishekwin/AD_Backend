@@ -53,7 +53,12 @@ const collectionSchema = mongoose.Schema(
         type: Number,
         trim: true,
         default: 0,
-    }
+    },
+    pinataHash: {
+      type: String,
+      trim: true,
+      default: null,
+  }
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }

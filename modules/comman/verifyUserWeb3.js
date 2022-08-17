@@ -12,6 +12,7 @@ const Signature = async (message) => {
 };
 
  exports.VerifySign = async(message) =>{
+  
   let signature = await Signature(message);
 
   let web3 = new Web3(process.env.WEB3_VERIFY_SIGNATURE_URL);
@@ -19,7 +20,7 @@ const Signature = async (message) => {
   let verifySign = web3.eth.accounts.recover(message, signature.signature);
 
   console.log(verifySign, "verifySign");
-  
+
   return verifySign
 }
 
