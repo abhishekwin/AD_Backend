@@ -155,7 +155,7 @@ const getImageUrlFromTokenUri = async (tokenURIUrl) => {
 
 
 const uploadImageOnS3 = async () => {
-    console.log("*****S3*****")
+    // console.log("*****S3*****")
     const filter = {$or: [{awsImagesUpdated:false}, {awsImagesUpdated: {$exists:false}}]}
     const nfts = await Nfts.find(filter).limit(1).sort({"createdAt":-1});
     let nftImageDir = appDir+'/public/nft-image-upload'

@@ -28,12 +28,35 @@ const createNft = catchAsync(async (req, res) => {
         []
       ));
     }
-    
+    //const results = await fileUpload(files, true);
+    const results = [{
+      url:"test"
+    },{
+      url:"test1"
+    }]
+
+    let nftDetails = [];
+    let baseArtName = launchPadCollection.baseArtName
+    let nftDescription = launchPadCollection.nftDescription
+    let nftCount = 1
+    for (const image of results) {
+      nftName = baseArtName + " #"+ nftCount
+      let nftObj = {
+        nftName:nftName,
+        nftImage:image,
+        nftDescription:nftDescription.replace("{name}", nftName),
+        mintCost:launchPadCollection.mintCost,
+        royalties:launchPadCollection.royalties,
+        status:"Active"
+      }
+      nftDetails.push(nftObj)
+      nftCount++
+    }
+
     console.log("launchPadCollection", launchPadCollection)
     // await LaunchPadNft.create()
-    // const result = await fileUpload(files, true);
     res.status(200).send(new ResponseObject(200,  "Nft create success",
-      []
+      nftDetails
     ));
   } catch (error) {
     res.status(500).send(new ResponseObject(500,  "Somthing went wrong",

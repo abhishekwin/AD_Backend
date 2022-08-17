@@ -12,6 +12,7 @@ const path = require('path');
 const pinata = pinataSDK(process.env.PINATAAPIKEY, process.env.PINATAAPISECRETAPIKEY);
 const fs = require('fs');
 const {uploadDir} = require("../services/pinata");
+
 const getjson = (file) => {
   const readableStreamForFile = fs.createReadStream(file.path);
   const jsonString = fs.readFileSync("./public/files/"+file.originalname);

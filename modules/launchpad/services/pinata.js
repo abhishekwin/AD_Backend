@@ -13,8 +13,6 @@ async function uploadDir(folderPath) {
     })    
 }
 
-//   uploadDir()
-
 module.exports = {
     uploadDir
 }

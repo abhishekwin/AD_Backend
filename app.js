@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
-const expressUpload = require("express-fileupload");
+// const expressUpload = require("express-fileupload");
 require("dotenv").config({ path: "./.env" });
 require("./config/db.config");
 const cookieParser = require("cookie-parser");
@@ -44,7 +44,7 @@ app.use(cors(), function (req, res, next) {
   next();
 });
 app.use(Sentry.Handlers.requestHandler());
-app.use(expressUpload());
+// app.use(expressUpload());
 
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
