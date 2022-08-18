@@ -168,7 +168,7 @@ const startCronForNftImage = async () => {
     } 
     startCronForNftImage() 
 }
-startCron();
-startCronForNftImage()
+// startCron();
+// startCronForNftImage()
 
 
