@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
-const { LaunchPadCollection } = require('../models');
+const { LaunchPadCollection, LaunchPadNft } = require('../models');
 
 const createCollection = catchAsync(async (req, res) => {
   const result = await Collection.createCollectionService(req.body);
@@ -19,6 +19,21 @@ const updateCollection = async (req, res) => {
     const result = await LaunchPadCollection.findOneAndUpdate({ _id : id }, req.body, {
       new: true,
     });
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "Collection update successfully"));
+  } catch (error) {
+    return res.status(500).send(new ResponseObject(500, error.message));
+  }
+};
+
+const updateCollectionWithNft = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id : id }, req.body, {
+      new: true,
+    });
+    await LaunchPadNft.findOneAndUpdate({ collectionId : id }, {collectionAddress : req.body.collectionAddress});
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
@@ -55,6 +70,7 @@ const getCollection = async (req, res) => {
 module.exports = {
   createCollection,
   updateCollection,
+  updateCollectionWithNft,
   deleteCollection,
   getCollection
 };

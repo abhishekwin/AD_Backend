@@ -45,10 +45,10 @@ const createNft = async (req, res) => {
         status:"Active"
       }
       let otherNftData = {
-        collectionId:launchPadCollection.id,
+        collectionId:launchPadCollection._id,
         nftS3Image:image.s3Images
       }
-      const launchpadnft = await LaunchPadNft.findOne({collectionId:launchPadCollection.id, nftName:nftName});
+      const launchpadnft = await LaunchPadNft.findOne({collectionId:launchPadCollection._id, nftName:nftName});
       if(launchpadnft){
         await LaunchPadNft.findByIdAndUpdate({_id:launchpadnft.id},{...otherNftData, ...nftObj});
       }else{

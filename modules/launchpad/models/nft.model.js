@@ -9,11 +9,21 @@ const nftSchema = mongoose.Schema(
       generated: true,
       trim: true,
     },
-    nftName: {
+    collectionId: {
       type: String,
       trim: true,
       default: null,
     },
+    collectionAddress: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    nftName: {
+      type: String,
+      trim: true,
+      default: null,
+    },    
     nftImage: {
       type: String,
       trim: true,
