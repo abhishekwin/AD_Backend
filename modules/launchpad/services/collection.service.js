@@ -22,7 +22,7 @@ const createCollectionService = async (reqBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
- const getLaunchPadList = async (filter, options, req) => {
+ const getLaunchPadCollectionList = async (filter, options, req) => {
 
   let page = options.page;
   let limit = options.limit;
