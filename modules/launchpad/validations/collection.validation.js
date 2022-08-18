@@ -15,7 +15,14 @@ const createCollectionValidation = {
   }),
 };
 
+const updateCollectionValidation = {
+  body: Joi.object().keys({
+    collectionId: Joi.string().required(),
+    collectionAddress: Joi.string().required()
+  }),
+};
 
 module.exports = {
-  createCollectionValidation
+  createCollectionValidation,
+  updateCollectionValidation
 };

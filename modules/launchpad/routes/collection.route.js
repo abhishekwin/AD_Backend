@@ -3,6 +3,7 @@ const express = require("express");
 const validate = require("../../../middleware/validate");
 const {
   createCollectionValidation,
+  updateCollectionValidation
 } = require("../validations/collection.validation");
 // const manageMessageValidation = require('./validations/collection.validation');
 
@@ -30,8 +31,8 @@ router.route("/create-whiteListedUser").post(createWhiteListUser);
 router.route("/verifyMinter").post(verifyMinter);
 
 router.route("/update-collection").patch(collectionController.updateCollection);
-router.route("/update-collection-with-nft").patch(collectionController.updateCollectionWithNft);
+router.route("/update-collection-with-nft").patch(validate(updateCollectionValidation), collectionController.updateCollectionWithNft);
 router.route("/delete-collection/:id").delete(collectionController.deleteCollection);
-router.route("/get-collection/:id").get(collectionController.getCollection);
+router.route("/get-collection-detail/:id").get(collectionController.getCollection);
 
 module.exports = router;

@@ -15,8 +15,11 @@ const createCollection = catchAsync(async (req, res) => {
 
 const updateCollection = async (req, res) => {
   try {
-    const { id } = req.body;
-    const result = await LaunchPadCollection.findOneAndUpdate({ _id : id }, req.body, {
+    const { collectionId } = req.body;
+    if(!collectionId){
+      return res.status(400).send(new ResponseObject(400, "collectionId is required!"));
+    }
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id : collectionId }, req.body, {
       new: true,
     });
     return res
@@ -29,11 +32,11 @@ const updateCollection = async (req, res) => {
 
 const updateCollectionWithNft = async (req, res) => {
   try {
-    const { id } = req.body;
-    const result = await LaunchPadCollection.findOneAndUpdate({ _id : id }, req.body, {
+    const { collectionId } = req.body;
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id : collectionId }, req.body, {
       new: true,
     });
-    await LaunchPadNft.findOneAndUpdate({ collectionId : id }, {collectionAddress : req.body.collectionAddress});
+    await LaunchPadNft.findOneAndUpdate({ collectionId : collectionId }, {collectionAddress : req.body.collectionAddress});
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
