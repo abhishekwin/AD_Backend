@@ -1,12 +1,19 @@
 const express = require("express");
 const validate = require("../../../middleware/validate");
 const nftController = require("../controllers/nft.controller");
+const fs = require("fs");
+const { dirname } = require("path");
+const appDir = dirname(require.main.filename);
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, "public/files")
+    const uploaddir = appDir+ '/public/nft-files';
+    if(!fs.existsSync(uploaddir)){
+      fs.mkdirSync(uploaddir, 0744);
+    }
+    cb(null, "public/nft-files")
   },
-filename: function (req, file, cb) { cb(null, file.originalname) }
+  filename: function (req, file, cb) { cb(null, file.originalname) }
 })
 const router = express.Router();
 

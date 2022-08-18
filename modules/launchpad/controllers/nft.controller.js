@@ -44,15 +44,25 @@ const createNft = async (req, res) => {
         royalties:launchPadCollection.royalties,
         status:"Active"
       }
-      await LaunchPadNft.create({...nftObj});
+      let otherNftData = {
+        collectionId:launchPadCollection.id,
+        nftS3Image:image.s3Images
+      }
+      const launchpadnft = await LaunchPadNft.findOne({collectionId:launchPadCollection.id, nftName:nftName});
+      if(launchpadnft){
+        await LaunchPadNft.findByIdAndUpdate({_id:launchpadnft.id},{...otherNftData, ...nftObj});
+      }else{
+        await LaunchPadNft.create({...otherNftData, ...nftObj});
+      }
       nftDetails.push(nftObj)
       nftCount++
     }
     const result = await uploadMultiJsonData(nftDetails);
-    res.status(200).send(new ResponseObject(200,  "Nft create success",
+    res.status(200).send(new ResponseObject(200,  "Nft create successfully",
       result
     ));
   } catch (error) {
+    console.log("error", error)
     res.status(500).send(new ResponseObject(500,  "Somthing went wrong",
       error
     ));

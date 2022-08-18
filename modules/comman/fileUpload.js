@@ -11,6 +11,7 @@ const IMAGE_URL = process.env.PINTA_IMAGE_DOMAIN;
 const appRoot = require('app-root-path');
 const path = require('path');
 const {uploadDir} = require("./pinata");
+const { uploadImageOnS3 } = require("./fileUploadOnS3");
 
 const uploadFileAtLocal = (uploadedFile, uploadPath) => {
   return new Promise((resolve, reject) => {
@@ -23,9 +24,7 @@ const uploadFileAtLocal = (uploadedFile, uploadPath) => {
   });
 };
 
-const uploadFileToPinata = async (file) => {
-  const readableStreamForFile = fs.createReadStream(file.path);
-  // console.log("readableStreamForFile", readableStreamForFile)
+const uploadFileToPinata = async (readableStreamForFile) => {
   return new Promise((resolve, reject) => {
       pinata.pinFileToIPFS(readableStreamForFile).then((result) => {
           resolve(result);
@@ -44,9 +43,17 @@ const fileUpload = async (files, localFileUnsync = false) => {
     const images = [];
     if (Array.isArray(files) && files.length > 0) {
       for (let file of files) {
-        const uploadedUrl = await uploadFileToPinata(file);
+        const readableStreamForFile = fs.createReadStream(file.path);
+        const uploadedUrl = await uploadFileToPinata(readableStreamForFile);
+        
+        const uploadedS3 = await uploadImageOnS3(file.path);
         if(uploadedUrl){
-          images.push({ url: "https://bleufi.mypinata.cloud/ipfs/"+uploadedUrl.IpfsHash });
+          images.push(
+            { 
+              url: "https://bleufi.mypinata.cloud/ipfs/"+uploadedUrl.IpfsHash,
+              s3Images: uploadedS3 
+            }
+          );
         }
       }
     } else {

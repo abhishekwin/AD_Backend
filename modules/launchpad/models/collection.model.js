@@ -9,6 +9,11 @@ const collectionSchema = mongoose.Schema(
       generated: true,
       trim: true,
     },
+    collectionAddress: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     contractName: {
       type: String,
       trim: true,

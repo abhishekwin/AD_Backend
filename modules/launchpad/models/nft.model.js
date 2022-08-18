@@ -19,6 +19,11 @@ const nftSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    nftS3Image: {
+      type: Object,
+      trim: true,
+      default: null,
+    },
     nftDescription: {
       type: String,
       trim: true,
