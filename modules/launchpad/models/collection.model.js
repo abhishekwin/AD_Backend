@@ -47,7 +47,7 @@ const collectionSchema = mongoose.Schema(
     nftDescription: {
       type: String,
       trim: true,
-      default: null,
+      default: null,x
     },
     mintCost: {
       type: Number,
