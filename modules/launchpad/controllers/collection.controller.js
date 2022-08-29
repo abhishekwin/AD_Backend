@@ -63,7 +63,7 @@ const getCollection = async (req, res) => {
     const result = await LaunchPadCollection.findById({ _id : id });
     return res
       .status(200)
-      .send(new ResponseObject(200, "Collection find successfully",result));
+      .send(new ResponseObject(200, "Collection found successfully",result));
   } catch (error) {
     return res.status(500).send(new ResponseObject(500, error.message));
   }

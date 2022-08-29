@@ -63,7 +63,7 @@ const createNft = async (req, res) => {
     ));
   } catch (error) {
     console.log("error", error)
-    res.status(500).send(new ResponseObject(500,  "Somthing went wrong",
+    res.status(500).send(new ResponseObject(500,  "Something went wrong",
       error
     ));
   }
