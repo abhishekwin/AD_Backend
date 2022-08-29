@@ -19,7 +19,7 @@ const createNft = async (req, res) => {
     if (!fs.existsSync(publicdir)) {
       fs.mkdirSync(publicdir, 0744);                  
     }
-    const uploaddir = appDir+ '/public/uploads';
+    const uploaddir = appDir+ '/public/nft-files';
     if(!fs.existsSync(uploaddir)){
       fs.mkdirSync(uploaddir, 0744);
     }
@@ -50,7 +50,7 @@ const createNft = async (req, res) => {
       }
       const launchpadnft = await LaunchPadNft.findOne({collectionId:launchPadCollection._id, nftName:nftName});
       if(launchpadnft){
-        await LaunchPadNft.findByIdAndUpdate({_id:launchpadnft.id},{...otherNftData, ...nftObj});
+        await LaunchPadNft.findByIdAndUpdate({_id:launchpadnft._id},{...otherNftData, ...nftObj});
       }else{
         await LaunchPadNft.create({...otherNftData, ...nftObj});
       }
@@ -58,6 +58,7 @@ const createNft = async (req, res) => {
       nftCount++
     }
     const result = await uploadMultiJsonData(nftDetails);
+    fs.rmSync(uploaddir, { recursive: true, force: true });
     res.status(200).send(new ResponseObject(200,  "Nft create successfully",
       result
     ));

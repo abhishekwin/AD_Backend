@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-// const pick = require('../../../utils/pick');
+const pick = require('../../comman/pick');
 // const ApiError = require('../../../utils/ApiError');
 const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
@@ -69,11 +69,36 @@ const getCollection = async (req, res) => {
   }
 };
 
+const getCollectionList = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+  filtercolumn.push('status');
+  if (req.body.company_id) {
+    filtercolumn.push('company_id');
+  }
+
+  // if (req.body.post) {
+  //   let search = await specialCharacter.specialCharacter(req.body.post);
+  //   req.body.post = new RegExp('.*' + search + '.*', "i");
+  //   filtercolumn.push('post');
+  // }
+
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ['sortBy', 'limit', 'page']);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(filter, options, req);
+
+  res.status(200).send(new ResponseObject(200, "Collections display successfully",
+    result
+  ));
+});
+
 
 module.exports = {
   createCollection,
   updateCollection,
   updateCollectionWithNft,
   deleteCollection,
-  getCollection
+  getCollection,
+  getCollectionList
 };
