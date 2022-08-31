@@ -15,17 +15,17 @@ const createNft = async (req, res) => {
   try {
     const { files } = req;
     const { collectionId } = req.body;
-    const publicdir = appDir+'/public';
+    const publicdir = appDir + '/public';
     if (!fs.existsSync(publicdir)) {
-      fs.mkdirSync(publicdir, 0744);                  
+      fs.mkdirSync(publicdir, 0744);
     }
-    const uploaddir = appDir+ '/public/nft-files';
-    if(!fs.existsSync(uploaddir)){
+    const uploaddir = appDir + '/public/nft-files';
+    if (!fs.existsSync(uploaddir)) {
       fs.mkdirSync(uploaddir, 0744);
     }
-    const launchPadCollection = await LaunchPadCollection.findOne({_id:collectionId})
-    if(!launchPadCollection){
-      res.status(204).send(new ResponseObject(204,  "Collection not found",
+    const launchPadCollection = await LaunchPadCollection.findOne({ _id: collectionId })
+    if (!launchPadCollection) {
+      return res.status(400).send(new ResponseObject(400, "Collection not found",
         []
       ));
     }
@@ -35,43 +35,47 @@ const createNft = async (req, res) => {
     let nftDescription = launchPadCollection.nftDescription
     let nftCount = 1
     for (const image of results) {
-      nftName = baseArtName + " #"+ nftCount
+      nftName = baseArtName + " #" + nftCount
       let nftObj = {
-        nftName:nftName,
-        nftImage:image.url,
-        nftDescription:nftDescription.replace("{name}", nftName),
-        mintCost:launchPadCollection.mintCost,
-        royalties:launchPadCollection.royalties,
-        status:"Active"
+        nftName: nftName,
+        nftImage: image.url,
+        nftDescription: nftDescription.replace("{name}", nftName),
+        mintCost: launchPadCollection.mintCost,
+        royalties: launchPadCollection.royalties,
+        status: "Active"
       }
       let otherNftData = {
-        collectionId:launchPadCollection._id,
-        nftS3Image:image.s3Images
+        collectionId: launchPadCollection._id,
+        nftS3Image: image.s3Images
       }
-      const launchpadnft = await LaunchPadNft.findOne({collectionId:launchPadCollection._id, nftName:nftName});
-      if(launchpadnft){
-        await LaunchPadNft.findByIdAndUpdate({_id:launchpadnft._id},{...otherNftData, ...nftObj});
-      }else{
-        await LaunchPadNft.create({...otherNftData, ...nftObj});
+      const launchpadnft = await LaunchPadNft.findOne({ collectionId: launchPadCollection._id, nftName: nftName });
+      if (launchpadnft) {
+        await LaunchPadNft.findByIdAndUpdate({ _id: launchpadnft._id }, { ...otherNftData, ...nftObj });
+      } else {
+        await LaunchPadNft.create({ ...otherNftData, ...nftObj });
       }
       nftDetails.push(nftObj)
       nftCount++
     }
     const result = await uploadMultiJsonData(nftDetails);
     fs.rmSync(uploaddir, { recursive: true, force: true });
-    res.status(200).send(new ResponseObject(200,  "Nft create successfully",
+    if(result && result.IpfsHash){
+      await LaunchPadCollection.findOneAndUpdate({ _id: collectionId }, {tokenURI:"https://bleufi.mypinata.cloud/ipfs/"+result.IpfsHash}, {
+        new: true,
+      });
+    }
+    res.status(200).send(new ResponseObject(200, "Nft create successfully",
       result
     ));
   } catch (error) {
-    console.log("error", error)
-    res.status(500).send(new ResponseObject(500,  "Something went wrong",
+    res.status(500).send(new ResponseObject(500, "Something went wrong",
       error
     ));
   }
-  
+
 };
 
 
 module.exports = {
-    createNft
+  createNft
 };

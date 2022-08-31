@@ -59,7 +59,7 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: 0,
     },
-    pinataHash: {
+    tokenURI: {
       type: String,
       trim: true,
       default: null,
@@ -80,6 +80,13 @@ const collectionSchema = mongoose.Schema(
   }
 );
 
+collectionSchema.pre('save', async function (next) {
+  const collection = this;
+  if (collection.isModified('tokenURI')) {
+    collection.tokenURI =  "https://bleufi.mypinata.cloud/ipfs/"+collection.tokenURI;
+  }
+  next();
+});
 // add plugin that converts mongoose to json
 collectionSchema.set("toJSON", { getters: true, virtuals: true });
 collectionSchema.plugin(toJSON);
