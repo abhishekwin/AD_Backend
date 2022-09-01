@@ -67,12 +67,41 @@ const collectionSchema = mongoose.Schema(
     imageCover: {
       type: String,
       trim: true,
-      default:null
+      default: null,
     },
     bannerImages: {
       type: String,
       trim: true,
-      default:null
+      default: null,
+    },
+    approve: {
+      type: Boolean,
+      default: false,
+    },
+    maxSupply: {
+      type: Number,
+      default: 0,
+    },
+    whitelistedFee: {
+      type: Number,
+      default: 0,
+    },
+    maximumQuantity: {
+      type: Number,
+      default: 0,
+    },
+    startDate: {
+      type: Date,
+      default: null,
+    },
+    endDate: {
+      type: Date,
+      default: null,
+    },
+    contactUri: {
+      type: String,
+      trim: true,
+      default: null,
     },
   },
   {
@@ -80,10 +109,11 @@ const collectionSchema = mongoose.Schema(
   }
 );
 
-collectionSchema.pre('save', async function (next) {
+collectionSchema.pre("save", async function (next) {
   const collection = this;
-  if (collection.isModified('tokenURI')) {
-    collection.tokenURI =  "https://bleufi.mypinata.cloud/ipfs/"+collection.tokenURI;
+  if (collection.isModified("tokenURI")) {
+    collection.tokenURI =
+      "https://bleufi.mypinata.cloud/ipfs/" + collection.tokenURI;
   }
   next();
 });
@@ -91,7 +121,6 @@ collectionSchema.pre('save', async function (next) {
 collectionSchema.set("toJSON", { getters: true, virtuals: true });
 collectionSchema.plugin(toJSON);
 collectionSchema.plugin(paginate);
-
 
 /**
  * @typedef Collection
