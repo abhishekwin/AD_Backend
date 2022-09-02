@@ -58,7 +58,7 @@ const createNft = async (req, res) => {
     const result = await uploadMultiJsonData(nftDetails);
     fs.rmSync(uploaddir, { recursive: true, force: true });
     if(result && result.IpfsHash){
-      await LaunchPadCollection.findOneAndUpdate({ _id: collectionId }, {tokenURI:"https://bleufi.mypinata.cloud/ipfs/"+result.IpfsHash}, {
+      await LaunchPadCollection.findOneAndUpdate({ _id: collectionId }, {tokenURI:"https://bleufi.mypinata.cloud/ipfs/"+result.IpfsHash,maxSupply:nftCount-1}, {
         new: true,
       });
     }
