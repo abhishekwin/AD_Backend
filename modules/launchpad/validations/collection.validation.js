@@ -12,6 +12,8 @@ const createCollectionValidation = {
     nftDescription: Joi.string().required(),
     mintCost: Joi.number().strict().required(),
     royalties: Joi.number().strict().required(),
+    imageCover: Joi.string().required(),
+    bannerImages: Joi.string().required(),
   }),
 };
 
