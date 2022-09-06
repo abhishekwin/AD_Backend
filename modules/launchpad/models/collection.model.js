@@ -107,6 +107,11 @@ const collectionSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status:{
+      type: String,
+      enum:[null,"in-progress","completed"],
+      default:null
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

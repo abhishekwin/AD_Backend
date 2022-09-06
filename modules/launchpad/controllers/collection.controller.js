@@ -86,10 +86,9 @@ const getCollection = async (req, res) => {
 
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+  req.body.status = "completed"
   filtercolumn.push("status");
-  if (req.body.company_id) {
-    filtercolumn.push("company_id");
-  }
+ 
 
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);
