@@ -89,13 +89,14 @@ const getCollectionList = catchAsync(async (req, res) => {
   req.body.status = "completed"
   filtercolumn.push("status");
  
-
+  if(req.body.approved || req.body.approved === false){
+    filtercolumn.push("approved")
+   }
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);
   //   req.body.post = new RegExp('.*' + search + '.*', "i");
   //   filtercolumn.push('post');
   // }
-
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 

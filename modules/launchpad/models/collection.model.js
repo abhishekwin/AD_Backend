@@ -74,7 +74,7 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
-    approve: {
+    approved: {
       type: Boolean,
       default: false,
     },
