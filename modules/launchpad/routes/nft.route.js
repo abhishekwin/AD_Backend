@@ -25,4 +25,5 @@ const router = express.Router();
 //   );
 const upload = multer({ storage })
 router.post("/create-nft-with-upload-images", upload.array("files"), nftController.createNft);
+router.post("/get-nft-list", nftController.getNftList);
 module.exports = router;
