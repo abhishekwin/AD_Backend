@@ -114,7 +114,7 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const approvedCollection = async (req, res) => {
   try {
-    const { collectionAddress } = req.body;
+    const { collectionId } = req.body;
     const bearerHeaders = req.headers["authorization"];
       if (typeof bearerHeaders !== "undefined") {
         const bearer = bearerHeaders.split(" ");
@@ -132,7 +132,7 @@ const approvedCollection = async (req, res) => {
         });
       } 
     const result = await LaunchPadCollection.findOneAndUpdate(
-      { collectionAddress },
+      { _id: collectionId },
       { approved: true },
       { new: true }
     );
