@@ -133,7 +133,7 @@ const approvedCollection = async (req, res) => {
       } 
     const result = await LaunchPadCollection.findOneAndUpdate(
       { collectionAddress },
-      { approve: true },
+      { approved: true },
       { new: true }
     );
     res
