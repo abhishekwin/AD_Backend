@@ -91,8 +91,14 @@ const createNft = async (req, res) => {
 
 const getNftList = async (req, res) => {
   try {
-    var filtercolumn = [];
-    filtercolumn.push("status");
+    const { collectionId } = req.body;
+    let filtercolumn = [];
+    if (req.body.isSale || req.body.isSale === false) {
+      filtercolumn.push("isSale");
+    }
+    if (collectionId) {
+      filtercolumn.push("collectionId");
+    }
     const filter = pick(req.body, filtercolumn);
     const options = pick(req.body, ["sortBy", "limit", "page"]);
     const result = await Nft.getLaunchPadNftList(filter, options, req);
