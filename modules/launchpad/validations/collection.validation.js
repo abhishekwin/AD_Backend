@@ -15,7 +15,9 @@ const createCollectionValidation = {
     bannerImages: Joi.string().required(),
     isWhiteListedUser: Joi.boolean().strict().required(),
     WhiteListedUser: Joi.array().required(),
-    currency: Joi.string()
+    currency: Joi.string(),
+    startDate: Joi.date(),
+    endDate: Joi.date()
   }),
 };
 
