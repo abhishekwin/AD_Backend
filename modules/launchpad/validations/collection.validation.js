@@ -1,5 +1,5 @@
-const Joi = require('joi');
-const { objectId } = require('./custom.validation');
+const Joi = require("joi");
+const { objectId } = require("./custom.validation");
 
 const createCollectionValidation = {
   body: Joi.object().keys({
@@ -14,21 +14,38 @@ const createCollectionValidation = {
     imageCover: Joi.string().required(),
     bannerImages: Joi.string().required(),
     isWhiteListedUser: Joi.boolean().strict().required(),
-    WhiteListedUser: Joi.array().required(),
-    currency: Joi.string(),
-    startDate: Joi.date(),
-    endDate: Joi.date()
+    currency: Joi.when("isWhiteListedUser", {
+      is: true,
+      then: Joi.string().required(),
+    }),
+    // WhiteListedUser: Joi.array().required(),
+    whitelistedFee: Joi.when("isWhiteListedUser", {
+      is: true,
+      then: Joi.number().required(),
+    }),
+    WhiteListedUser: Joi.when("isWhiteListedUser", {
+      is: true,
+      then: Joi.array().required(),
+    }),
+    startDate: Joi.when("isWhiteListedUser", {
+      is: true,
+      then: Joi.date().required(),
+    }),
+    endDate: Joi.when("isWhiteListedUser", {
+      is: true,
+      then: Joi.date().required(),
+    }),
   }),
 };
 
 const updateCollectionValidation = {
   body: Joi.object().keys({
     collectionId: Joi.string().required(),
-    collectionAddress: Joi.string().required()
+    collectionAddress: Joi.string().required(),
   }),
 };
 
 module.exports = {
   createCollectionValidation,
-  updateCollectionValidation
+  updateCollectionValidation,
 };

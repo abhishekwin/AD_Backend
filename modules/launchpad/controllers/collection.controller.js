@@ -14,6 +14,7 @@ const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 
 const createCollection = catchAsync(async (req, res) => {
+  
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
   let WhiteListUser = [];
