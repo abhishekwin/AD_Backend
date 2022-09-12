@@ -5,11 +5,22 @@ const jwt_decode = require("jwt-decode");
 const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
-const { LaunchPadCollection, LaunchPadNft } = require("../models");
-const { Users } = require('../../../models')
+const {
+  LaunchPadCollection,
+  LaunchPadNft,
+  WhiteListedUser,
+} = require("../models");
+const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
+
 const createCollection = catchAsync(async (req, res) => {
   const result = await Collection.createCollectionService(req.body);
+  const collectionId = result._id;
+  let WhiteListUser = [];
+  for (userAddress of req.body.WhiteListedUser) {
+    WhiteListUser.push({ collectionId, userAddress });
+  }
+  await WhiteListedUser.insertMany(WhiteListUser);
   res
     .status(200)
     .send(new ResponseObject(200, "Collection create successfully", result));
@@ -86,12 +97,12 @@ const getCollection = async (req, res) => {
 
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
-  req.body.status = "completed"
+  req.body.status = "completed";
   filtercolumn.push("status");
- 
-  if(req.body.approved || req.body.approved === false){
-    filtercolumn.push("approved")
-   }
+
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);
   //   req.body.post = new RegExp('.*' + search + '.*', "i");
@@ -116,21 +127,21 @@ const approvedCollection = async (req, res) => {
   try {
     const { collectionId } = req.body;
     const bearerHeaders = req.headers["authorization"];
-      if (typeof bearerHeaders !== "undefined") {
-        const bearer = bearerHeaders.split(" ");
-        const bearerToken = bearer[1];
-        userdata = jwt_decode(bearerToken);
-        userdata = await Users.findOne({ _id: userdata._id });
-      }
-      const isAdmin = await getAdminAddress(userdata.account);
-      if (!isAdmin) {
-        return res.status(400).json({
-          error: true,
-          status: 400,
-          success: false,
-          message: "You don't have permission",
-        });
-      } 
+    if (typeof bearerHeaders !== "undefined") {
+      const bearer = bearerHeaders.split(" ");
+      const bearerToken = bearer[1];
+      userdata = jwt_decode(bearerToken);
+      userdata = await Users.findOne({ _id: userdata._id });
+    }
+    const isAdmin = await getAdminAddress(userdata.account);
+    if (!isAdmin) {
+      return res.status(400).json({
+        error: true,
+        status: 400,
+        success: false,
+        message: "You don't have permission",
+      });
+    }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
       { approved: true },

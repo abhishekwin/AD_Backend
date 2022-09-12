@@ -103,15 +103,24 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    currency: {
+      type: String,
+      enum: ["ether", "bnb", "solana", "marsh"],
+      default: "ether",
+    },
+    isWhiteListedUser: {
+      type: Boolean,
+      default: false,
+    },
     isSale: {
       type: Boolean,
       default: false,
     },
-    status:{
+    status: {
       type: String,
-      enum:[null,"in-progress","completed"],
-      default:null
-    }
+      enum: [null, "in-progress", "completed"],
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
