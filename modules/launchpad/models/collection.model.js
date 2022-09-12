@@ -34,11 +34,11 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
-    addWhitelist: {
-      type: Boolean,
-      trim: true,
-      default: null,
-    },
+    // addWhitelist: {
+    //   type: Boolean,
+    //   trim: true,
+    //   default: null,
+    // },
     baseArtName: {
       type: String,
       trim: true,
