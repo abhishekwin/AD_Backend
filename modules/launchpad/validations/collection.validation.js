@@ -18,15 +18,15 @@ const createCollectionValidation = {
       is: true,
       then: Joi.string().required(),
     }),
-    // WhiteListedUser: Joi.array().required(),
+    WhiteListedUser: Joi.array().required(),
     whitelistedFee: Joi.when("isWhiteListedUser", {
       is: true,
       then: Joi.number().required(),
     }),
-    WhiteListedUser: Joi.when("isWhiteListedUser", {
-      is: true,
-      then: Joi.array().required(),
-    }),
+    // WhiteListedUser: Joi.when("isWhiteListedUser", {
+    //   is: true,
+    //   then: Joi.array().required(),
+    // }),
     startDate: Joi.when("isWhiteListedUser", {
       is: true,
       then: Joi.date().required(),
