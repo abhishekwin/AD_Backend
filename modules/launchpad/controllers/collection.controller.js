@@ -29,11 +29,14 @@ const createCollection = catchAsync(async (req, res) => {
 
 const updateCollection = async (req, res) => {
   try {
-    const { collectionId } = req.body;
+    const { collectionId, collectionAddress } = req.body;
     if (!collectionId) {
       return res
         .status(400)
         .send(new ResponseObject(400, "collectionId is required!"));
+    }
+    if(collectionAddress){
+      await LaunchPadNft.updateMany({collectionId}, {collectionAddress})
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
@@ -158,6 +161,48 @@ const approvedCollection = async (req, res) => {
   }
 };
 
+const stashCollectionHeader = async (req, res) => {
+  const { collectionAddress } = req.body;
+  try {
+    const filter = { collectionAddress, isActive: true };
+    const nftsCount = await LaunchPadNft.count(filter);
+    const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
+    const nftLowestPrice = await LaunchPadNft.findOne(filter)
+      .sort({ price: 1 })
+      .limit(1);
+
+    let nftsOwnerIds = [];
+    let nftsOwnerCount = 0;
+    let totalVolume = 0;
+    for (const iterator of nftsOwner) {
+      if (!nftsOwnerIds.includes(iterator.owner)) {
+        nftsOwnerIds.push(iterator.owner);
+        nftsOwnerCount += 1;
+      }
+      totalVolume += iterator.price;
+    }
+    response = {
+      items: nftsCount,
+      owners: nftsOwnerCount,
+      floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
+      volumeTraded: totalVolume,
+    };
+    return res.status(200).send({
+      data: response,
+      status: 200,
+      success: true,
+      message: "Collections Headers Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch Collection",
+    });
+  }
+};
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -166,4 +211,5 @@ module.exports = {
   getCollection,
   getCollectionList,
   approvedCollection,
+  stashCollectionHeader,
 };

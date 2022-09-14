@@ -51,4 +51,8 @@ router
   .route("/approved-collection")
   .patch(checkAdminToken, collectionController.approvedCollection);
 
+router
+  .route("/getStashCollectionsHeader")
+  .post(collectionController.stashCollectionHeader);  
+  
 module.exports = router;
