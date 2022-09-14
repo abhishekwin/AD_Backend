@@ -39,20 +39,20 @@ const createNft = async (req, res) => {
     for (const image of results) {
       nftName = baseArtName + " #" + nftCount;
       let nftObj = {
-        nftName: nftName,
-        nftImage: image.url,
-        nftDescription: nftDescription.replace("{name}", nftName),
+        name: nftName,
+        image: image.url,
+        description: nftDescription.replace("{name}", nftName),
         mintCost: launchPadCollection.mintCost,
         royalties: launchPadCollection.royalties,
         status: "Active",
       };
       let otherNftData = {
         collectionId: launchPadCollection._id,
-        nftS3Image: image.s3Images,
+        awsImage: image.s3Images,
       };
       const launchpadnft = await LaunchPadNft.findOne({
         collectionId: launchPadCollection._id,
-        nftName: nftName,
+        name: nftName,
       });
       if (launchpadnft) {
         await LaunchPadNft.findByIdAndUpdate(
@@ -111,8 +111,30 @@ const getNftList = async (req, res) => {
       .send(new ResponseObject(500, "Something went wrong", error));
   }
 };
+const nftDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getNftDetail = await LaunchPadNft.findOne({ _id: id });
+    if(!getNftDetail){
+      return res
+      .status(400)
+      .send(new ResponseObject(400, "nft is not found"));
+    }
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "get nft successfully", getNftDetail));
+  } catch (error) {
+    res
+      .status(500)
+      .send(new ResponseObject(500, "Something went wrong", error));
+  }
+};
+
+
+
 
 module.exports = {
   createNft,
   getNftList,
+  nftDetail,
 };

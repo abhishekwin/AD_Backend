@@ -49,6 +49,16 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    creator: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    owner: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     mintCost: {
       type: Number,
       trim: true,
