@@ -91,13 +91,16 @@ const createNft = async (req, res) => {
 
 const getNftList = async (req, res) => {
   try {
-    const { collectionId } = req.body;
+    const { collectionId, owner } = req.body;
     let filtercolumn = [];
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
     }
     if (collectionId) {
       filtercolumn.push("collectionId");
+    }
+    if (owner) {
+      filtercolumn.push("owner");
     }
     const filter = pick(req.body, filtercolumn);
     const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -115,10 +118,8 @@ const nftDetail = async (req, res) => {
   try {
     const { id } = req.params;
     const getNftDetail = await LaunchPadNft.findOne({ _id: id });
-    if(!getNftDetail){
-      return res
-      .status(400)
-      .send(new ResponseObject(400, "nft is not found"));
+    if (!getNftDetail) {
+      return res.status(400).send(new ResponseObject(400, "nft is not found"));
     }
     return res
       .status(200)
@@ -129,9 +130,6 @@ const nftDetail = async (req, res) => {
       .send(new ResponseObject(500, "Something went wrong", error));
   }
 };
-
-
-
 
 module.exports = {
   createNft,
