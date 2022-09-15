@@ -103,9 +103,11 @@ const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
   req.body.status = "completed";
   filtercolumn.push("status");
-
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
+  }
+  if (req.body.owner) {
+    filtercolumn.push("owner");
   }
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);

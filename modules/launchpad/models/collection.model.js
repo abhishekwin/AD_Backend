@@ -115,8 +115,8 @@ const collectionSchema = mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ["ether", "bnb", "solana", "marsh"],
-      default: "ether",
+      enum: ["ETH", "BNB"],
+      default: "ETH",
     },
     isWhiteListedUser: {
       type: Boolean,
