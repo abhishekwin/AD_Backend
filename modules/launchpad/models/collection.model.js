@@ -131,6 +131,10 @@ const collectionSchema = mongoose.Schema(
       enum: [null, "in-progress", "completed"],
       default: null,
     },
+    nonce:{
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

@@ -14,7 +14,6 @@ const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 
 const createCollection = catchAsync(async (req, res) => {
-  
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
   let WhiteListUser = [];
@@ -29,14 +28,17 @@ const createCollection = catchAsync(async (req, res) => {
 
 const updateCollection = async (req, res) => {
   try {
-    const { collectionId, collectionAddress } = req.body;
+    const { collectionId, collectionAddress, owner, creator } = req.body;
     if (!collectionId) {
       return res
         .status(400)
         .send(new ResponseObject(400, "collectionId is required!"));
     }
-    if(collectionAddress){
-      await LaunchPadNft.updateMany({collectionId}, {collectionAddress})
+    if (collectionAddress) {
+      await LaunchPadNft.updateMany(
+        { collectionId },
+        { collectionAddress, owner, creator }
+      );
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
@@ -189,6 +191,26 @@ const stashCollectionHeader = async (req, res) => {
       floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
       volumeTraded: totalVolume,
     };
+    return res.status(200).send({
+      data: response,
+      status: 200,
+      success: true,
+      message: "Collections Headers Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch Collection",
+    });
+  }
+};
+
+const verifyCollection = async (req, res) => {
+  try {
+    const { collectionAddress, userAddress, nonce } = req.body;
+   
     return res.status(200).send({
       data: response,
       status: 200,

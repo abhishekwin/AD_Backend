@@ -11,7 +11,7 @@ const { checkAdminToken } = require("../../middleware/auth");
 const {
   createWhiteListUser,
   updateWhiteListUser,
-  verifyMinter,
+  createSignature,
   uploadFile,
 } = require("../controllers/index");
 
@@ -30,7 +30,7 @@ router
 
 router.route("/create-whiteListedUser").post(createWhiteListUser);
 router.route("/update-whiteListedUser").post(updateWhiteListUser);
-router.route("/verifyMinter").post(verifyMinter);
+router.route("/create-signature").post(createSignature);
 router.route("/update-collection").patch(collectionController.updateCollection);
 router
   .route("/update-collection-with-nft")

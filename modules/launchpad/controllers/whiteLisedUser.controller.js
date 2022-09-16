@@ -1,4 +1,4 @@
-const { WhiteListedUser } = require("../models/index");
+const { WhiteListedUser, LaunchPadCollection } = require("../models/index");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
 
@@ -44,7 +44,7 @@ exports.updateWhiteListUser = async (req, res) => {
   }
 };
 
-exports.verifyMinter = async (req, res) => {
+exports.createSignature = async (req, res) => {
   try {
     const { nonce, userAddress, collectionId } = req.body;
 
@@ -62,10 +62,21 @@ exports.verifyMinter = async (req, res) => {
       isWhiteListed,
     };
     const generateSignature = await VerifySign(message);
+    if (generateSignature) {
+       await LaunchPadCollection.findOneAndUpdate(
+        { _id: collectionId },
+        { nonce },
+        { new: true }
+      );
+    }
     return res
       .status(201)
       .send(
-        new ResponseObject(201, "verify minter successfully", generateSignature)
+        new ResponseObject(
+          201,
+          "Signature generate successfully",
+          generateSignature
+        )
       );
   } catch (error) {
     return res.status(500).json({

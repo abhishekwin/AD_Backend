@@ -34,7 +34,7 @@ const { CronManagerModel } = require("../models");
 
 const Sentry = require('@sentry/node');
 const SentryTracing = require('@sentry/tracing');
-
+const {launchpadTransferEvent} = require('./launchpad/transferEvent')
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
 function sleep(ms) {
@@ -166,8 +166,28 @@ const startCronForNftImage = async () => {
     catch (e) {
         console.log("&& upload image error", e)
     } 
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEvent();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }  
     startCronForNftImage() 
 }
+
+const launchpadTransferEventCron = async () => {
+    
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEvent();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }  
+    launchpadTransferEventCron() 
+}
+launchpadTransferEventCron();
 // startCron();
 // startCronForNftImage()
 
