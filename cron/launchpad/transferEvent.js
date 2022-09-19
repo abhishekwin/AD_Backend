@@ -68,7 +68,6 @@ const launchpadTransferEvent = async () => {
 
   try {
     let transferdata = await transferFunctionQuery(from);
-    // console.log("teransfer", transferdata);
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
       await manageData(transferdata);

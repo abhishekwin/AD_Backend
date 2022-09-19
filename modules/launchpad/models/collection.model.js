@@ -149,6 +149,20 @@ collectionSchema.pre("save", async function (next) {
   }
   next();
 });
+
+collectionSchema.virtual('isWhiteListed', {
+  ref: 'WhiteListedUser',
+  localField: '_id',
+  foreignField: 'collectionId',
+  count: true
+});
+collectionSchema.virtual('whiteListedUsers', {
+  ref: 'WhiteListedUser',
+  localField: '_id',
+  foreignField: 'collectionId',
+  justOne: false
+});
+
 // add plugin that converts mongoose to json
 collectionSchema.set("toJSON", { getters: true, virtuals: true });
 collectionSchema.plugin(toJSON);

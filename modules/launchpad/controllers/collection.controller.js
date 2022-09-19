@@ -92,7 +92,19 @@ const deleteCollection = async (req, res) => {
 const getCollection = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await LaunchPadCollection.findById({ _id: id });
+    const { userAddress } = req.query;
+    const result = await LaunchPadCollection.findOne({ _id: id }).populate(
+      [
+        {
+          path: "isWhiteListed",
+          match:{userAddress}
+        },
+        {
+          path: "whiteListedUsers"
+        }
+        
+      ]
+    )
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", result));

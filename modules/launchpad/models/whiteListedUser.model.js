@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const whiteListedUserSchema = mongoose.Schema(
   {
     collectionId: {
-      type: String,
+      type: mongoose.Schema.Types.String,
       require: true,
     },
     userAddress: {
