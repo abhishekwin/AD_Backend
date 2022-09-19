@@ -36,6 +36,8 @@ const createCollectionValidation = {
       is: true,
       then: Joi.date().required(),
     }),
+    networkId: Joi.number().optional(),
+    networkName: Joi.string().optional(),
   }),
 };
 

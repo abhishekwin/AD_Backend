@@ -126,6 +126,9 @@ const getCollectionList = catchAsync(async (req, res) => {
   if (req.body.owner) {
     filtercolumn.push("owner");
   }
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId","networkName");
+  }
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);
   //   req.body.post = new RegExp('.*' + search + '.*', "i");
