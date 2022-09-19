@@ -115,7 +115,7 @@ const collectionSchema = mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ["ETH", "BNB"],
+      enum: ["ETH", "BNB", "AD", "SAFEMOON"],
       default: "ETH",
     },
     isWhiteListedUser: {
@@ -134,7 +134,12 @@ const collectionSchema = mongoose.Schema(
     nonce:{
       type: Number,
       default: 0
-    }
+    },
+    currencyStatus: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
