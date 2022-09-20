@@ -34,7 +34,8 @@ const { CronManagerModel } = require("../models");
 
 const Sentry = require('@sentry/node');
 const SentryTracing = require('@sentry/tracing');
-const {launchpadTransferEvent} = require('./launchpad/transferEvent')
+const {launchpadTransferEventBsc} = require('./launchpad/transferEventBsc')
+const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEthereum')
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
 function sleep(ms) {
@@ -180,11 +181,19 @@ const launchpadTransferEventCron = async () => {
     
     try {
         // console.log("start collection on sale event")
-        await launchpadTransferEvent();
+        await launchpadTransferEventBsc();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEventEthereum();
     }
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }  
+    
     launchpadTransferEventCron() 
 }
 launchpadTransferEventCron();

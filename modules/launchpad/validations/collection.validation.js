@@ -38,6 +38,7 @@ const createCollectionValidation = {
     }),
     networkId: Joi.number().optional(),
     networkName: Joi.string().optional(),
+    currencyAddress: Joi.string().required(),
   }),
 };
 

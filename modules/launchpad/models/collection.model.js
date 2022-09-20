@@ -115,8 +115,13 @@ const collectionSchema = mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ["ETH", "BNB", "AD", "SAFEMOON"],
-      default: "ETH",
+      enum: ["ETH", "BNB", "SAFEMOON", "DOGE"],
+      default: "BNB",
+    },
+    currencyAddress: {
+      type: String,
+      trim: true,
+      default: null,
     },
     isWhiteListedUser: {
       type: Boolean,
@@ -134,11 +139,6 @@ const collectionSchema = mongoose.Schema(
     nonce:{
       type: Number,
       default: 0
-    },
-    currencyStatus: {
-      type: String,
-      trim: true,
-      default: null,
     },
     networkId: {
       type: Number,
