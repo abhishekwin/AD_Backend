@@ -86,8 +86,8 @@ const launchpadTransferEventBsc = async () => {
   }
 };
 
-launchpadTransferEventBsc();
+// launchpadTransferEventBsc();
 
-// module.exports = {
-//   launchpadTransferEventBsc
-// };
+module.exports = {
+  launchpadTransferEventBsc
+};
