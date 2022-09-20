@@ -2,7 +2,7 @@ const axios = require("axios");
 const { EventManager } = require("../../models");
 const mongoose = require("mongoose");
 require("dotenv").config({ path: "../../.env" });
-const { LaunchPadNft } = require("../../modules/launchpad/models");
+const { LaunchPadNft, LaunchPadCollection } = require("../../modules/launchpad/models");
 let LAUNCHPAD_SUBGRAPH_URL_ETHEREUM = process.env.LAUNCHPAD_SUBGRAPH_URL_ETHEREUM;
 let DB_URL = process.env.DB_URL;
 let ETHEREUM_NETWORK_ID = process.env.ETHEREUM_NETWORK_ID 
@@ -42,6 +42,13 @@ const transferFunctionQuery = async (from) => {
 
 const manageData = async (transferdata) => {
   for (data of transferdata) {
+    const findCollection = await LaunchPadCollection.findOne({
+      collectionAddress: data.collection_address
+    });
+    if(findCollection){
+      const updateMintCount = findCollection.nftMintCount+1
+      await updateMintCount.save()
+    }
     const findNft = await LaunchPadNft.find({
       collectionAddress: data.collection_address,
       networkId : ETHEREUM_NETWORK_ID
@@ -52,7 +59,7 @@ const manageData = async (transferdata) => {
       const id = nft._id;
        await LaunchPadNft.updateOne(
         { _id: id },
-        { tokenId: data.tokenId, nftMintCount:data.nftMintCount+1 },
+        { tokenId: data.tokenId },
         { new: true }
       );
     }

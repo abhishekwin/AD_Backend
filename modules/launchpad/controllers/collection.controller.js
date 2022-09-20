@@ -100,21 +100,22 @@ const getCollection = async (req, res) => {
           match:{userAddress}
         },
         {
-          path: "whiteListedUsers"
+          path: "whiteListedUsers",
+          select:'userAddress'
         }
         
       ]
     )
-    let response = result;
-    if(result && result.whiteListedUsers){
-       const data = result.whiteListedUsers?result.whiteListedUsers.map((data)=>data.userAddress):[];
-      let response = result.toObject();
-      response.whiteListedUsers = data;
-      response.isWhiteListed = result.whiteListedUsers;
-    }
+    // let response = result;
+    // if(result && result.whiteListedUsers){
+    //    const data = result.whiteListedUsers?result.whiteListedUsers.map((data)=>data.userAddress):[];
+    //   let response = result.toObject();
+    //   response.whiteListedUsers = data;
+    //   response.isWhiteListed = result.whiteListedUsers;
+    // }
     return res
       .status(200)
-      .send(new ResponseObject(200, "Collection found successfully", response));
+      .send(new ResponseObject(200, "Collection found successfully", result));
   } catch (error) {
     return res.status(500).send(new ResponseObject(500, error.message));
   }
