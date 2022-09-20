@@ -148,6 +148,15 @@ const nftSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    networkId: {
+      type: Number,
+      default: 0,
+    },
+    networkName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

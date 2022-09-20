@@ -5,6 +5,7 @@ require("dotenv").config({ path: "../../.env" });
 const { LaunchPadNft } = require("../../modules/launchpad/models");
 let LAUNCHPAD_SUBGRAPH_URL_ETHEREUM = process.env.LAUNCHPAD_SUBGRAPH_URL_ETHEREUM;
 let DB_URL = process.env.DB_URL;
+let ETHEREUM_NETWORK_ID = process.env.ETHEREUM_NETWORK_ID 
 
 mongoose
   .connect(DB_URL)
@@ -43,6 +44,7 @@ const manageData = async (transferdata) => {
   for (data of transferdata) {
     const findNft = await LaunchPadNft.find({
       collectionAddress: data.collection_address,
+      networkId : ETHEREUM_NETWORK_ID
     });
     const index = parseInt(data.tokenId)-1;
     let nft = findNft[index];
@@ -50,7 +52,7 @@ const manageData = async (transferdata) => {
       const id = nft._id;
        await LaunchPadNft.updateOne(
         { _id: id },
-        { tokenId: data.tokenId },
+        { tokenId: data.tokenId, nftMintCount:data.nftMintCount+1 },
         { new: true }
       );
     }
@@ -58,12 +60,12 @@ const manageData = async (transferdata) => {
 };
 
 const launchpadTransferEventEthereum = async () => {
-  let transfereventDetails = await EventManager.findOne({name:"launchpadTransferV2"})
+  let transfereventDetails = await EventManager.findOne({name:"launchpadTransferEthereum"})
   let from = 0
   if(transfereventDetails){
      from = transfereventDetails.lastcrontime;
   }else{
-      await EventManager.create({name:"launchpadTransferV2", lastcrontime:0})
+      await EventManager.create({name:"launchpadTransferEthereum", lastcrontime:0})
   }
 
   try {

@@ -105,9 +105,13 @@ const getCollection = async (req, res) => {
         
       ]
     )
-   const data = result.whiteListedUsers.map((data)=>data.userAddress);
-   let response = result.toObject();
-   response.whiteListedUsers = data;
+    let response = result;
+    if(result && result.whiteListedUsers){
+       const data = result.whiteListedUsers?result.whiteListedUsers.map((data)=>data.userAddress):[];
+      let response = result.toObject();
+      response.whiteListedUsers = data;
+      response.isWhiteListed = result.whiteListedUsers;
+    }
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", response));

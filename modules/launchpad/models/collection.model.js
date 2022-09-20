@@ -149,6 +149,10 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    nftMintCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

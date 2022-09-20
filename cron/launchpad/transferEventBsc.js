@@ -5,6 +5,7 @@ require("dotenv").config({ path: "../../.env" });
 const { LaunchPadNft } = require("../../modules/launchpad/models");
 let LAUNCHPAD_SUBGRAPH_URL_BSC = process.env.LAUNCHPAD_SUBGRAPH_URL_BSC;
 let DB_URL = process.env.DB_URL;
+let BSC_NETWORK_ID = process.env.BSC_NETWORK_ID
 
 mongoose
   .connect(DB_URL)
@@ -43,6 +44,7 @@ const manageData = async (transferdata) => {
   for (data of transferdata) {
     const findNft = await LaunchPadNft.find({
       collectionAddress: data.collection_address,
+      networkId : BSC_NETWORK_ID
     });
     const index = parseInt(data.tokenId)-1;
     let nft = findNft[index];
@@ -58,12 +60,12 @@ const manageData = async (transferdata) => {
 };
 
 const launchpadTransferEventBsc = async () => {
-  let transfereventDetails = await EventManager.findOne({name:"launchpadTransfer"})
+  let transfereventDetails = await EventManager.findOne({name:"launchpadTransferBsc"})
   let from = 0
   if(transfereventDetails){
      from = transfereventDetails.lastcrontime;
   }else{
-      await EventManager.create({name:"launchpadTransfer", lastcrontime:0})
+      await EventManager.create({name:"launchpadTransferBsc", lastcrontime:0})
   }
 
   try {
