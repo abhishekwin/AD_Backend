@@ -47,6 +47,8 @@ const createNft = async (req, res) => {
         status: "Active",
         networkId: launchPadCollection.networkId,
         networkName: launchPadCollection.networkName,
+        owner: launchPadCollection.owner,
+        creator: launchPadCollection.creator,
       };
       let otherNftData = {
         collectionId: launchPadCollection._id,
