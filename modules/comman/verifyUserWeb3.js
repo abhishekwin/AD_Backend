@@ -16,9 +16,11 @@ exports.VerifySign = async (message) => {
   const userAddress = message.userAddress;
   const nonce = message.nonce;
   const isWhiteListed = message.isWhiteListed;
+  const collectionAddress = message.collectionAddress
+  const launchpadFactoryAddress = message.launchpadFactoryAddress
   let messageN = ethers.utils.solidityPack(
-    ["address", "uint256", "bool"],
-    [userAddress, nonce, isWhiteListed]
+    ["address","address","address", "uint256", "bool"],
+    [collectionAddress, launchpadFactoryAddress, userAddress, nonce, isWhiteListed]
   );
   let messageHash = ethers.utils.keccak256(messageN);
   const privateKey = process.env.PRIVATE_KEY;
