@@ -46,7 +46,13 @@ exports.updateWhiteListUser = async (req, res) => {
 
 exports.createSignature = async (req, res) => {
   try {
-    const { nonce, userAddress, collectionId, launchpadFactoryAddress, collectionAddress } = req.body;
+    const {
+      nonce,
+      userAddress,
+      collectionId,
+      launchpadFactoryAddress,
+      collectionAddress,
+    } = req.body;
 
     const checkUser = await WhiteListedUser.findOne({
       userAddress,
@@ -61,11 +67,11 @@ exports.createSignature = async (req, res) => {
       userAddress,
       isWhiteListed,
       launchpadFactoryAddress,
-      collectionAddress
+      collectionAddress,
     };
     const generateSignature = await VerifySign(message);
     if (generateSignature) {
-       await LaunchPadCollection.findOneAndUpdate(
+      await LaunchPadCollection.findOneAndUpdate(
         { _id: collectionId },
         { nonce },
         { new: true }

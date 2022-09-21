@@ -5,7 +5,7 @@ const {
   createCollectionValidation,
   updateCollectionValidation,
 } = require("../validations/collection.validation");
-
+const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
 const { checkAdminToken } = require("../../middleware/auth");
 const {
@@ -30,7 +30,7 @@ router
 
 router.route("/create-whiteListedUser").post(createWhiteListUser);
 router.route("/update-whiteListedUser").post(updateWhiteListUser);
-router.route("/create-signature").post(createSignature);
+router.route("/create-signature").post(validate(createWhiteListedValidation),createSignature);
 router.route("/update-collection").patch(collectionController.updateCollection);
 router
   .route("/update-collection-with-nft")
