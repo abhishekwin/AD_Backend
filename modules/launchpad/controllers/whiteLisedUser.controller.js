@@ -47,13 +47,17 @@ exports.updateWhiteListUser = async (req, res) => {
 exports.createSignature = async (req, res) => {
   try {
     const {
-      nonce,
       userAddress,
       collectionId,
       launchpadFactoryAddress,
       collectionAddress,
     } = req.body;
-
+    const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
+    let nonce = 1
+    if(findCollection){
+      nonce = findCollection.nonce?findCollection.nonce+1:nonce
+      await findCollection.save()
+    }
     const checkUser = await WhiteListedUser.findOne({
       userAddress,
       collectionId,
