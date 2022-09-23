@@ -8,6 +8,7 @@ const { fileUpload, uploadMultiJsonData } = require("../../comman/fileUpload");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 const { LaunchPadNft, LaunchPadCollection } = require("../models");
+const { getAdminAddress } = require("../../helpers/adminHelper");
 const path = require("path");
 const { Nft } = require("../services");
 
@@ -95,7 +96,12 @@ const createNft = async (req, res) => {
 
 const getNftList = async (req, res) => {
   try {
-    const { collectionId, owner } = req.body;
+    const { collectionId, owner, loginUserAddress } = req.body;
+    if (!loginUserAddress) {
+      return res
+        .status(400)
+        .send(new ResponseObject(400, "loginUserAddress is required", []));
+    }
     let filtercolumn = [];
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
@@ -103,9 +109,17 @@ const getNftList = async (req, res) => {
     if (collectionId) {
       filtercolumn.push("collectionId");
     }
-    if (owner) {
-      filtercolumn.push("owner");
+    const isAdmin = await getAdminAddress(loginUserAddress);
+    if (!isAdmin && !owner) {
+      req.body.isMint = true;
+      filtercolumn.push("isMint");
+    } else {
+      if (!isAdmin) {
+        req.body.$or = [{ isMint: true }, { owner: loginUserAddress }];
+        filtercolumn.push("$or");
+      }
     }
+
     const filter = pick(req.body, filtercolumn);
     const options = pick(req.body, ["sortBy", "limit", "page"]);
     const result = await Nft.getLaunchPadNftList(filter, options, req);
