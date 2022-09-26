@@ -119,7 +119,6 @@ const getNftList = async (req, res) => {
         filtercolumn.push("$or");
       }
     }
-
     const filter = pick(req.body, filtercolumn);
     const options = pick(req.body, ["sortBy", "limit", "page"]);
     const result = await Nft.getLaunchPadNftList(filter, options, req);

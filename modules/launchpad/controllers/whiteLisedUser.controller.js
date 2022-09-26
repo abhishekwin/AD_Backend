@@ -67,11 +67,11 @@ exports.createSignature = async (req, res) => {
       isWhiteListed = false;
     }
     const message = {
-      nonce,
-      userAddress,
-      isWhiteListed,
-      launchpadFactoryAddress,
       collectionAddress,
+      launchpadFactoryAddress,
+      userAddress,
+      nonce,
+      isWhiteListed
     };
     const generateSignature = await VerifySign(message);
     if (generateSignature) {
