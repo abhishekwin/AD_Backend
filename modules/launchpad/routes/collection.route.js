@@ -62,5 +62,14 @@ router
 router
   .route("/get-top-creator")
   .post(collectionController.topCreator); 
-  
+router
+  .route("/get-latest-creator")
+  .get(collectionController.getLatestCreator);  
+router
+  .route("/get-top-sellers")
+  .get(collectionController.getTopSellers); 
+router
+  .route("/get-top-buyers")
+  .get(collectionController.getTopBuyers);
+
 module.exports = router;

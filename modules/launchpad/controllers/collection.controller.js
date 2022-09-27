@@ -315,6 +315,61 @@ const topCreator = async (req, res) => {
   }
 };
 
+const getLatestCreator = async (req, res) => {
+  try {
+    const findLatestCreator = await Users.find().limit(5)
+    return res.status(200).send({
+      data: findLatestCreator,
+      status: 200,
+      success: true,
+      message: "Get Latest Creator Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch data",
+    });
+  }
+};
+const getTopSellers = async (req, res) => {
+  try {
+    const findTopSellers = await Users.find().limit(5)
+    return res.status(200).send({
+      data: findTopSellers,
+      status: 200,
+      success: true,
+      message: "Get Top Sellers Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch data",
+    });
+  }
+};
+const getTopBuyers = async (req, res) => {
+  try {
+    const findTopBuyers = await Users.find().limit(5)
+    return res.status(200).send({
+      data: findTopBuyers,
+      status: 200,
+      success: true,
+      message: "Get Top Buyers Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch data",
+    });
+  }
+};
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -326,4 +381,7 @@ module.exports = {
   stashCollectionHeader,
   topCreator,
   stashAllCollectionHeader,
+  getLatestCreator,
+  getTopSellers,
+  getTopBuyers,
 };
