@@ -30,7 +30,7 @@ router
 
 router.route("/create-whiteListedUser").post( checkToken, createWhiteListUser);
 router.route("/update-whiteListedUser").post( checkToken, updateWhiteListUser);
-router.route("/create-signature").post(checkToken, validate( checkToken, createWhiteListedValidation), createSignature);
+router.route("/create-signature").post(checkToken, validate( createWhiteListedValidation), createSignature);
 router.route("/update-collection").patch( checkToken, collectionController.updateCollection);
 router
   .route("/update-collection-with-nft")
