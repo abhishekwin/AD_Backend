@@ -26,6 +26,7 @@ exports.createWhiteListUser = async (req, res) => {
 exports.updateWhiteListUser = async (req, res) => {
   try {
     const { collectionId, userAddresses } = req.body;
+    const findUser = await LaunchPadCollection.findOne({creator: req.userData.account})
     await WhiteListedUser.deleteMany({ collectionId });
     let whiteListUser = [];
     for (const userAddress of userAddresses) {
@@ -47,11 +48,11 @@ exports.updateWhiteListUser = async (req, res) => {
 exports.createSignature = async (req, res) => {
   try {
     const {
-      userAddress,
       collectionId,
       launchpadFactoryAddress,
       collectionAddress,
     } = req.body;
+    const userAddress = req.userData.account
     const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
     let nonce = 1
     if(findCollection){

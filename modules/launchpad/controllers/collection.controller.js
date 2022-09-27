@@ -230,22 +230,23 @@ const stashCollectionHeader = async (req, res) => {
   }
 };
 
-const verifyCollection = async (req, res) => {
+const topCreator = async (req, res) => {
   try {
-    const { collectionAddress, userAddress, nonce } = req.body;
-   
+    const result = await LaunchPadCollection.aggregate([
+      {"$group" : {_id:"$creator", count:{$sum:1}}},{$sort:{"count":-1}}
+  ]);
     return res.status(200).send({
-      data: response,
+      data: result,
       status: 200,
       success: true,
-      message: "Collections Headers Successfully",
+      message: "Get TopCreator Successfully",
     });
   } catch (err) {
     return res.status(400).send({
       error: err.message,
       status: 400,
       success: false,
-      message: "Failed To Fetch Collection",
+      message: "Failed To Fetch TopCreator",
     });
   }
 };
@@ -259,4 +260,5 @@ module.exports = {
   getCollectionList,
   approvedCollection,
   stashCollectionHeader,
+  topCreator,
 };

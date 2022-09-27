@@ -7,7 +7,7 @@ const {
 } = require("../validations/collection.validation");
 const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
-const { checkAdminToken } = require("../../middleware/auth");
+const { checkAdminToken, checkToken } = require("../../middleware/auth");
 const {
   createWhiteListUser,
   updateWhiteListUser,
@@ -28,19 +28,20 @@ router
     collectionController.createCollection
   );
 
-router.route("/create-whiteListedUser").post(createWhiteListUser);
-router.route("/update-whiteListedUser").post(updateWhiteListUser);
-router.route("/create-signature").post(validate(createWhiteListedValidation),createSignature);
-router.route("/update-collection").patch(collectionController.updateCollection);
+router.route("/create-whiteListedUser").post( checkToken, createWhiteListUser);
+router.route("/update-whiteListedUser").post( checkToken, updateWhiteListUser);
+router.route("/create-signature").post(checkToken, validate( checkToken, createWhiteListedValidation), createSignature);
+router.route("/update-collection").patch( checkToken, collectionController.updateCollection);
 router
   .route("/update-collection-with-nft")
   .patch(
+    checkToken,
     validate(updateCollectionValidation),
     collectionController.updateCollectionWithNft
   );
 router
   .route("/delete-collection/:id")
-  .delete(collectionController.deleteCollection);
+  .delete( checkToken, collectionController.deleteCollection);
 router
   .route("/get-collection-detail/:id")
   .get(collectionController.getCollection);
@@ -53,6 +54,10 @@ router
 
 router
   .route("/getStashCollectionsHeader")
-  .post(collectionController.stashCollectionHeader);  
+  .post(collectionController.stashCollectionHeader); 
+  
+router
+  .route("/topCreator")
+  .post( checkToken, collectionController.topCreator); 
   
 module.exports = router;

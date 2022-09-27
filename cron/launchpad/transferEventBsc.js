@@ -59,7 +59,7 @@ const manageData = async (transferdata) => {
       const id = nft._id;
        await LaunchPadNft.updateOne(
         { _id: id },
-        { tokenId: data.tokenId , isMint:true},
+        { tokenId: data.tokenId , isMint:true, creator:data.to},
         { new: true }
       );
     }
