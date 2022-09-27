@@ -29,6 +29,14 @@ const createCollection = catchAsync(async (req, res) => {
 const updateCollection = async (req, res) => {
   try {
     const { collectionId, collectionAddress, owner, creator } = req.body;
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    if(!authenticateUser){
+    return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Invalid User", [])
+      );
+    }
     if (!collectionId) {
       return res
         .status(400)
@@ -58,6 +66,14 @@ const updateCollection = async (req, res) => {
 const updateCollectionWithNft = async (req, res) => {
   try {
     const { collectionId } = req.body;
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    if(!authenticateUser){
+    return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Invalid User", [])
+      );
+    }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
       req.body,
@@ -80,6 +96,14 @@ const updateCollectionWithNft = async (req, res) => {
 const deleteCollection = async (req, res) => {
   try {
     const { id } = req.params;
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    if(!authenticateUser){
+    return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Invalid User", [])
+      );
+    }
     const result = await LaunchPadCollection.findByIdAndDelete({ _id: id });
     return res
       .status(200)
@@ -229,6 +253,46 @@ const stashCollectionHeader = async (req, res) => {
     });
   }
 };
+const stashAllCollectionHeader = async (req, res) => {
+   try {
+    const filter = { isActive: true };
+    const nftsCount = await LaunchPadNft.count(filter);
+    const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
+    const nftLowestPrice = await LaunchPadNft.findOne(filter)
+      .sort({ price: 1 })
+      .limit(1);
+
+    let nftsOwnerIds = [];
+    let nftsOwnerCount = 0;
+    let totalVolume = 0;
+    for (const iterator of nftsOwner) {
+      if (!nftsOwnerIds.includes(iterator.owner)) {
+        nftsOwnerIds.push(iterator.owner);
+        nftsOwnerCount += 1;
+      }
+      totalVolume += iterator.price;
+    }
+    response = {
+      items: nftsCount,
+      owners: nftsOwnerCount,
+      floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
+      volumeTraded: totalVolume,
+    };
+    return res.status(200).send({
+      data: response,
+      status: 200,
+      success: true,
+      message: "Get All Collections Headers Successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: err.message,
+      status: 400,
+      success: false,
+      message: "Failed To Fetch Collection",
+    });
+  }
+};
 
 const topCreator = async (req, res) => {
   try {
@@ -261,4 +325,5 @@ module.exports = {
   approvedCollection,
   stashCollectionHeader,
   topCreator,
+  stashAllCollectionHeader,
 };

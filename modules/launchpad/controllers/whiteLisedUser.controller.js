@@ -5,6 +5,14 @@ const { VerifySign } = require("../../comman/verifyUserWeb3");
 exports.createWhiteListUser = async (req, res) => {
   try {
     const { collectionId, userAddresses } = req.body;
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    if(!authenticateUser){
+    return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Invalid User", [])
+      );
+    }
     for (const userAddress of userAddresses) {
       await WhiteListedUser.create({
         collectionId,
@@ -26,7 +34,14 @@ exports.createWhiteListUser = async (req, res) => {
 exports.updateWhiteListUser = async (req, res) => {
   try {
     const { collectionId, userAddresses } = req.body;
-    const findUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    if(!authenticateUser){
+    return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Invalid User", [])
+      );
+    }
     await WhiteListedUser.deleteMany({ collectionId });
     let whiteListUser = [];
     for (const userAddress of userAddresses) {

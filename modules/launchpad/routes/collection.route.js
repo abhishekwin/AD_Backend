@@ -31,6 +31,7 @@ router
 router.route("/create-whiteListedUser").post( checkToken, createWhiteListUser);
 router.route("/update-whiteListedUser").post( checkToken, updateWhiteListUser);
 router.route("/create-signature").post(checkToken, validate( createWhiteListedValidation), createSignature);
+
 router.route("/update-collection").patch( checkToken, collectionController.updateCollection);
 router
   .route("/update-collection-with-nft")
@@ -53,11 +54,13 @@ router
   .patch(checkAdminToken, collectionController.approvedCollection);
 
 router
-  .route("/getStashCollectionsHeader")
-  .post(collectionController.stashCollectionHeader); 
-  
+  .route("/get-stash-collections-header")
+  .post(collectionController.stashCollectionHeader);  
 router
-  .route("/topCreator")
-  .post( checkToken, collectionController.topCreator); 
+  .route("/get-stash-all-collections-header")
+  .get(collectionController.stashAllCollectionHeader);   
+router
+  .route("/get-top-creator")
+  .post(collectionController.topCreator); 
   
 module.exports = router;
