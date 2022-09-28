@@ -64,9 +64,11 @@ exports.createSignature = async (req, res) => {
   try {
     const {
       collectionId,
-      launchpadFactoryAddress,
       collectionAddress,
+      networkId
     } = req.body;
+    
+
     const userAddress = req.userData.account
     const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
     let nonce = 1
@@ -82,6 +84,14 @@ exports.createSignature = async (req, res) => {
     if (!checkUser) {
       isWhiteListed = false;
     }
+
+    let launchpadFactoryAddress = "";
+    if(networkId == process.env.ETHEREUM_NETWORK_ID){
+      launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_ETHEREUM
+    }else if(networkId == process.env.BSC_NETWORK_ID){
+      launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_BSC
+    }
+
     const message = {
       collectionAddress,
       launchpadFactoryAddress,
@@ -89,6 +99,7 @@ exports.createSignature = async (req, res) => {
       nonce,
       isWhiteListed
     };
+    
     const generateSignature = await VerifySign(message);
     if (generateSignature) {
       await LaunchPadCollection.findOneAndUpdate(
@@ -97,13 +108,14 @@ exports.createSignature = async (req, res) => {
         { new: true }
       );
     }
+    const data =  {sign:generateSignature, createSignData:message}
     return res
       .status(201)
       .send(
         new ResponseObject(
           201,
           "Signature generate successfully",
-          generateSignature
+          data
         )
       );
   } catch (error) {

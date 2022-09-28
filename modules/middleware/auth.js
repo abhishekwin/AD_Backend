@@ -24,7 +24,7 @@ module.exports = {
       res.status(401).json({
         status: 401,
         success: false,
-        message: "token is not supplied",
+        message: "Auth token is not supplied",
       });
     }
   },
@@ -59,7 +59,7 @@ module.exports = {
       res.status(401).json({
         status: 401,
         success: false,
-        message: "token is not supplied",
+        message: "Auth token is not supplied",
       });
     }
   }

@@ -16,7 +16,7 @@ const userSchema = new Schema({
   subscribe: { type: String, default: null },
   isBlackList: { type: Boolean, default: false },
   followers: [],
-  nonce: { type: String, deafult: null }
+  nonce: { type: Number, deafult: 0 }
 }, { 
   //timestamps: true 
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }

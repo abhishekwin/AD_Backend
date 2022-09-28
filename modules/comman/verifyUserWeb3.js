@@ -23,8 +23,11 @@ exports.VerifySign = async (message) => {
     [collectionAddress, launchpadFactoryAddress, userAddress, nonce, isWhiteListed]
   );
   let messageHash = ethers.utils.keccak256(messageN);
+
   const privateKey = process.env.PRIVATE_KEY;
+
   let web3 = new Web3(process.env.WEB3_VERIFY_SIGNATURE_URL);
+  
   let sign = (await web3.eth.accounts.sign(messageHash, privateKey)).signature;
   return sign;
 };
