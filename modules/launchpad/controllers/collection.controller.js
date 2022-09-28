@@ -293,7 +293,15 @@ const topCreator = async (req, res) => {
 
 const getLatestCreator = async (req, res) => {
   try {
-    const findLatestCreator = await Users.find().limit(5);
+    const lanchpadCollection = await LaunchPadCollection.find({approved: true}).sort({created_at: -1});
+    let creator = lanchpadCollection.map((item) => {
+      if(item.creator != null){
+        return item.creator
+      }
+      return null
+    }) 
+    creator = [...new Set(creator)]
+    const findLatestCreator = await Users.find({account:{$in:creator}}).limit(5);
     return res
       .status(200)
       .send(
