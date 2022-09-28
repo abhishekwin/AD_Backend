@@ -10,7 +10,7 @@ exports.createWhiteListUser = async (req, res) => {
     return res
       .status(400)
       .send(
-        new ResponseObject(400, "Invalid User", [])
+        new ResponseObject(400, "Invalid User")
       );
     }
     for (const userAddress of userAddresses) {
@@ -39,7 +39,7 @@ exports.updateWhiteListUser = async (req, res) => {
     return res
       .status(400)
       .send(
-        new ResponseObject(400, "Invalid User", [])
+        new ResponseObject(400, "Invalid User")
       );
     }
     await WhiteListedUser.deleteMany({ collectionId });
@@ -108,7 +108,7 @@ exports.createSignature = async (req, res) => {
         { new: true }
       );
     }
-    const data = {sign: generateSignature, signData:message}
+    const data = {sign: generateSignature, signData:message, nonce}
     return res
       .status(201)
       .send(

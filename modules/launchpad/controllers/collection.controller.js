@@ -29,12 +29,6 @@ const createCollection = catchAsync(async (req, res) => {
 const updateCollection = async (req, res) => {
   try {
     const { collectionId, collectionAddress, owner, creator } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({
-      creator: req.userData.account,
-    });
-    if (!authenticateUser) {
-      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
-    }
     if (!collectionId) {
       return res
         .status(400)
@@ -68,7 +62,7 @@ const updateCollectionWithNft = async (req, res) => {
       creator: req.userData.account,
     });
     if (!authenticateUser) {
-      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
+      return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
@@ -96,7 +90,7 @@ const deleteCollection = async (req, res) => {
       creator: req.userData.account,
     });
     if (!authenticateUser) {
-      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
+      return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
     const result = await LaunchPadCollection.findByIdAndDelete({ _id: id });
     return res
