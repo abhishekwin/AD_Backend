@@ -76,7 +76,7 @@ const manageData = async (transferdata) => {
       }
     }
   }
-  await EventManager.updateOne({name:"launchpadTransferBsc"}, {lastcrontime:timestamp})
+  await EventManager.updateOne({name:"launchpadTransferEthereum"}, {lastcrontime:timestamp})
 };
 const launchpadTransferEventEthereum = async () => {
   let transfereventDetails = await EventManager.findOne({name:"launchpadTransferEthereum"})
