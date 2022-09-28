@@ -5,6 +5,8 @@ const fs = require("fs");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 const multer = require("multer");
+const { checkAdminToken, checkToken } = require("../../middleware/auth");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploaddir = appDir+ '/public/nft-files';
@@ -25,6 +27,6 @@ const router = express.Router();
 //   );
 const upload = multer({ storage })
 router.post("/create-nft-with-upload-images", upload.array("files"), nftController.createNft);
-router.post("/get-nft-list", nftController.getNftList);
-router.get("/get-nft-detail/:id", nftController.nftDetail);
+router.post("/get-nft-list", checkToken, nftController.getNftList);
+router.get("/get-nft-detail/:id", checkToken, nftController.nftDetail);
 module.exports = router;
