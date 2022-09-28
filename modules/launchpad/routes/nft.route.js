@@ -5,6 +5,8 @@ const fs = require("fs");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 const multer = require("multer");
+const { checkAdminToken, checkToken } = require("../../middleware/auth");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploaddir = appDir+ '/public/nft-files';

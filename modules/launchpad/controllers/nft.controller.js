@@ -97,11 +97,7 @@ const createNft = async (req, res) => {
 const getNftList = async (req, res) => {
   try {
     const { collectionId, owner, loginUserAddress } = req.body;
-    if (!loginUserAddress) {
-      return res
-        .status(400)
-        .send(new ResponseObject(400, "loginUserAddress is required", []));
-    }
+    
     let filtercolumn = [];
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
@@ -109,7 +105,11 @@ const getNftList = async (req, res) => {
     if (collectionId) {
       filtercolumn.push("collectionId");
     }
-    const isAdmin = await getAdminAddress(loginUserAddress);
+    let isAdmin = false
+    if(loginUserAddress){
+      isAdmin = await getAdminAddress(loginUserAddress);
+    }
+
     if (!isAdmin && !owner) {
       req.body.isMint = true;
       filtercolumn.push("isMint");
