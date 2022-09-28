@@ -5,7 +5,7 @@ const { VerifySign } = require("../../comman/verifyUserWeb3");
 exports.createWhiteListUser = async (req, res) => {
   try {
     const { collectionId, userAddresses } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
     if(!authenticateUser){
     return res
       .status(400)
@@ -34,7 +34,7 @@ exports.createWhiteListUser = async (req, res) => {
 exports.updateWhiteListUser = async (req, res) => {
   try {
     const { collectionId, userAddresses } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
+    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
     if(!authenticateUser){
     return res
       .status(400)

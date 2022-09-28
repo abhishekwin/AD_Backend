@@ -59,7 +59,7 @@ const updateCollectionWithNft = async (req, res) => {
   try {
     const { collectionId } = req.body;
     const authenticateUser = await LaunchPadCollection.findOne({
-      creator: req.userData.account,
+      creator: req.userData.account.toLowerCase(),
     });
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
@@ -85,10 +85,12 @@ const updateCollectionWithNft = async (req, res) => {
 
 const deleteCollection = async (req, res) => {
   try {
+    debugger
     const { id } = req.params;
     const authenticateUser = await LaunchPadCollection.findOne({
-      creator: req.userData.account,
+      creator: req.userData.account.toLowerCase(),
     });
+    console.log("authenticateUser",authenticateUser)
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
