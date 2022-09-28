@@ -1008,7 +1008,7 @@ module.exports = {
       const { nonce, signature } = req.body;
       // get user by nonce
       let user = await Users.findOne({ nonce: nonce });
-      console.log("user", user)
+      // console.log("user", user)
       // check user existance or block field
       if (!user) {
         return res.status(400).json({

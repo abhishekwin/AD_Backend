@@ -108,7 +108,6 @@ exports.createSignature = async (req, res) => {
         { new: true }
       );
     }
-    const data =  {sign:generateSignature, createSignData:message}
     return res
       .status(201)
       .send(
