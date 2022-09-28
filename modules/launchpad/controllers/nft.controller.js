@@ -115,6 +115,7 @@ const getNftList = async (req, res) => {
       filtercolumn.push("isMint");
     } else {
       if (!isAdmin) {
+        console.log("error")
         req.body.$or = [{ isMint: true }, { owner: loginUserAddress }];
         filtercolumn.push("$or");
       }

@@ -2,7 +2,7 @@ const axios = require("axios");
 const { EventManager } = require("../../models");
 const mongoose = require("mongoose");
 require("dotenv").config({ path: "../../.env" });
-const { LaunchPadNft, LaunchPadCollection } = require("../../modules/launchpad/models");
+const { LaunchPadNft, LaunchPadCollection, LaunchPadMintHistory } = require("../../modules/launchpad/models");
 let LAUNCHPAD_SUBGRAPH_URL_BSC = process.env.LAUNCHPAD_SUBGRAPH_URL_BSC;
 let DB_URL = process.env.DB_URL;
 let BSC_NETWORK_ID = process.env.BSC_NETWORK_ID
@@ -41,20 +41,24 @@ const transferFunctionQuery = async (from) => {
 };
 
 const manageData = async (transferdata) => {
+  let timestamp = transferdata[0].timestamp;
   for (data of transferdata) {
-    const findCollection = await LaunchPadCollection.findOne({
-      collectionAddress: data.collection_address
-    });
-    if(findCollection){
-      const updateMintCount = findCollection.nftMintCount+1
-      await updateMintCount.save()
-    }
+    
+    timestamp = data.timestamp
+    // const findCollection = await LaunchPadCollection.findOne({
+    //   collectionAddress: data.collection_address
+    // });
+    // if(findCollection){
+    //   const updateMintCount = findCollection.nftMintCount+1
+    //   await findCollection.save()
+    // }
     const findNft = await LaunchPadNft.find({
       collectionAddress: data.collection_address,
-      networkId : BSC_NETWORK_ID
+      networkId : +BSC_NETWORK_ID
     });
     const index = parseInt(data.tokenId)-1;
     let nft = findNft[index];
+   // process.exit();
     if (nft) {
       const id = nft._id;
        await LaunchPadNft.updateOne(
@@ -62,8 +66,20 @@ const manageData = async (transferdata) => {
         { tokenId: data.tokenId , isMint:true, creator:data.to},
         { new: true }
       );
+
+      const findAddress = await LaunchPadMintHistory.findOne({
+        collectionAddress: data.collection_address,
+        userAddress: data.to,
+      });
+      if (!findAddress) {
+        await LaunchPadMintHistory.create({
+          collectionAddress: data.collection_address,
+          userAddress: data.to,
+        });
+      }
     }
   }
+  await EventManager.updateOne({name:"launchpadTransferBsc"}, {lastcrontime:timestamp})
 };
 
 const launchpadTransferEventBsc = async () => {
