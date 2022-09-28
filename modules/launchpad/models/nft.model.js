@@ -18,6 +18,7 @@ const nftSchema = mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      lowercase: true
     },
     mintCost: {
       type: Number,
@@ -63,11 +64,13 @@ const nftSchema = mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      lowercase: true
     },
     creator: {
       type: String,
       trim: true,
       default: null,
+      lowercase: true
     },
     price: {
       type: Number,
