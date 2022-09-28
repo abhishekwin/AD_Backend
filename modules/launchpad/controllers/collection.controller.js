@@ -29,13 +29,11 @@ const createCollection = catchAsync(async (req, res) => {
 const updateCollection = async (req, res) => {
   try {
     const { collectionId, collectionAddress, owner, creator } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
-    if(!authenticateUser){
-    return res
-      .status(400)
-      .send(
-        new ResponseObject(400, "Invalid User", [])
-      );
+    const authenticateUser = await LaunchPadCollection.findOne({
+      creator: req.userData.account,
+    });
+    if (!authenticateUser) {
+      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
     }
     if (!collectionId) {
       return res
@@ -66,13 +64,11 @@ const updateCollection = async (req, res) => {
 const updateCollectionWithNft = async (req, res) => {
   try {
     const { collectionId } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
-    if(!authenticateUser){
-    return res
-      .status(400)
-      .send(
-        new ResponseObject(400, "Invalid User", [])
-      );
+    const authenticateUser = await LaunchPadCollection.findOne({
+      creator: req.userData.account,
+    });
+    if (!authenticateUser) {
+      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
@@ -96,13 +92,11 @@ const updateCollectionWithNft = async (req, res) => {
 const deleteCollection = async (req, res) => {
   try {
     const { id } = req.params;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account})
-    if(!authenticateUser){
-    return res
-      .status(400)
-      .send(
-        new ResponseObject(400, "Invalid User", [])
-      );
+    const authenticateUser = await LaunchPadCollection.findOne({
+      creator: req.userData.account,
+    });
+    if (!authenticateUser) {
+      return res.status(400).send(new ResponseObject(400, "Invalid User", []));
     }
     const result = await LaunchPadCollection.findByIdAndDelete({ _id: id });
     return res
@@ -117,19 +111,16 @@ const getCollection = async (req, res) => {
   try {
     const { id } = req.params;
     const { userAddress } = req.query;
-    const result = await LaunchPadCollection.findOne({ _id: id }).populate(
-      [
-        {
-          path: "isWhiteListed",
-          match:{userAddress}
-        },
-        {
-          path: "whiteListedUsers",
-          select:'userAddress'
-        }
-        
-      ]
-    )
+    const result = await LaunchPadCollection.findOne({ _id: id }).populate([
+      {
+        path: "isWhiteListed",
+        match: { userAddress },
+      },
+      {
+        path: "whiteListedUsers",
+        select: "userAddress",
+      },
+    ]);
     // let response = result;
     // if(result && result.whiteListedUsers){
     //    const data = result.whiteListedUsers?result.whiteListedUsers.map((data)=>data.userAddress):[];
@@ -156,7 +147,7 @@ const getCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("owner");
   }
   if (req.body.networkId && req.body.networkName) {
-    filtercolumn.push("networkId","networkName");
+    filtercolumn.push("networkId", "networkName");
   }
   // if (req.body.post) {
   //   let search = await specialCharacter.specialCharacter(req.body.post);
@@ -238,23 +229,19 @@ const stashCollectionHeader = async (req, res) => {
       floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
       volumeTraded: totalVolume,
     };
-    return res.status(200).send({
-      data: response,
-      status: 200,
-      success: true,
-      message: "Collections Headers Successfully",
-    });
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(200, "Collections Headers Successfully", response)
+      );
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch Collection",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 const stashAllCollectionHeader = async (req, res) => {
-   try {
+  try {
     const filter = { isActive: true };
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
@@ -278,95 +265,82 @@ const stashAllCollectionHeader = async (req, res) => {
       floorPrice: nftLowestPrice ? nftLowestPrice.price : 0,
       volumeTraded: totalVolume,
     };
-    return res.status(200).send({
-      data: response,
-      status: 200,
-      success: true,
-      message: "Get All Collections Headers Successfully",
-    });
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(
+          200,
+          "Get All Collections Headers Successfully",
+          response
+        )
+      );
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch Collection",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 
 const topCreator = async (req, res) => {
   try {
     const result = await LaunchPadCollection.aggregate([
-      {"$group" : {_id:"$creator", count:{$sum:1}}},{$sort:{"count":-1}}
-  ]);
-    return res.status(200).send({
-      data: result,
-      status: 200,
-      success: true,
-      message: "Get TopCreator Successfully",
-    });
+      { $group: { _id: "$creator", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "Get Top Creator Successfully", result));
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch TopCreator",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 
 const getLatestCreator = async (req, res) => {
   try {
-    const findLatestCreator = await Users.find().limit(5)
-    return res.status(200).send({
-      data: findLatestCreator,
-      status: 200,
-      success: true,
-      message: "Get Latest Creator Successfully",
-    });
+    const findLatestCreator = await Users.find().limit(5);
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(
+          200,
+          "Get Latest Creator Successfully",
+          findLatestCreator
+        )
+      );
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch data",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 const getTopSellers = async (req, res) => {
   try {
-    const findTopSellers = await Users.find().limit(5)
-    return res.status(200).send({
-      data: findTopSellers,
-      status: 200,
-      success: true,
-      message: "Get Top Sellers Successfully",
-    });
+    const findTopSellers = await Users.find().limit(5);
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(200, "Get Top Sellers Successfully", findTopSellers)
+      );
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch data",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 const getTopBuyers = async (req, res) => {
   try {
-    const findTopBuyers = await Users.find().limit(5)
-    return res.status(200).send({
-      data: findTopBuyers,
-      status: 200,
-      success: true,
-      message: "Get Top Buyers Successfully",
-    });
+    const findTopBuyers = await Users.find().limit(5);
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(200, "Get Top Buyers Successfully", findTopBuyers)
+      );
   } catch (err) {
-    return res.status(400).send({
-      error: err.message,
-      status: 400,
-      success: false,
-      message: "Failed To Fetch data",
-    });
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong "));
   }
 };
 
