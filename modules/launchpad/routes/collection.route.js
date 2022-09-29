@@ -4,6 +4,7 @@ const validate = require("../../../middleware/validate");
 const {
   createCollectionValidation,
   updateCollectionValidation,
+  topCreatorValidation
 } = require("../validations/collection.validation");
 const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
@@ -71,5 +72,12 @@ router
 router
   .route("/get-top-buyers")
   .get(collectionController.getTopBuyers);
+router
+  .route("/get-collection-creator-users")
+  .get(collectionController.collectionCreatorUsers);
+
+router
+  .route("/add-top-creator")
+  .post(validate(topCreatorValidation), collectionController.addTopCreator);
 
 module.exports = router;

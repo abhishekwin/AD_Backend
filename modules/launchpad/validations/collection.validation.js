@@ -49,7 +49,14 @@ const updateCollectionValidation = {
   }),
 };
 
+const topCreatorValidation = {
+  body: Joi.object().keys({
+    userAddresses: Joi.array().required(),
+  }),
+};
+
 module.exports = {
   createCollectionValidation,
   updateCollectionValidation,
+  topCreatorValidation,
 };

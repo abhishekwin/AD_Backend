@@ -49,7 +49,7 @@ const manageData = async (transferdata) => {
     //   collectionAddress: data.collection_address
     // });
     // if(findCollection){
-    //   const updateMintCount = findCollection.nftMintCount+1
+    //    findCollection = findCollection.nftMintCount+1
     //   await findCollection.save()
     // }
     const findNft = await LaunchPadNft.find({

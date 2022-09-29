@@ -9,6 +9,7 @@ const {
   LaunchPadCollection,
   LaunchPadNft,
   WhiteListedUser,
+  LaunchPadTopCreator
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
@@ -85,12 +86,10 @@ const updateCollectionWithNft = async (req, res) => {
 
 const deleteCollection = async (req, res) => {
   try {
-    debugger
     const { id } = req.params;
     const authenticateUser = await LaunchPadCollection.findOne({
       creator: req.userData.account.toLowerCase(),
     });
-    console.log("authenticateUser",authenticateUser)
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
@@ -228,12 +227,16 @@ const stashCollectionHeader = async (req, res) => {
     return res
       .status(200)
       .send(
-        new ResponseObject(200, "Collections Headers Successfully", response)
+        new ResponseObject(
+          200,
+          "Get Collections Headers Successfully",
+          response
+        )
       );
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 const stashAllCollectionHeader = async (req, res) => {
@@ -273,7 +276,7 @@ const stashAllCollectionHeader = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 
@@ -289,21 +292,25 @@ const topCreator = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 
 const getLatestCreator = async (req, res) => {
   try {
-    const lanchpadCollection = await LaunchPadCollection.find({approved: true}).sort({created_at: -1});
+    const lanchpadCollection = await LaunchPadCollection.find({
+      approved: true,
+    }).sort({ created_at: -1 });
     let creator = lanchpadCollection.map((item) => {
-      if(item.creator != null){
-        return item.creator
+      if (item.creator != null) {
+        return item.creator;
       }
-      return null
-    }) 
-    creator = [...new Set(creator)]
-    const findLatestCreator = await Users.find({account:{$in:creator}}).limit(5);
+      return null;
+    });
+    creator = [...new Set(creator)];
+    const findLatestCreator = await Users.find({
+      account: { $in: creator },
+    }).limit(5);
     return res
       .status(200)
       .send(
@@ -316,7 +323,7 @@ const getLatestCreator = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 const getTopSellers = async (req, res) => {
@@ -330,7 +337,7 @@ const getTopSellers = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 const getTopBuyers = async (req, res) => {
@@ -344,7 +351,51 @@ const getTopBuyers = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .send(new ResponseObject(500, "Something Went Wrong "));
+      .send(new ResponseObject(500, "Something Went Wrong"));
+  }
+};
+
+const addTopCreator = async (req, res) => {
+  try {
+    const { userAddresses } = req.body
+
+    await LaunchPadTopCreator.deleteMany()
+    for(userAccountAddress of userAddresses){
+      const addTopCreator = await LaunchPadTopCreator.create({userAccountAddress});
+    }
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(200, "Add Top Creator Successfully",[])
+      );
+  } catch (err) {
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong"));
+  }
+};
+const collectionCreatorUsers = async (req, res) => {
+  try {
+    const findCreator = await LaunchPadCollection.find();
+    let creator = findCreator.map((item) => {
+      if (item.creator != null) {
+        return item.creator;
+      }
+      return;
+    });
+    creator = [...new Set(creator)];
+    const findCollectionCreatorUsers = await Users.find({
+      account: { $in: creator },
+    })
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(200, "Get Collection Creator Users Successfully", findCollectionCreatorUsers)
+      );
+  } catch (err) {
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
 
@@ -362,4 +413,6 @@ module.exports = {
   getLatestCreator,
   getTopSellers,
   getTopBuyers,
+  addTopCreator,
+  collectionCreatorUsers
 };
