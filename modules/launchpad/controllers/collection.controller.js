@@ -276,6 +276,7 @@ const stashCollectionHeader = async (req, res) => {
       .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
+
 const stashAllCollectionHeader = async (req, res) => {
   try {
     const filter = { };
@@ -363,6 +364,7 @@ const getLatestCreator = async (req, res) => {
       .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
+
 const getTopSellers = async (req, res) => {
   try {
     const findTopSellers = await Users.find().limit(5);
@@ -377,6 +379,7 @@ const getTopSellers = async (req, res) => {
       .send(new ResponseObject(500, "Something Went Wrong"));
   }
 };
+
 const getTopBuyers = async (req, res) => {
   try {
     const findTopBuyers = await Users.find().limit(5);
