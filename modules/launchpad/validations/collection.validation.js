@@ -55,8 +55,16 @@ const topCreatorValidation = {
   }),
 };
 
+const collectionCreatorUsersValidation = {
+  body: Joi.object().keys({
+    page: Joi.number().required(),
+    limit: Joi.number().required()
+  }),
+};
+
 module.exports = {
   createCollectionValidation,
   updateCollectionValidation,
   topCreatorValidation,
+  collectionCreatorUsersValidation,
 };

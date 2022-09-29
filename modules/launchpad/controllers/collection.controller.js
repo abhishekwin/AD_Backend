@@ -9,10 +9,11 @@ const {
   LaunchPadCollection,
   LaunchPadNft,
   WhiteListedUser,
-  LaunchPadTopCreator
+  LaunchPadTopCreator,
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
+const customPagination = require('../../comman/customPagination');
 
 const createCollection = catchAsync(async (req, res) => {
   const result = await Collection.createCollectionService(req.body);
@@ -393,17 +394,15 @@ const getTopBuyers = async (req, res) => {
 
 const addTopCreator = async (req, res) => {
   try {
-    const { userAddresses } = req.body
+    const { userAddresses } = req.body;
 
-    await LaunchPadTopCreator.deleteMany()
-    for(userAccountAddress of userAddresses){
-      const addTopCreator = await LaunchPadTopCreator.create({userAccountAddress});
+    await LaunchPadTopCreator.deleteMany();
+    for (userAccountAddress of userAddresses) {
+      await LaunchPadTopCreator.create({ userAccountAddress });
     }
     return res
       .status(200)
-      .send(
-        new ResponseObject(200, "Add Top Creator Successfully",[])
-      );
+      .send(new ResponseObject(200, "Top Creator Added Successfully", []));
   } catch (err) {
     return res
       .status(500)
@@ -412,6 +411,7 @@ const addTopCreator = async (req, res) => {
 };
 const collectionCreatorUsers = async (req, res) => {
   try {
+    const { page, limit } = req.body
     const findCreator = await LaunchPadCollection.find();
     let creator = findCreator.map((item) => {
       if (item.creator != null) {
@@ -420,15 +420,24 @@ const collectionCreatorUsers = async (req, res) => {
       return;
     });
     creator = [...new Set(creator)];
-    const findCollectionCreatorUsers = await Users.find({
-      account: { $in: creator },
-    })
+    const tableData = await Users.find({account: { $in: creator }})
+    // .sort({ [sort_by_name]: sort_by_order })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const row_count = await Users.count({account: { $in: creator }});
+  const result = customPagination.customPagination(tableData, page, limit, row_count);
     return res
       .status(200)
       .send(
-        new ResponseObject(200, "Get Collection Creator Users Successfully", findCollectionCreatorUsers)
+        new ResponseObject(
+          200,
+          "Get Collection Creator Users Successfully",
+          result
+        )
       );
   } catch (err) {
+    console.log("error", err)
     return res
       .status(500)
       .send(new ResponseObject(500, "Something Went Wrong"));
@@ -451,5 +460,5 @@ module.exports = {
   getTopSellers,
   getTopBuyers,
   addTopCreator,
-  collectionCreatorUsers
+  collectionCreatorUsers,
 };
