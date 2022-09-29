@@ -46,6 +46,7 @@ const createNft = async (req, res) => {
         mintCost: launchPadCollection.mintCost,
         royalties: launchPadCollection.royalties,
         status: "Active",
+        isActive: true,
         networkId: launchPadCollection.networkId,
         networkName: launchPadCollection.networkName,
         owner: launchPadCollection.owner,
