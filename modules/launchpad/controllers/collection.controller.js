@@ -9,7 +9,7 @@ const {
   LaunchPadCollection,
   LaunchPadNft,
   WhiteListedUser,
-  LaunchPadTopCreator
+  LaunchPadTopCreator,
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
@@ -357,17 +357,15 @@ const getTopBuyers = async (req, res) => {
 
 const addTopCreator = async (req, res) => {
   try {
-    const { userAddresses } = req.body
+    const { userAddresses } = req.body;
 
-    await LaunchPadTopCreator.deleteMany()
-    for(userAccountAddress of userAddresses){
-      const addTopCreator = await LaunchPadTopCreator.create({userAccountAddress});
+    await LaunchPadTopCreator.deleteMany();
+    for (userAccountAddress of userAddresses) {
+      await LaunchPadTopCreator.create({ userAccountAddress });
     }
     return res
       .status(200)
-      .send(
-        new ResponseObject(200, "Add Top Creator Successfully",[])
-      );
+      .send(new ResponseObject(200, "Add Top Creator Successfully", []));
   } catch (err) {
     return res
       .status(500)
@@ -386,11 +384,15 @@ const collectionCreatorUsers = async (req, res) => {
     creator = [...new Set(creator)];
     const findCollectionCreatorUsers = await Users.find({
       account: { $in: creator },
-    })
+    });
     return res
       .status(200)
       .send(
-        new ResponseObject(200, "Get Collection Creator Users Successfully", findCollectionCreatorUsers)
+        new ResponseObject(
+          200,
+          "Get Collection Creator Users Successfully",
+          findCollectionCreatorUsers
+        )
       );
   } catch (err) {
     return res
@@ -414,5 +416,5 @@ module.exports = {
   getTopSellers,
   getTopBuyers,
   addTopCreator,
-  collectionCreatorUsers
+  collectionCreatorUsers,
 };
