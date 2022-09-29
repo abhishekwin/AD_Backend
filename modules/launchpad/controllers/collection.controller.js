@@ -168,17 +168,17 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const getMyCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
-  
+
   // if (req.body.approved || req.body.approved === false) {
   //   filtercolumn.push("approved");
   // }
   if (req.body.status) {
     filtercolumn.push("status");
   }
-  
-  req.body.creator = req.userData.account.toLowerCase()
+
+  req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
-  
+
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
@@ -280,7 +280,7 @@ const stashCollectionHeader = async (req, res) => {
 
 const stashAllCollectionHeader = async (req, res) => {
   try {
-    const filter = { };
+    const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
     const nftLowestPrice = await LaunchPadNft.findOne(filter)
@@ -321,24 +321,16 @@ const stashAllCollectionHeader = async (req, res) => {
 
 const topCreator = async (req, res) => {
   try {
-    const getCollectionAddress = await LaunchPadMintHistory.aggregate([
-      { $group: { _id: "$collectionAddress", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-    ]);
-    let collectionAddress = [];
+    const getCollectionAddress = await LaunchPadTopCreator.find();
+    let creator = [];
     for (item of getCollectionAddress) {
-      item._id ? collectionAddress.push(item._id) : 0;
-    }
-    const getCreator = await LaunchPadCollection.find({
-      collectionAddress: { $in: collectionAddress },
-    });
-    let creator = []
-    for (item of getCreator) {
-      item.creator ? creator.push(item.creator) : 0;
+      item.userAccountAddress
+        ? creator.push(item.userAccountAddress)
+        : 0;
     }
     const getUsers = await Users.find({
       account: { $in: creator },
-    });
+    }).limit(10);
     return res
       .status(200)
       .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
@@ -363,7 +355,7 @@ const getLatestCreator = async (req, res) => {
     creator = [...new Set(creator)];
     const findLatestCreator = await Users.find({
       account: { $in: creator },
-    }).limit(5);
+    }).limit(6);
     return res
       .status(200)
       .send(
@@ -382,12 +374,27 @@ const getLatestCreator = async (req, res) => {
 
 const getTopSellers = async (req, res) => {
   try {
-    const findTopSellers = await Users.find().limit(5);
+    const getCollectionAddress = await LaunchPadMintHistory.aggregate([
+      { $group: { _id: "$collectionAddress", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    let collectionAddress = [];
+    for (item of getCollectionAddress) {
+      item._id ? collectionAddress.push(item._id) : 0;
+    }
+    const getCreator = await LaunchPadCollection.find({
+      collectionAddress: { $in: collectionAddress },
+    });
+    let creator = [];
+    for (item of getCreator) {
+      item.creator ? creator.push(item.creator) : 0;
+    }
+    const getUsers = await Users.find({
+      account: { $in: creator },
+    }).limit(6);
     return res
       .status(200)
-      .send(
-        new ResponseObject(200, "Get Top Sellers Successfully", findTopSellers)
-      );
+      .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
   } catch (err) {
     return res
       .status(500)
@@ -397,12 +404,20 @@ const getTopSellers = async (req, res) => {
 
 const getTopBuyers = async (req, res) => {
   try {
-    const findTopBuyers = await Users.find().limit(5);
+    const getUserAddress = await LaunchPadMintHistory.aggregate([
+      { $group: { _id: "$userAddress", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    let creator = [];
+    for (item of getUserAddress) {
+      item._id ? creator.push(item._id) : 0;
+    }
+    const getUsers = await Users.find({
+      account: { $in: creator },
+    }).limit(6);
     return res
       .status(200)
-      .send(
-        new ResponseObject(200, "Get Top Buyers Successfully", findTopBuyers)
-      );
+      .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
   } catch (err) {
     return res
       .status(500)
@@ -439,18 +454,17 @@ const collectionCreatorUsers = async (req, res) => {
     });
     creator = [...new Set(creator)];
     const tableData = await Users.find({ account: { $in: creator } })
-    .populate([
-      {
-        path:"isSelected",
-        
-      }
-    ])
+      .populate([
+        {
+          path: "isSelected",
+        },
+      ])
       // .sort({ [sort_by_name]: sort_by_order })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const row_count = await Users.count({ account: { $in: creator } })
-    
+    const row_count = await Users.count({ account: { $in: creator } });
+
     const result = customPagination.customPagination(
       tableData,
       page,
