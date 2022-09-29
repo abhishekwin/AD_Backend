@@ -278,7 +278,7 @@ const stashCollectionHeader = async (req, res) => {
 };
 const stashAllCollectionHeader = async (req, res) => {
   try {
-    const filter = { isActive: true };
+    const filter = { };
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
     const nftLowestPrice = await LaunchPadNft.findOne(filter)
