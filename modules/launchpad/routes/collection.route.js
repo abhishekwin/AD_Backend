@@ -84,6 +84,6 @@ router
   
 router
   .route("/add-top-creator")
-  .post(validate(topCreatorValidation), collectionController.addTopCreator);
+  .post(checkAdminToken, validate(topCreatorValidation), collectionController.addTopCreator);
 
 module.exports = router;

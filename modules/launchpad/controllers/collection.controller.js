@@ -439,11 +439,18 @@ const collectionCreatorUsers = async (req, res) => {
     });
     creator = [...new Set(creator)];
     const tableData = await Users.find({ account: { $in: creator } })
+    .populate([
+      {
+        path:"isSelected",
+        
+      }
+    ])
       // .sort({ [sort_by_name]: sort_by_order })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const row_count = await Users.count({ account: { $in: creator } });
+    const row_count = await Users.count({ account: { $in: creator } })
+    
     const result = customPagination.customPagination(
       tableData,
       page,

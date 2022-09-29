@@ -30,6 +30,13 @@ userSchema.virtual('follower_count', {
   count: true,
 });
 
+userSchema.virtual('isSelected', {
+  ref: 'LaunchPadTopCreator',
+  localField: 'account',
+  foreignField: 'userAccountAddress',
+  count: true,
+});
+
 userSchema.virtual('is_followed', {
   ref: 'userfollower',
   localField: '_id',
