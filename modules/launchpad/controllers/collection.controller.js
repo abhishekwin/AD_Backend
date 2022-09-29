@@ -10,10 +10,11 @@ const {
   LaunchPadNft,
   WhiteListedUser,
   LaunchPadTopCreator,
+  LaunchPadMintHistory,
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
-const customPagination = require('../../comman/customPagination');
+const customPagination = require("../../comman/customPagination");
 
 const createCollection = catchAsync(async (req, res) => {
   const result = await Collection.createCollectionService(req.body);
@@ -283,13 +284,27 @@ const stashAllCollectionHeader = async (req, res) => {
 
 const topCreator = async (req, res) => {
   try {
-    const result = await LaunchPadCollection.aggregate([
-      { $group: { _id: "$creator", count: { $sum: 1 } } },
+    const getCollectionAddress = await LaunchPadMintHistory.aggregate([
+      { $group: { _id: "$collectionAddress", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
+    let collectionAddress = [];
+    for (item of getCollectionAddress) {
+      item._id ? collectionAddress.push(item._id) : 0;
+    }
+    const getCreator = await LaunchPadCollection.find({
+      collectionAddress: { $in: collectionAddress },
+    });
+    let creator = []
+    for (item of getCreator) {
+      item.creator ? creator.push(item.creator) : 0;
+    }
+    const getUsers = await Users.find({
+      account: { $in: creator },
+    });
     return res
       .status(200)
-      .send(new ResponseObject(200, "Get Top Creator Successfully", result));
+      .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
   } catch (err) {
     return res
       .status(500)
@@ -375,7 +390,7 @@ const addTopCreator = async (req, res) => {
 };
 const collectionCreatorUsers = async (req, res) => {
   try {
-    const { page, limit } = req.body
+    const { page, limit } = req.body;
     const findCreator = await LaunchPadCollection.find();
     let creator = findCreator.map((item) => {
       if (item.creator != null) {
@@ -384,13 +399,18 @@ const collectionCreatorUsers = async (req, res) => {
       return;
     });
     creator = [...new Set(creator)];
-    const tableData = await Users.find({account: { $in: creator }})
-    // .sort({ [sort_by_name]: sort_by_order })
-    .skip((page - 1) * limit)
-    .limit(limit);
+    const tableData = await Users.find({ account: { $in: creator } })
+      // .sort({ [sort_by_name]: sort_by_order })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-  const row_count = await Users.count({account: { $in: creator }});
-  const result = customPagination.customPagination(tableData, page, limit, row_count);
+    const row_count = await Users.count({ account: { $in: creator } });
+    const result = customPagination.customPagination(
+      tableData,
+      page,
+      limit,
+      row_count
+    );
     return res
       .status(200)
       .send(
@@ -401,7 +421,7 @@ const collectionCreatorUsers = async (req, res) => {
         )
       );
   } catch (err) {
-    console.log("error", err)
+    console.log("error", err);
     return res
       .status(500)
       .send(new ResponseObject(500, "Something Went Wrong"));

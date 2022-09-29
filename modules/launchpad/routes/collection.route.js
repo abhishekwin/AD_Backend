@@ -63,7 +63,7 @@ router
   .get(collectionController.stashAllCollectionHeader);   
 router
   .route("/get-top-creator")
-  .post(collectionController.topCreator); 
+  .get(collectionController.topCreator); 
 router
   .route("/get-latest-creator")
   .get(collectionController.getLatestCreator);  
