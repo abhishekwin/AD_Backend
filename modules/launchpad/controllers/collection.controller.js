@@ -164,6 +164,42 @@ const getCollectionList = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collections display successfully", result));
 });
 
+const getMyCollectionList = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+  
+  // if (req.body.approved || req.body.approved === false) {
+  //   filtercolumn.push("approved");
+  // }
+  if (req.body.status) {
+    filtercolumn.push("status");
+  }
+  
+  req.body.creator = req.userData.account.toLowerCase()
+  filtercolumn.push("creator");
+  
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  // if (req.body.post) {
+  //   let search = await specialCharacter.specialCharacter(req.body.post);
+  //   req.body.post = new RegExp('.*' + search + '.*', "i");
+  //   filtercolumn.push('post');
+  // }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
 const approvedCollection = async (req, res) => {
   try {
     const { collectionId } = req.body;
@@ -406,6 +442,7 @@ module.exports = {
   deleteCollection,
   getCollection,
   getCollectionList,
+  getMyCollectionList,
   approvedCollection,
   stashCollectionHeader,
   topCreator,

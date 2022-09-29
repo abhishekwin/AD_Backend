@@ -50,6 +50,11 @@ router
 router
   .route("/get-collection-list")
   .post(collectionController.getCollectionList);
+
+router
+  .route("/get-my-collection-list")
+  .post(checkToken, collectionController.getMyCollectionList);
+
 router
   .route("/approved-collection")
   .patch(checkAdminToken, collectionController.approvedCollection);
