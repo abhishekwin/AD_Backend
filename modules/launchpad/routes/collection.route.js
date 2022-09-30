@@ -72,6 +72,10 @@ router
 router
   .route("/get-latest-creator")
   .get(collectionController.getLatestCreator);  
+
+router
+  .route("/get-latest-collection")
+  .get(collectionController.getLatestCollection);  
 router
   .route("/get-top-sellers")
   .get(collectionController.getTopSellers); 
