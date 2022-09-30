@@ -15,6 +15,7 @@ const {
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 const customPagination = require("../../comman/customPagination");
+const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 const createCollection = catchAsync(async (req, res) => {
   const result = await Collection.createCollectionService(req.body);
@@ -146,11 +147,12 @@ const getCollectionList = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  // if (req.body.post) {
-  //   let search = await specialCharacter.specialCharacter(req.body.post);
-  //   req.body.post = new RegExp('.*' + search + '.*', "i");
-  //   filtercolumn.push('post');
-  // }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -324,9 +326,7 @@ const topCreator = async (req, res) => {
     const getCollectionAddress = await LaunchPadTopCreator.find();
     let creator = [];
     for (item of getCollectionAddress) {
-      item.userAccountAddress
-        ? creator.push(item.userAccountAddress)
-        : 0;
+      item.userAccountAddress ? creator.push(item.userAccountAddress) : 0;
     }
     const getUsers = await Users.find({
       account: { $in: creator },

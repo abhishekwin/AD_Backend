@@ -11,6 +11,7 @@ const { LaunchPadNft, LaunchPadCollection } = require("../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 const path = require("path");
 const { Nft } = require("../services");
+const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 const createNft = async (req, res) => {
   try {
@@ -98,7 +99,7 @@ const createNft = async (req, res) => {
 const getNftList = async (req, res) => {
   try {
     const { collectionId, owner, loginUserAddress } = req.body;
-    
+
     let filtercolumn = [];
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
@@ -106,17 +107,22 @@ const getNftList = async (req, res) => {
     if (collectionId) {
       filtercolumn.push("collectionId");
     }
-    let isAdmin = false
-    if(loginUserAddress){
+    let isAdmin = false;
+    if (loginUserAddress) {
       isAdmin = await getAdminAddress(loginUserAddress);
     }
-
+    if (req.body.searchText) {
+      let search = await specialCharacter(req.body.searchText);
+      search = new RegExp(".*" + search + ".*", "i");
+      req.body.$or = [{ description: search }, { name: search }];
+      filtercolumn.push("$or");
+    }
     if (!isAdmin && !owner) {
       req.body.isMint = true;
       filtercolumn.push("isMint");
     } else {
       if (!isAdmin) {
-        console.log("error")
+        console.log("error");
         req.body.$or = [{ isMint: true }, { owner: loginUserAddress }];
         filtercolumn.push("$or");
       }
