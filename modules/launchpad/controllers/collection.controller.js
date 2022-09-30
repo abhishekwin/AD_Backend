@@ -11,6 +11,8 @@ const {
   WhiteListedUser,
   LaunchPadTopCreator,
   LaunchPadMintHistory,
+  LaunchPadCoolTime,
+  LaunchPadAdminSetting,
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
@@ -18,8 +20,37 @@ const customPagination = require("../../comman/customPagination");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 const createCollection = catchAsync(async (req, res) => {
+  const findCoolTime = await LaunchPadCoolTime.findOne({
+    userAddress: req.userData.account.toLowerCase(),
+  });
+  const findTime = await LaunchPadAdminSetting.findOne({
+    type: "create-collection",
+  });
+  if (findTime) {
+    const time = findTime.settingData.coolTime;
+    let currentDate = findCoolTime.time;
+    const checkTime = new Date(currentDate.getTime() + +time * 60 * 60000);
+    if (new Date() < checkTime) {
+      return res
+        .status(400)
+        .send(new ResponseObject(400, "Please Wait SomeTime"));
+    }
+  }
+  req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
+  if (findCoolTime) {
+    findCoolTime.collectionAddress = result.collectionAddress;
+    findCoolTime.time = new Date();
+    await findCoolTime.save();
+  } else {
+    await LaunchPadCoolTime.create({
+      userAddress: req.userData.account,
+      collectionAddress: result.collectionAddress,
+      type: "create-collection",
+      time: new Date(),
+    });
+  }
   let WhiteListUser = [];
   for (userAddress of req.body.WhiteListedUser) {
     WhiteListUser.push({ collectionId, userAddress });
@@ -481,7 +512,6 @@ const collectionCreatorUsers = async (req, res) => {
         )
       );
   } catch (err) {
-    console.log("error", err);
     return res
       .status(500)
       .send(new ResponseObject(500, "Something Went Wrong"));

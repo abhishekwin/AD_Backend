@@ -164,6 +164,11 @@ const nftSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    currency: {
+      type: String,
+      enum: ["ETH", "BNB", "SAFEMOON", "DOGE", "USDC"],
+      default: "BNB",
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

@@ -52,6 +52,7 @@ const createNft = async (req, res) => {
         networkName: launchPadCollection.networkName,
         owner: launchPadCollection.owner,
         creator: launchPadCollection.creator,
+        currency: launchPadCollection.currency
       };
       let otherNftData = {
         collectionId: launchPadCollection._id,

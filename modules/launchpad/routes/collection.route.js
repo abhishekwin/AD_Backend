@@ -26,6 +26,7 @@ const router = express.Router();
 router
   .route("/create-collection")
   .post(
+    checkToken,
     validate(createCollectionValidation),
     collectionController.createCollection
   );

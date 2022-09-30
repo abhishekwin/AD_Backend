@@ -6,22 +6,24 @@ const coolTimeSchema = mongoose.Schema(
     collectionAddress: {
       type: String,
       trim: true,
-      default: null, 
+      default: null,
+      lowercase: true
     },
     userAddress: {
       type: String,
       trim: true,
       default: null,
+      lowercase: true
     },
-    mintTime: {
-      type: Date,
-      default: null,
-    },
-    currentMintTime: {
+    type: {
       type: String,
       trim: true,
       default: null,
     },
+    time: {
+      type: Date,
+      default: null,
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
