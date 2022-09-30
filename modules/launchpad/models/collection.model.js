@@ -185,9 +185,12 @@ collectionSchema.virtual('whiteListedUsers', {
 
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   let whiteListedUsers = []
-  for (const iterator of this.whiteListedUsers) {
-    whiteListedUsers.push(iterator.userAddress)
-  }
+  if(this.whiteListedUsers){
+    
+    for (const iterator of this.whiteListedUsers) {
+      whiteListedUsers.push(iterator.userAddress)
+    }
+  }  
   return whiteListedUsers;
 });
 
