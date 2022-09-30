@@ -403,6 +403,37 @@ const getLatestCreator = async (req, res) => {
   }
 };
 
+const getLatestCollection = async (req, res) => {
+  try {
+    const lanchpadCollection = await LaunchPadCollection.find({
+      approved: true,
+    }).sort({ created_at: -1 }).limit(4);
+    // let creator = lanchpadCollection.map((item) => {
+    //   if (item.creator != null) {
+    //     return item.creator;
+    //   }
+    //   return null;
+    // });
+    // creator = [...new Set(creator)];
+    // const findLatestCreator = await Users.find({
+    //   account: { $in: creator },
+    // }).limit(6);
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(
+          200,
+          "Get Latest Collection Successfully",
+          lanchpadCollection
+        )
+      );
+  } catch (err) {
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong"));
+  }
+};
+
 const getTopSellers = async (req, res) => {
   try {
     const getCollectionAddress = await LaunchPadMintHistory.aggregate([
@@ -531,6 +562,7 @@ module.exports = {
   topCreator,
   stashAllCollectionHeader,
   getLatestCreator,
+  getLatestCollection,
   getTopSellers,
   getTopBuyers,
   addTopCreator,

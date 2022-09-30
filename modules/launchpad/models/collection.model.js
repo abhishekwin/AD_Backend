@@ -183,6 +183,16 @@ collectionSchema.virtual('whiteListedUsers', {
   justOne: false
 });
 
+collectionSchema.virtual('whiteListedUsersInArray').get(function () {
+  let whiteListedUsers = []
+  if(this.whiteListedUsers){
+    for (const iterator of this.whiteListedUsers) {
+      whiteListedUsers.push(iterator.userAddress)
+    }
+  }  
+  return whiteListedUsers;
+});
+
 // add plugin that converts mongoose to json
 collectionSchema.set("toJSON", { getters: true, virtuals: true });
 collectionSchema.plugin(toJSON);

@@ -7,6 +7,7 @@ const userSchema = new Schema({
   imageCover: { type: String, default : null }, 
   firstName: { type: String, default: null },
   lastName: { type: String, default: null },
+  email: { type: String, default: null },
   nickName: { type: String, default: null },
   account : { type: String, default: null, lowercase: true }, //wallet_address
   bio: { type: String, default: null },
