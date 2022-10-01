@@ -279,9 +279,9 @@ const stashCollectionHeader = async (req, res) => {
   try {
     const filter = { collectionAddress, isActive: true };
     const nftsCount = await LaunchPadNft.count(filter);
-    const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
+    const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
     const nftLowestPrice = await LaunchPadNft.findOne(filter)
-      .sort({ price: 1 })
+      .sort({ mintCost: 1 })
       .limit(1);
 
     let nftsOwnerIds = [];
@@ -320,9 +320,9 @@ const stashAllCollectionHeader = async (req, res) => {
   try {
     const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
-    const nftsOwner = await LaunchPadNft.find(filter).select("owner price");
+    const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
     const nftLowestPrice = await LaunchPadNft.findOne(filter)
-      .sort({ price: 1 })
+      .sort({ mintCost: 1 })
       .limit(1);
 
     let nftsOwnerIds = [];
