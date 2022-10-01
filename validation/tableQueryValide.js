@@ -11,10 +11,11 @@ const tableQueryData = {
         "history",
         "userFollower",
         "nonce",
-        "launchpadcollections",
+        "eventManager",
+        "launchPadCollection",
         "launchpadhistories",
         "launchpadminthistories",
-        "launchpadnfts",
+        "launchPadNft",
         "launchpadtopcreators"
       )
       .required(),

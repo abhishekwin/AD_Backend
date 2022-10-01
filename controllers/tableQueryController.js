@@ -8,6 +8,7 @@ const {
   ImageUploadLogs,
   EventManager,
 } = require("../models");
+
 const {
   LaunchPadCollection,
   LaunchPadNft,
@@ -40,15 +41,15 @@ module.exports = {
         result = await ImageUploadLogs.find(filter)
           .limit(50)
           .sort({ createdAt: "-1" });
-      } else if ("EventManager" === table) {
+      } else if ("eventManager" === table) {
         result = await EventManager.find(filter)
           .limit(50)
           .sort({ createdAt: "-1" });
-      } else if ("LaunchPadCollection" === table) {
+      } else if ("launchPadCollection" === table) {
         result = await LaunchPadCollection.find(filter)
           .limit(100)
           .sort({ createdAt: "-1" });
-      } else if ("LaunchPadNft" === table) {
+      } else if ("launchPadNft" === table) {
         result = await LaunchPadNft.find(filter)
           .limit(100)
           .sort({ createdAt: "-1" });
