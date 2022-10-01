@@ -366,7 +366,7 @@ const topCreator = async (req, res) => {
     }
     const getUsers = await Users.find({
       account: { $in: creator },
-    }).limit(10);
+    }).limit(4);
     return res
       .status(200)
       .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
@@ -391,7 +391,7 @@ const getLatestCreator = async (req, res) => {
     creator = [...new Set(creator)];
     const findLatestCreator = await Users.find({
       account: { $in: creator },
-    }).limit(6);
+    }).limit(4);
     return res
       .status(200)
       .send(
@@ -458,7 +458,7 @@ const getTopSellers = async (req, res) => {
     }
     const getUsers = await Users.find({
       account: { $in: creator },
-    }).limit(6);
+    }).limit(4);
     return res
       .status(200)
       .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
@@ -481,7 +481,7 @@ const getTopBuyers = async (req, res) => {
     }
     const getUsers = await Users.find({
       account: { $in: creator },
-    }).limit(6);
+    }).limit(4);
     return res
       .status(200)
       .send(new ResponseObject(200, "Get Top Creator Successfully", getUsers));
