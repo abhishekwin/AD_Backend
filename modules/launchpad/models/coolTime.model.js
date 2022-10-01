@@ -38,6 +38,6 @@ coolTimeSchema.plugin(paginate);
 /**
  * @typedef CoolTime
  */
-const CoolTime = mongoose.model("CoolTime", coolTimeSchema);
+const CoolTime = mongoose.model("LaunchpadCoolTime", coolTimeSchema);
 
 module.exports = CoolTime;

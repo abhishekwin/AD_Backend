@@ -31,6 +31,23 @@ const createAdminSetting = async (req, res) => {
   }
 };
 
+const getAdminSetting = async (req, res) => {
+  try {
+    const { type, settingData } = req.body;
+
+    const adminSetting = await LaunchPadAdminSetting.find();
+    
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "Create Admin Setting Successfully", adminSetting));
+  } catch (err) {
+    console.log("error",err)
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong"));
+  }
+};
 module.exports = {
   createAdminSetting,
+  getAdminSetting
 };

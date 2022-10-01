@@ -6,8 +6,7 @@ const adminSettingSchema = mongoose.Schema(
     type: {
       type: String,
       trim: true,
-      default: null,
-      lowercase: true,
+      default: null
     },
     settingData: {
       type: Object,

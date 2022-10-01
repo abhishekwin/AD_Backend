@@ -20,22 +20,27 @@ const customPagination = require("../../comman/customPagination");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 const createCollection = catchAsync(async (req, res) => {
-  const findCoolTime = await LaunchPadCoolTime.findOne({
-    userAddress: req.userData.account.toLowerCase(),
-  });
-  const findTime = await LaunchPadAdminSetting.findOne({
-    type: "create-collection",
-  });
-  if (findTime) {
-    const time = findTime.settingData.coolTime;
-    let currentDate = findCoolTime.time;
-    const checkTime = new Date(currentDate.getTime() + +time * 60 * 60000);
-    if (new Date() < checkTime) {
-      return res
-        .status(400)
-        .send(new ResponseObject(400, "Please Wait SomeTime"));
-    }
-  }
+  // const findCoolTime = await LaunchPadCoolTime.findOne({
+  //   userAddress: req.userData.account.toLowerCase(),
+  // });
+  // const findTime = await LaunchPadAdminSetting.findOne({
+  //   type: "createCollection",
+  // });
+  // if (findTime) {
+  //   let time = 0;
+  //   if (findTime?.settingData?.coolTime) {
+  //     time = findTime.settingData.coolTime
+  //   }
+  //   if (time) {
+  //     let currentDate = new Date();
+  //     currentDate = new Date(currentDate.getTime() + time * 60 * 1000)
+  //     if (new Date() < currentDate) {
+  //       return res
+  //         .status(400)
+  //         .send(new ResponseObject(400, "Please Wait SomeTime"));
+  //     }
+  //   }
+  // }
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
@@ -47,7 +52,7 @@ const createCollection = catchAsync(async (req, res) => {
     await LaunchPadCoolTime.create({
       userAddress: req.userData.account,
       collectionAddress: result.collectionAddress,
-      type: "create-collection",
+      type: "createCollection",
       time: new Date(),
     });
   }
