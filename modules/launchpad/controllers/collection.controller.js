@@ -43,19 +43,19 @@ const createCollection = catchAsync(async (req, res) => {
   // }
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
-  const collectionId = result._id;
-  if (findCoolTime) {
-    findCoolTime.collectionAddress = result.collectionAddress;
-    findCoolTime.time = new Date();
-    await findCoolTime.save();
-  } else {
-    await LaunchPadCoolTime.create({
-      userAddress: req.userData.account,
-      collectionAddress: result.collectionAddress,
-      type: "createCollection",
-      time: new Date(),
-    });
-  }
+  // const collectionId = result._id;
+  // if (findCoolTime) {
+  //   findCoolTime.collectionAddress = result.collectionAddress;
+  //   findCoolTime.time = new Date();
+  //   await findCoolTime.save();
+  // } else {
+  //   await LaunchPadCoolTime.create({
+  //     userAddress: req.userData.account,
+  //     collectionAddress: result.collectionAddress,
+  //     type: "createCollection",
+  //     time: new Date(),
+  //   });
+  // }
   let WhiteListUser = [];
   for (userAddress of req.body.WhiteListedUser) {
     WhiteListUser.push({ collectionId, userAddress });
