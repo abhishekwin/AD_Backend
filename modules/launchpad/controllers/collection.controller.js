@@ -43,7 +43,7 @@ const createCollection = catchAsync(async (req, res) => {
   // }
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
-  // const collectionId = result._id;
+  const collectionId = result._id;
   // if (findCoolTime) {
   //   findCoolTime.collectionAddress = result.collectionAddress;
   //   findCoolTime.time = new Date();
