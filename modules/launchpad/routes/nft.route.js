@@ -28,5 +28,6 @@ const router = express.Router();
 const upload = multer({ storage })
 router.post("/create-nft-with-upload-images", upload.array("files"), nftController.createNft);
 router.post("/get-nft-list", nftController.getNftList);
+router.post("/get-my-nft-list", checkToken,  nftController.getMyNftList);
 router.get("/get-nft-detail/:id", nftController.nftDetail);
 module.exports = router;

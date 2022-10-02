@@ -140,6 +140,55 @@ const getNftList = async (req, res) => {
       .send(new ResponseObject(500, "Something went wrong", error));
   }
 };
+
+const getMyNftList = async (req, res) => {
+  try {
+    const { collectionId, owner, loginUserAddress } = req.body;
+
+    let filtercolumn = [];
+    
+    req.body.creator = req.userData.account.toLowerCase();
+    filtercolumn.push("creator");
+
+    if (req.body.isSale || req.body.isSale === false) {
+      filtercolumn.push("isSale");
+    }
+    if (collectionId) {
+      filtercolumn.push("collectionId");
+    }
+    let isAdmin = false;
+    if (loginUserAddress) {
+      isAdmin = await getAdminAddress(loginUserAddress);
+    }
+    if (req.body.searchText) {
+      let search = await specialCharacter(req.body.searchText);
+      search = new RegExp(".*" + search + ".*", "i");
+      req.body.$or = [{ description: search }, { name: search }];
+      filtercolumn.push("$or");
+    }
+    // if (!isAdmin && !owner) {
+    //   req.body.isMint = true;
+    //   filtercolumn.push("isMint");
+    // } else {
+    //   if (!isAdmin) {
+    //     console.log("error");
+    //     req.body.$or = [{ isMint: true }, { owner: loginUserAddress }];
+    //     filtercolumn.push("$or");
+    //   }
+    // }
+    const filter = pick(req.body, filtercolumn);
+    const options = pick(req.body, ["sortBy", "limit", "page"]);
+    const result = await Nft.getLaunchPadNftList(filter, options, req);
+    res
+      .status(200)
+      .send(new ResponseObject(200, "get all nft successfully", result));
+  } catch (error) {
+    res
+      .status(500)
+      .send(new ResponseObject(500, "Something went wrong", error));
+  }
+};
+
 const nftDetail = async (req, res) => {
   try {
     const { id } = req.params;
@@ -160,5 +209,6 @@ const nftDetail = async (req, res) => {
 module.exports = {
   createNft,
   getNftList,
+  getMyNftList,
   nftDetail,
 };
