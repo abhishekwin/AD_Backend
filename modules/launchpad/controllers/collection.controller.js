@@ -172,6 +172,10 @@ const getCollection = async (req, res) => {
 
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+  
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress"); 
+
   req.body.status = "completed";
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
@@ -206,6 +210,9 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const upcomingCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress"); 
 
   req.body.startDate = {$gt: new Date()}
   filtercolumn.push("startDate");
@@ -255,7 +262,10 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 const liveCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
   
-  req.body.startDate = {$lt: new Date()}
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress"); 
+
+  req.body.startDate = {$lte: new Date()}
   filtercolumn.push("startDate");
 
   req.body.status = "completed";
@@ -299,6 +309,10 @@ const endCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
   req.body.status = "completed";
   filtercolumn.push("status");
+
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress"); 
+  
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
   }
@@ -341,6 +355,9 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   // if (req.body.approved || req.body.approved === false) {
   //   filtercolumn.push("approved");
   // }
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress"); 
+
   if (req.body.status) {
     filtercolumn.push("status");
   }
@@ -408,7 +425,7 @@ const approvedCollection = async (req, res) => {
 const stashCollectionHeader = async (req, res) => {
   const { collectionAddress } = req.body;
   try {
-    const filter = { collectionAddress, isActive: true };
+    const filter = { collectionAddress, isActive: true, collectionAddress : { $ne: null } };
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
     const nftLowestPrice = await LaunchPadNft.findOne({...filter, ...{ mintCost: { $ne: null } }})
@@ -452,7 +469,7 @@ const stashAllCollectionHeader = async (req, res) => {
     const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
-    const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null } })
+    const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null }, collectionAddress : { $ne: null } })
       .sort({ mintCost: 1 })
       .limit(1);
 
@@ -543,6 +560,7 @@ const getLatestCollection = async (req, res) => {
   try {
     const lanchpadCollection = await LaunchPadCollection.find({
       approved: true,
+      collectionAddress : { $ne: null }
     }).sort({ created_at: -1 }).limit(4);
     // let creator = lanchpadCollection.map((item) => {
     //   if (item.creator != null) {
