@@ -181,7 +181,7 @@ const getMyNftList = async (req, res) => {
     const result = await Nft.getLaunchPadNftList(filter, options, req);
     res
       .status(200)
-      .send(new ResponseObject(200, "get all nft successfully", result));
+      .send(new ResponseObject(200, "Get all my nfts successfully", result));
   } catch (error) {
     res
       .status(500)
