@@ -172,7 +172,7 @@ const getCollection = async (req, res) => {
 
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
-  
+
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress"); 
 
@@ -214,11 +214,10 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress"); 
 
-  req.body.startDate = {$gt: new Date()}
-  filtercolumn.push("startDate");
+  
 
-  req.body.endDate = {$lt: new Date()}
-  filtercolumn.push("endDate");
+  // req.body.endDate = {$lt: new Date()}
+  // filtercolumn.push("endDate");
 
   req.body.status = "completed";
   filtercolumn.push("status");
@@ -233,12 +232,14 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
   filtercolumn.push("networkId", "networkName");
   
+  let orArray = [{startDate: {$gt: new Date()}}, {startDate: null}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
-    req.body.$or = [{ collectionName: search }, { symbol: search }];
-    filtercolumn.push("$or");
+    orArray.push(...[{ collectionName: search }, { symbol: search }]);
   }
+  req.body.$or = orArray;
+  filtercolumn.push("$or");
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -265,9 +266,6 @@ const liveCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress"); 
 
-  req.body.startDate = {$lte: new Date()}
-  filtercolumn.push("startDate");
-
   req.body.status = "completed";
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
@@ -279,12 +277,17 @@ const liveCollectionList = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
+  
+  let orArray = [{startDate: {$lte: new Date()}}, {startDate: null}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
-    req.body.$or = [{ collectionName: search }, { symbol: search }];
-    filtercolumn.push("$or");
+    orArray.push(...[{ collectionName: search }, { symbol: search }]);
   }
+
+  req.body.$or = orArray;
+  filtercolumn.push("$or");
+
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
