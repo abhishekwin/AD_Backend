@@ -23,13 +23,10 @@ const createCollectionService = async (reqBody) => {
  * @returns {Promise<QueryResult>}
  */
  const getLaunchPadCollectionList = async (filter, options, req) => {
-
   let page = options.page;
   let limit = options.limit;
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
-
-  //console.log("filtercolumn", filter);
 
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
@@ -43,7 +40,34 @@ const createCollectionService = async (reqBody) => {
   return result;
 };
 
+const getLaunchPadEndCollectionList = async (filter, options, req) => {
+  let page = options.page;
+  let limit = options.limit;
+  let sort_by_name = options.sortBy?options.sortBy.name:"";
+  let sort_by_order = options.sortBy?options.sortBy.order:"";
+
+  const endCollectionData = await LaunchPadCollection.find(filter);
+  let collectionIds = []
+  
+  for (const iterator of endCollectionData) {
+    if(iterator.maxSupply <= iterator.nftMintCount){
+      collectionIds.push(iterator._id.toString())
+    }
+  }
+  
+  const tableData = await LaunchPadCollection.find({_id:{$in : collectionIds}})
+    .sort({ [sort_by_name]: sort_by_order })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const row_count = await LaunchPadCollection.count(filter);
+
+  const result = customPagination.customPagination(tableData, page, limit, row_count);
+
+  return result;
+};
 module.exports = {
   createCollectionService,
-  getLaunchPadCollectionList
+  getLaunchPadCollectionList,
+  getLaunchPadEndCollectionList
 };

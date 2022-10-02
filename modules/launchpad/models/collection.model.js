@@ -135,7 +135,7 @@ const collectionSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [null, "in-progress", "completed"],
+      enum: [null, "in-progress", "completed", "ended"],
       default: null,
     },
     nonce:{

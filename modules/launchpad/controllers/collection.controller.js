@@ -206,6 +206,10 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const upcomingCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.startDate = {$gt: new Date()}
+  filtercolumn.push("startDate");
+
   req.body.status = "completed";
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
@@ -217,6 +221,8 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
+  filtercolumn.push("networkId", "networkName");
+  
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
@@ -240,6 +246,10 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
 const liveCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+  
+  req.body.startDate = {$lt: new Date()}
+  filtercolumn.push("startDate");
+
   req.body.status = "completed";
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
@@ -295,7 +305,7 @@ const endCollectionList = catchAsync(async (req, res) => {
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
   // const result = await NewsPostService.getNewsPost
-  const result = await Collection.getLaunchPadCollectionList(
+  const result = await Collection.getLaunchPadEndCollectionList(
     filter,
     options,
     req
