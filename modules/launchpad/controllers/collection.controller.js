@@ -241,10 +241,15 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     options,
     req
   );
-
+  
+  const response = {
+    type:"upcoming",
+    result:result
+  }
+  
   res
     .status(200)
-    .send(new ResponseObject(200, "Collections display successfully", result));
+    .send(new ResponseObject(200, "Collections display successfully", response));
 });
 
 const liveCollectionList = catchAsync(async (req, res) => {
@@ -280,9 +285,14 @@ const liveCollectionList = catchAsync(async (req, res) => {
     req
   );
 
+  const response = {
+    type:"live",
+    result:result
+  }
+
   res
     .status(200)
-    .send(new ResponseObject(200, "Collections display successfully", result));
+    .send(new ResponseObject(200, "Collections display successfully", response));
 });
 
 const endCollectionList = catchAsync(async (req, res) => {
@@ -314,9 +324,14 @@ const endCollectionList = catchAsync(async (req, res) => {
     req
   );
 
+  const response = {
+    type:"ended",
+    result:result
+  }
+
   res
     .status(200)
-    .send(new ResponseObject(200, "Collections display successfully", result));
+    .send(new ResponseObject(200, "Collections display successfully", response));
 });
 
 
