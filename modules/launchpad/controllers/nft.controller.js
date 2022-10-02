@@ -100,6 +100,9 @@ const createNft = async (req, res) => {
 const getNftList = async (req, res) => {
   try {
     const { collectionId, owner, loginUserAddress } = req.body;
+    
+    req.body.collectionAddress = { $ne: null }
+    filtercolumn.push("collectionAddress"); 
 
     let filtercolumn = [];
     if (req.body.isSale || req.body.isSale === false) {
@@ -146,7 +149,8 @@ const getMyNftList = async (req, res) => {
     const { collectionId, owner, loginUserAddress } = req.body;
 
     let filtercolumn = [];
-    
+    req.body.collectionAddress = { $ne: null }
+    filtercolumn.push("collectionAddress"); 
     req.body.creator = req.userData.account.toLowerCase();
     filtercolumn.push("creator");
 
