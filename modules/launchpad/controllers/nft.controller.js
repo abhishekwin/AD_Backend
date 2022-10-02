@@ -100,7 +100,7 @@ const createNft = async (req, res) => {
 const getNftList = async (req, res) => {
   try {
     const { collectionId, owner, loginUserAddress } = req.body;
-    
+
     req.body.collectionAddress = { $ne: null }
     filtercolumn.push("collectionAddress"); 
 
@@ -121,6 +121,11 @@ const getNftList = async (req, res) => {
       req.body.$or = [{ description: search }, { name: search }];
       filtercolumn.push("$or");
     }
+
+    if (req.body.networkId && req.body.networkName) {
+      filtercolumn.push("networkId", "networkName");
+    }
+
     if (!isAdmin && !owner) {
       req.body.isMint = true;
       filtercolumn.push("isMint");
@@ -164,6 +169,11 @@ const getMyNftList = async (req, res) => {
     if (loginUserAddress) {
       isAdmin = await getAdminAddress(loginUserAddress);
     }
+
+    if (req.body.networkId && req.body.networkName) {
+      filtercolumn.push("networkId", "networkName");
+    }
+    
     if (req.body.searchText) {
       let search = await specialCharacter(req.body.searchText);
       search = new RegExp(".*" + search + ".*", "i");
