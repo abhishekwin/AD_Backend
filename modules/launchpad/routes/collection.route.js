@@ -54,6 +54,18 @@ router
   .post(collectionController.getCollectionList);
 
 router
+  .route("/upcoming-collection-list")
+  .post(collectionController.upcomingCollectionList);
+
+router
+  .route("/live-collection-list")
+  .post(collectionController.liveCollectionList);
+
+router
+  .route("/end-collection-list")
+  .post(collectionController.endCollectionList);
+
+router
   .route("/get-my-collection-list")
   .post(checkToken, collectionController.getMyCollectionList);
 

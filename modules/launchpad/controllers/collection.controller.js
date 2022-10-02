@@ -204,6 +204,109 @@ const getCollectionList = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collections display successfully", result));
 });
 
+const upcomingCollectionList = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+  req.body.status = "completed";
+  filtercolumn.push("status");
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+  if (req.body.owner) {
+    filtercolumn.push("owner");
+  }
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
+const liveCollectionList = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+  req.body.status = "completed";
+  filtercolumn.push("status");
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+  if (req.body.owner) {
+    filtercolumn.push("owner");
+  }
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
+const endCollectionList = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+  req.body.status = "completed";
+  filtercolumn.push("status");
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+  if (req.body.owner) {
+    filtercolumn.push("owner");
+  }
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
+
 const getMyCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
@@ -561,6 +664,9 @@ module.exports = {
   deleteCollection,
   getCollection,
   getCollectionList,
+  upcomingCollectionList,
+  liveCollectionList,
+  endCollectionList,
   getMyCollectionList,
   approvedCollection,
   stashCollectionHeader,
