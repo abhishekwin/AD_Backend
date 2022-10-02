@@ -210,6 +210,9 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   req.body.startDate = {$gt: new Date()}
   filtercolumn.push("startDate");
 
+  req.body.endDate = {$lt: new Date()}
+  filtercolumn.push("endDate");
+
   req.body.status = "completed";
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
