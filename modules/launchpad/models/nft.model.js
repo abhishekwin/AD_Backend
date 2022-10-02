@@ -76,11 +76,6 @@ const nftSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    paymentType: {
-      type: String,
-      enum: ["BNB","ETH"],
-      default: "BNB",
-    },
     saleType: {
       type: String,
       default: "Fixed",
