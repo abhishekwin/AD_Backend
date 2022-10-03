@@ -232,7 +232,7 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
   filtercolumn.push("networkId", "networkName");
   
-  let orArray = [{startDate: {$gt: new Date()}}, {startDate: null}];
+  let orArray = [{startDate: {$gt: new Date()}}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
@@ -292,7 +292,7 @@ const liveCollectionList = catchAsync(async (req, res) => {
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
   // const result = await NewsPostService.getNewsPost
-  const result = await Collection.getLaunchPadCollectionList(
+  const result = await Collection.getLaunchPadLiveCollectionList(
     filter,
     options,
     req

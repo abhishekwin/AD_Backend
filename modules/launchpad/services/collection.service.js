@@ -27,7 +27,26 @@ const createCollectionService = async (reqBody) => {
   let limit = options.limit;
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
-console.log("filter", filter)
+
+  const tableData = await LaunchPadCollection.find(filter)
+    .sort({ [sort_by_name]: sort_by_order })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const row_count = await LaunchPadCollection.count(filter);
+
+  const result = customPagination.customPagination(tableData, page, limit, row_count);
+
+  return result;
+};
+
+const getLaunchPadLiveCollectionList = async (filter, options, req) => {
+  let page = options.page;
+  let limit = options.limit;
+  let sort_by_name = options.sortBy?options.sortBy.name:"";
+  let sort_by_order = options.sortBy?options.sortBy.order:"";
+
+  filter = {...filter, ...{$where: "this.nftMintCount != this.maxSupply" }}
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
@@ -46,16 +65,10 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
 
-  const endCollectionData = await LaunchPadCollection.find(filter);
+  const endCollectionData = await LaunchPadCollection.find({ $expr: { $gte: [ "$nftMintCount" , "$maxSupply" ] } });
   let collectionIds = []
   
-  for (const iterator of endCollectionData) {
-    if(iterator.maxSupply <= iterator.nftMintCount){
-      collectionIds.push(iterator._id.toString())
-    }
-  }
-  
-  const tableData = await LaunchPadCollection.find({_id:{$in : collectionIds}})
+  const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
     .limit(limit);
@@ -69,5 +82,6 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
 module.exports = {
   createCollectionService,
   getLaunchPadCollectionList,
+  getLaunchPadLiveCollectionList,
   getLaunchPadEndCollectionList
 };
