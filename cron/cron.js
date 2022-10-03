@@ -38,6 +38,7 @@ const {launchpadTransferEventBsc} = require('./launchpad/transferEventBsc')
 const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEthereum')
 const {launchPadCreatedEventsBsc} = require('./launchpad/launchPadCreatedEventsBsc')
 const {launchPadCreatedEventsEthereum} = require('./launchpad/launchPadCreatedEventsEthereum')
+const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
 
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
@@ -209,7 +210,15 @@ const launchpadTransferEventCron = async () => {
     }
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }  
+    } 
+    
+    try {
+        // console.log("start collection on sale event")
+        await launchpadCollectionEnd();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }     
     
     launchpadTransferEventCron() 
 }

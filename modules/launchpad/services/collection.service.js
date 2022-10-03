@@ -67,7 +67,6 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
 
   //const endCollectionData = await LaunchPadCollection.find({ $expr: { $gte: [ "$nftMintCount" , "$maxSupply" ] } });
   let collectionIds = []
-  //filter = {$or : {$expr: {$gt: ["$nftMintCount", "$maxSupply"]}}}
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)

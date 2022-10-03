@@ -88,7 +88,7 @@ router
 
 router
   .route("/get-latest-collection")
-  .get(collectionController.getLatestCollection);  
+  .post(collectionController.getLatestCollection);  
 router
   .route("/get-top-sellers")
   .get(collectionController.getTopSellers); 

@@ -93,7 +93,7 @@ const manageData = async (transferdata) => {
             epochTime: data.timestamp
           })
         }
-      }
+      }      
     }
     await EventManager.updateOne({ name: "launchpadTransferBsc" }, { lastcrontime: timestamp })
 

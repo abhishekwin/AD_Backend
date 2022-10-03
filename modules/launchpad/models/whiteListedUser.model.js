@@ -9,6 +9,7 @@ const whiteListedUserSchema = mongoose.Schema(
     userAddress: {
       type: String,
       require: true,
+      lowercase: true
     },
   },
   {

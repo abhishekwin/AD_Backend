@@ -156,20 +156,18 @@ const getCollection = async (req, res) => {
     const result = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
-        match: { userAddress },
+        match: {userAddress},
       },
       {
         path: "whiteListedUsers",
         select: "userAddress",
       },
-    ]);
-    // let response = result;
-    // if(result && result.whiteListedUsers){
-    //    const data = result.whiteListedUsers?result.whiteListedUsers.map((data)=>data.userAddress):[];
-    //   let response = result.toObject();
-    //   response.whiteListedUsers = data;
-    //   response.isWhiteListed = result.whiteListedUsers;
-    // }
+    ]).lean();
+    if(result && result.isWhiteListed){
+      if(result.endDate <= await getUTCDate()){
+        result.isWhiteListed = 0;
+      }
+    }
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", result));
@@ -568,10 +566,19 @@ const getLatestCreator = async (req, res) => {
 
 const getLatestCollection = async (req, res) => {
   try {
-    const lanchpadCollection = await LaunchPadCollection.find({
+    let filter = {
       approved: true,
       collectionAddress : { $ne: null }
-    }).sort({ created_at: -1 }).limit(4);
+    }
+    if (req.body.networkId && req.body.networkName) {
+      filter = {
+        approved: true,
+        collectionAddress : { $ne: null },
+        networkId: req.body.networkId,
+        networkName : req.body.networkName
+      }
+    }
+    const lanchpadCollection = await LaunchPadCollection.find(filter).sort({ created_at: -1 }).limit(4);
     // let creator = lanchpadCollection.map((item) => {
     //   if (item.creator != null) {
     //     return item.creator;
