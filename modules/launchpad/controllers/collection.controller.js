@@ -318,7 +318,7 @@ const liveCollectionList = catchAsync(async (req, res) => {
 
 const endCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
-  req.body.status = "completed";
+  req.body.status = "ended";
   filtercolumn.push("status");
 
   req.body.collectionAddress = { $ne: null }

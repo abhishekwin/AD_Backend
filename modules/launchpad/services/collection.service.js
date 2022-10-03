@@ -65,9 +65,9 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
 
-  const endCollectionData = await LaunchPadCollection.find({ $expr: { $gte: [ "$nftMintCount" , "$maxSupply" ] } });
+  //const endCollectionData = await LaunchPadCollection.find({ $expr: { $gte: [ "$nftMintCount" , "$maxSupply" ] } });
   let collectionIds = []
-  
+  //filter = {$or : {$expr: {$gt: ["$nftMintCount", "$maxSupply"]}}}
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
@@ -79,6 +79,7 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
 
   return result;
 };
+
 module.exports = {
   createCollectionService,
   getLaunchPadCollectionList,

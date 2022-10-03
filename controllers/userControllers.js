@@ -709,6 +709,7 @@ module.exports = {
           bio: reqBody.bio,
           firstName: reqBody.firstName,
           followers: reqBody.followers,
+          email: reqBody.email,
           imageCover: reqBody.imageCover,
           instagram: reqBody.instagram,
           lastName: reqBody.lastName,
