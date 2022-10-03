@@ -46,13 +46,10 @@ const manageData = async (transferdata) => {
     for (data of transferdata) {
 
       timestamp = data.timestamp
-      // const findCollection = await LaunchPadCollection.findOne({
-      //   collectionAddress: data.collection_address
-      // });
-      // if(findCollection){
-      //    findCollection = findCollection.nftMintCount+1
-      //   await findCollection.save()
-      // }
+      const findCollection = await LaunchPadCollection.findOne({
+        collectionAddress: data.collection_address
+      });
+      
       const findNft = await LaunchPadNft.find({
         collectionAddress: data.collection_address,
         networkId: +BSC_NETWORK_ID
@@ -68,6 +65,13 @@ const manageData = async (transferdata) => {
           { new: true }
         );
 
+        if(findCollection){
+          await LaunchPadCollection.findOneAndUpdate({
+            collectionAddress: data.collection_address,
+            nftMintCount:findCollection.nftMintCount+1
+          });
+        }
+        
         const findAddress = await LaunchPadMintHistory.findOne({
           collectionAddress: data.collection_address,
           userAddress: data.to,

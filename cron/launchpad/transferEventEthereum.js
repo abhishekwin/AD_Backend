@@ -45,13 +45,9 @@ const manageData = async (transferdata) => {
     let timestamp = transferdata[0].timestamp;
     for (data of transferdata) {
       timestamp = data.timestamp
-      // const findCollection = await LaunchPadCollection.findOne({
-      //   collectionAddress: data.collection_address
-      // });
-      // if(findCollection){
-      //    findCollection = findCollection.nftMintCount+1
-      //   await findCollection.save()
-      // }
+      const findCollection = await LaunchPadCollection.findOne({
+        collectionAddress: data.collection_address
+      });
       const findNft = await LaunchPadNft.find({
         collectionAddress: data.collection_address,
         networkId: +ETHEREUM_NETWORK_ID
@@ -65,6 +61,14 @@ const manageData = async (transferdata) => {
           { tokenId: data.tokenId, isMint: true, creator: data.to },
           { new: true }
         );
+
+        if(findCollection){
+          await LaunchPadCollection.findOneAndUpdate({
+            collectionAddress: data.collection_address,
+            nftMintCount:findCollection.nftMintCount+1
+          });
+        }
+
         const findAddress = await LaunchPadMintHistory.findOne({
           collectionAddress: data.collection_address,
           userAddress: data.to,
