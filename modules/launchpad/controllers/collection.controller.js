@@ -5,7 +5,7 @@ const jwt_decode = require("jwt-decode");
 const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
-const { getUTCDate } = require("../../helpers/timezone")
+const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 const {
   LaunchPadCollection,
   LaunchPadNft,
@@ -42,6 +42,10 @@ const createCollection = catchAsync(async (req, res) => {
   //     }
   //   }
   // }
+  
+  req.body.startDate = await createUTCDate(req.body.startDate)
+  req.body.endDate = await createUTCDate(req.body.endDate)
+
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
@@ -80,6 +84,12 @@ const updateCollection = async (req, res) => {
         { collectionId },
         { collectionAddress, owner, creator }
       );
+    }
+    if(req.body.startDate){
+      req.body.startDate = await createUTCDate(req.body.startDate)
+    }
+    if(endDate){
+      req.body.endDate = await createUTCDate(req.body.endDate)
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
