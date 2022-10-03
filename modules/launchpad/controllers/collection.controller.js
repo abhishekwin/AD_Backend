@@ -5,6 +5,7 @@ const jwt_decode = require("jwt-decode");
 const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
+const { getUTCDate } = require("../../helpers/timezone")
 const {
   LaunchPadCollection,
   LaunchPadNft,
@@ -232,7 +233,7 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
   filtercolumn.push("networkId", "networkName");
   
-  let orArray = [{startDate: {$gt: new Date().UTC()}}];
+  let orArray = [{startDate: {$gt: await getUTCDate()}}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
@@ -278,7 +279,7 @@ const liveCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("networkId", "networkName");
   }
   
-  let orArray = [{startDate: {$lte: new Date().UTC()}}, {startDate: null}];
+  let orArray = [{startDate: {$lte: await getUTCDate()}}, {startDate: null}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
