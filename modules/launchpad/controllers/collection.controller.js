@@ -43,9 +43,6 @@ const createCollection = catchAsync(async (req, res) => {
   //   }
   // }
   
-  req.body.startDate = await createUTCDate(req.body.startDate)
-  req.body.endDate = await createUTCDate(req.body.endDate)
-
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
@@ -85,12 +82,12 @@ const updateCollection = async (req, res) => {
         { collectionAddress, owner, creator }
       );
     }
-    if(req.body.startDate){
-      req.body.startDate = await createUTCDate(req.body.startDate)
-    }
-    if(endDate){
-      req.body.endDate = await createUTCDate(req.body.endDate)
-    }
+    // if(req.body.startDate){
+    //   req.body.startDate = await createUTCDate(req.body.startDate)
+    // }
+    // if(endDate){
+    //   req.body.endDate = await createUTCDate(req.body.endDate)
+    // }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
       req.body,
