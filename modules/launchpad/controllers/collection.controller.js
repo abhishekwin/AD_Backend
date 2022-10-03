@@ -232,7 +232,7 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
   filtercolumn.push("networkId", "networkName");
   
-  let orArray = [{startDate: {$gt: new Date()}}];
+  let orArray = [{startDate: {$gt: new Date().UTC()}}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
@@ -278,7 +278,7 @@ const liveCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("networkId", "networkName");
   }
   
-  let orArray = [{startDate: {$lte: new Date()}}, {startDate: null}];
+  let orArray = [{startDate: {$lte: new Date().UTC()}}, {startDate: null}];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
