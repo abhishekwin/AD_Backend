@@ -229,9 +229,10 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
   req.body.status = "completed";
   filtercolumn.push("status");
-  if (req.body.approved || req.body.approved === false) {
-    filtercolumn.push("approved");
-  }
+
+  req.body.approved = true;
+  filtercolumn.push("approved");
+  
   if (req.body.owner) {
     filtercolumn.push("owner");
   }
@@ -276,9 +277,8 @@ const liveCollectionList = catchAsync(async (req, res) => {
 
   req.body.status = "completed";
   filtercolumn.push("status");
-  if (req.body.approved || req.body.approved === false) {
-    filtercolumn.push("approved");
-  }
+  req.body.approved = true;
+  filtercolumn.push("approved");
   if (req.body.owner) {
     filtercolumn.push("owner");
   }
@@ -324,9 +324,8 @@ const endCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress"); 
   
-  if (req.body.approved || req.body.approved === false) {
-    filtercolumn.push("approved");
-  }
+  req.body.approved = true;
+  filtercolumn.push("approved");
   if (req.body.owner) {
     filtercolumn.push("owner");
   }
