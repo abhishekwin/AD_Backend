@@ -106,7 +106,7 @@ const launchpadTransferEventBsc = async () => {
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferBsc" })
   let from = 0
   if (transfereventDetails) {
-    //from = transfereventDetails.lastcrontime;
+    from = transfereventDetails.lastcrontime;
   } else {
     await EventManager.create({ name: "launchpadTransferBsc", lastcrontime: 0 })
   }
