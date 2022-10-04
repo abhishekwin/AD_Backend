@@ -50,7 +50,7 @@ const manageData = async (transferdata) => {
         collectionAddress: data.collection_address,
         networkId: +BSC_NETWORK_ID
       });
-      const index = parseInt(data.tokenId);
+      const index = parseInt(data.tokenId)-1;
       let nft = findNft[index];
     
       if (nft) {

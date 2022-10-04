@@ -43,16 +43,17 @@ const transferFunctionQuery = async (from) => {
 const manageData = async (transferdata) => {
   try {
     let timestamp = transferdata[0].timestamp;
-    for (data of transferdata) {
+    for ( data of transferdata) {
       timestamp = data.timestamp
       
       const findNft = await LaunchPadNft.find({
         collectionAddress: data.collection_address,
         networkId: +ETHEREUM_NETWORK_ID
       });
-
-      const index = parseInt(data.tokenId);
+     
+      const index = parseInt(data.tokenId)-1;
       let nft = findNft[index];
+
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(
@@ -65,7 +66,7 @@ const manageData = async (transferdata) => {
           collectionAddress: data.collection_address,
           networkId: +ETHEREUM_NETWORK_ID
         });
-
+        
         if(findCollection){
           await LaunchPadCollection.findOneAndUpdate({
             collectionAddress: data.collection_address.toLowerCase(),
@@ -99,7 +100,7 @@ const manageData = async (transferdata) => {
           })
         }
       }
-    }
+     }
     await EventManager.updateOne({ name: "launchpadTransferEthereum" }, { lastcrontime: timestamp })
   } catch (e) {
     console.log("error ethereum transfer", e)
