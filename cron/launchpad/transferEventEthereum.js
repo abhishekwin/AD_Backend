@@ -45,13 +45,12 @@ const manageData = async (transferdata) => {
     let timestamp = transferdata[0].timestamp;
     for (data of transferdata) {
       timestamp = data.timestamp
-      const findCollection = await LaunchPadCollection.findOne({
-        collectionAddress: data.collection_address
-      });
+      
       const findNft = await LaunchPadNft.find({
         collectionAddress: data.collection_address,
         networkId: +ETHEREUM_NETWORK_ID
       });
+      
       const index = parseInt(data.tokenId) - 1;
       let nft = findNft[index];
       if (nft) {
@@ -62,10 +61,14 @@ const manageData = async (transferdata) => {
           { new: true }
         );
 
+        const findCollection = await LaunchPadCollection.findOne({
+          collectionAddress: data.collection_address
+        });
+
         if(findCollection){
           await LaunchPadCollection.findOneAndUpdate({
             collectionAddress: data.collection_address,
-            nftMintCount:findCollection.nftMintCount+1
+            nftMintCount:findCollection?findCollection.nftMintCount+1:1
           });
         }
 

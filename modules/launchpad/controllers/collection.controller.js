@@ -285,15 +285,30 @@ const liveCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("networkId", "networkName");
   }
   
-  let orArray = [{startDate: {$lte: await getUTCDate()}}, {startDate: null}];
+  // let orArray = [{startDate: {$lte: await getUTCDate()}}, {startDate: null}];
+  // if (req.body.searchText) {
+  //   let search = await specialCharacter(req.body.searchText);
+  //   search = new RegExp(".*" + search + ".*", "i");
+  //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
+  // }
+
+  // req.body.$or = orArray;
+  // filtercolumn.push("$or");
+
+  let orArray = [
+    {
+      "$or" : [{startDate: {$lte: await getUTCDate()}}, {startDate: null}]
+    }
+  ];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
-    orArray.push(...[{ collectionName: search }, { symbol: search }]);
+    //orArray.push(...[{ collectionName: search }, { symbol: search }]);
+    orArray.push({"$or":[{ collectionName: search }, { symbol: search }]})
   }
-
-  req.body.$or = orArray;
-  filtercolumn.push("$or");
+  
+  req.body.$and = orArray;
+  filtercolumn.push("$and");
 
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
