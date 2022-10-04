@@ -1,7 +1,6 @@
 const { WhiteListedUser, LaunchPadCollection } = require("../models/index");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
-const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 
 exports.createWhiteListUser = async (req, res) => {
   try {
@@ -68,10 +67,15 @@ exports.createSignature = async (req, res) => {
       collectionAddress,
       networkId
     } = req.body;
-   
-   // startDate = {$gt: await getUTCDate()}
+    
 
     const userAddress = req.userData.account
+    const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
+    let nonce = 1
+    if(findCollection){
+      nonce = findCollection.nonce?findCollection.nonce+1:nonce
+      await findCollection.save()
+    }
     const checkUser = await WhiteListedUser.findOne({
       userAddress,
       collectionId,
@@ -80,32 +84,6 @@ exports.createSignature = async (req, res) => {
     if (!checkUser) {
       isWhiteListed = false;
     }
-   
-    const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
-    if(isWhiteListed == false){
-      if(findCollection.endDate){
-        if(findCollection.endDate < await getUTCDate()){
-          isWhiteListed = true
-        }
-      }
-      if(isWhiteListed == false){
-        return res
-        .status(400)
-        .send(
-          new ResponseObject(
-            400,
-            "You don't have access to this collection",
-            []
-          )
-        );
-      }      
-    }
-    
-    let nonce = 1
-    if(findCollection){
-      nonce = findCollection.nonce?findCollection.nonce+1:nonce
-      await findCollection.save()
-    }    
 
     let launchpadFactoryAddress = "";
     if(networkId == process.env.ETHEREUM_NETWORK_ID){
