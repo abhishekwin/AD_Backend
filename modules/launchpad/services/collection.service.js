@@ -46,7 +46,7 @@ const getLaunchPadLiveCollectionList = async (filter, options, req) => {
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
 
-  filter = {...filter, ...{$where: "this.nftMintCount != this.maxSupply" }}
+  console.log("filter", filter)
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
