@@ -13,6 +13,7 @@ const collectionSchema = mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      lowercase: true
     },
     contractName: {
       type: String,
