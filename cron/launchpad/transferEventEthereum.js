@@ -51,7 +51,7 @@ const manageData = async (transferdata) => {
         networkId: +ETHEREUM_NETWORK_ID
       });
 
-      const index = parseInt(data.tokenId) - 1;
+      const index = parseInt(data.tokenId);
       let nft = findNft[index];
       if (nft) {
         const id = nft._id;
