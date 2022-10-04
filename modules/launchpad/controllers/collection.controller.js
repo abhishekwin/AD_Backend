@@ -153,6 +153,16 @@ const getCollection = async (req, res) => {
   try {
     const { id } = req.params;
     const { userAddress } = req.query;
+    const resultFirst = await LaunchPadCollection.findOne({ _id: id }).populate([
+      {
+        path: "isWhiteListed",
+        match: {userAddress},
+      },
+      {
+        path: "whiteListedUsers",
+        select: "userAddress",
+      },
+    ])
     const result = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
@@ -168,6 +178,7 @@ const getCollection = async (req, res) => {
         result.isWhiteListed = 0;
       }
     }
+    result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", result));
