@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { toJSON, paginate } = require("./plugins");
 const { number } = require("@hapi/joi");
 
+
 const collectionSchema = mongoose.Schema(
   {
     id: {
