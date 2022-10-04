@@ -23,6 +23,10 @@ const userSchema = new Schema({
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
 });
 
+userSchema.virtual('fullName').get(function () {
+  return [this.firstName, this.lastName].filter(Boolean).join(' ');
+});
+
 userSchema.index({ "$**" : "text" })
 userSchema.virtual('follower_count', {
   ref: 'userfollower',

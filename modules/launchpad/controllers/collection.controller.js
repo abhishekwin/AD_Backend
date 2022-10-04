@@ -239,12 +239,15 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
   
   req.body.startDate = {$gt: await getUTCDate()};
+  filtercolumn.push("startDate")
+
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
     req.body.$or = [{ collectionName: search }, { symbol: search }];
     filtercolumn.push("$or");
   }
+  
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
