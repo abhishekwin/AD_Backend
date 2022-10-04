@@ -27,7 +27,7 @@ const createCollectionService = async (reqBody) => {
   let limit = options.limit;
   let sort_by_name = options.sortBy?options.sortBy.name:"";
   let sort_by_order = options.sortBy?options.sortBy.order:"";
-
+  
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)

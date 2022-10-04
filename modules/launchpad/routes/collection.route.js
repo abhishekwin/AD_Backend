@@ -67,7 +67,10 @@ router
 
 router
   .route("/get-my-collection-list")
-  .post(checkToken, collectionController.getMyCollectionList);
+  .post(
+    checkToken, 
+    collectionController.getMyCollectionList
+  );
 
 router
   .route("/approved-collection")

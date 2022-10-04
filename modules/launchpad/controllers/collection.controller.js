@@ -231,22 +231,20 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   req.body.approved = true;
   filtercolumn.push("approved");
   
-  if (req.body.owner) {
-    filtercolumn.push("owner");
-  }
+  // if (req.body.owner) {
+  //   filtercolumn.push("owner");
+  // }
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  filtercolumn.push("networkId", "networkName");
   
-  let orArray = [{startDate: {$gt: await getUTCDate()}}];
+  req.body.startDate = {$gt: await getUTCDate()};
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
-    orArray.push(...[{ collectionName: search }, { symbol: search }]);
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
   }
-  req.body.$or = orArray;
-  filtercolumn.push("$or");
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -369,17 +367,18 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   if (req.body.status) {
     filtercolumn.push("status");
   }
-
   req.body.creator = req.userData.account.toLowerCase();
+  console.log("req.body.creator", req.body.creator)
   filtercolumn.push("creator");
 
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  // if (req.body.post) {
-  //   let search = await specialCharacter.specialCharacter(req.body.post);
-  //   req.body.post = new RegExp('.*' + search + '.*', "i");
-  //   filtercolumn.push('post');
+  // if (req.body.searchText) {
+  //   let search = await specialCharacter(req.body.searchText);
+  //   search = new RegExp(".*" + search + ".*", "i");
+  //   req.body.$or = [{ collectionName: search }, { symbol: search }];
+  //   filtercolumn.push("$or");
   // }
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
