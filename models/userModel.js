@@ -7,6 +7,7 @@ const userSchema = new Schema({
   imageCover: { type: String, default : null }, 
   firstName: { type: String, default: null },
   lastName: { type: String, default: null },
+  email: { type: String, default: null },
   nickName: { type: String, default: null },
   account : { type: String, default: null, lowercase: true }, //wallet_address
   bio: { type: String, default: null },
@@ -22,11 +23,22 @@ const userSchema = new Schema({
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
 });
 
+userSchema.virtual('fullName').get(function () {
+  return [this.firstName, this.lastName].filter(Boolean).join(' ');
+});
+
 userSchema.index({ "$**" : "text" })
 userSchema.virtual('follower_count', {
   ref: 'userfollower',
   localField: '_id',
   foreignField: 'user_id',
+  count: true,
+});
+
+userSchema.virtual('isSelected', {
+  ref: 'LaunchPadTopCreator',
+  localField: 'account',
+  foreignField: 'userAccountAddress',
   count: true,
 });
 

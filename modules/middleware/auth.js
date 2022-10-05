@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const jwt_decode = require('jwt-decode');
 const { getAdminAddress } = require("../helpers/adminHelper");
+const Users = require("../../models/userModel")
 
 module.exports = {
   checkToken: (req, res, next) => {
@@ -8,15 +9,23 @@ module.exports = {
     if (typeof bearerHeaders !== "undefined") {
       const bearer = bearerHeaders.split(" ");
       const bearerToken = bearer[1];
-      jwt.verify(bearerToken, process.env.SECRET, function (err, decoded) {
+      jwt.verify(bearerToken, process.env.SECRET, async (err, decoded) =>{
         if (err) {
-          res.status(401).json({
+          return res.status(401).json({
             error: err.message,
             status: 401,
             success: false,
           });
         } else {
           req.userData = jwt_decode(bearerToken)
+          const findUser = await Users.findOne({ account : req.userData.account.toLowerCase() })
+          if(!findUser){
+           return res.status(401).json({
+              error: "Invalid User",
+              status: 401,
+              success: false,
+            });
+          }
           next();
         }
       });

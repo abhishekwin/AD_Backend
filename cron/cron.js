@@ -34,6 +34,11 @@ const { CronManagerModel } = require("../models");
 
 const Sentry = require('@sentry/node');
 const SentryTracing = require('@sentry/tracing');
+const {launchpadTransferEventBsc} = require('./launchpad/transferEventBsc')
+const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEthereum')
+const {launchPadCreatedEventsBsc} = require('./launchpad/launchPadCreatedEventsBsc')
+const {launchPadCreatedEventsEthereum} = require('./launchpad/launchPadCreatedEventsEthereum')
+const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
 
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
@@ -166,9 +171,59 @@ const startCronForNftImage = async () => {
     catch (e) {
         console.log("&& upload image error", e)
     } 
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEvent();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }  
     startCronForNftImage() 
 }
-startCron();
-startCronForNftImage()
+
+const launchpadTransferEventCron = async () => {
+    
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEventBsc();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+    try {
+        // console.log("start collection on sale event")
+        await launchpadTransferEventEthereum();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+    try {
+        // console.log("start collection on sale event")
+        await launchPadCreatedEventsBsc();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+    try {
+        // console.log("start collection on sale event")
+        await launchPadCreatedEventsEthereum();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+    
+    try {
+        // console.log("start collection on sale event")
+        await launchpadCollectionEnd();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }     
+    
+    launchpadTransferEventCron() 
+}
+launchpadTransferEventCron();
+// startCron();
+// startCronForNftImage()
 
 

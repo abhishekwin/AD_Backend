@@ -5,6 +5,6 @@ const db = mongoose.connect(process.env.DB_URL, {
     useUnifiedTopology: true
 }).then(() =>
     console.log("database is connected")
-).catch((error) => console.log(`${error}`));
+).catch((error) => console.log("---error---", `${error}`));
 
 module.exports = db;
