@@ -108,9 +108,16 @@ const getNftList = async (req, res) => {
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
     }
+
     if (collectionId) {
       filtercolumn.push("collectionId");
     }
+    
+    if (req.body.owner) {
+      filtercolumn.push("owner");
+    }
+
+   
     let isAdmin = false;
     if (loginUserAddress) {
       isAdmin = await getAdminAddress(loginUserAddress);
