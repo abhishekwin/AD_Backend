@@ -10,9 +10,16 @@ const {
 } = require("../controllers");
 const multer = require("multer");
 
+const { dirname } = require("path");
+const appDir = dirname(require.main.filename);
+const fs = require("fs")
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, "public/files")
+    const uploaddir = appDir+ '/public/files';
+    if(!fs.existsSync(uploaddir)){
+      fs.mkdirSync(uploaddir, 0744);
+    }
+    cb(null, "public/files")
   },
 filename: function (req, file, cb) { cb(null, file.originalname) }
 })
