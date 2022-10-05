@@ -10,7 +10,13 @@ const tableQueryData = {
         "users",
         "history",
         "userFollower",
-        "nonce"
+        "nonce",
+        "eventManager",
+        "launchPadCollection",
+        "launchpadhistories",
+        "launchpadminthistories",
+        "launchPadNft",
+        "launchpadtopcreators"
       )
       .required(),
     filter: Joi.object().optional(),

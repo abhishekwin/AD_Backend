@@ -709,6 +709,7 @@ module.exports = {
           bio: reqBody.bio,
           firstName: reqBody.firstName,
           followers: reqBody.followers,
+          email: reqBody.email,
           imageCover: reqBody.imageCover,
           instagram: reqBody.instagram,
           lastName: reqBody.lastName,
@@ -1006,9 +1007,9 @@ module.exports = {
   verifySignatureController: async (req, res) => {
     try {
       const { nonce, signature } = req.body;
-
       // get user by nonce
       let user = await Users.findOne({ nonce: nonce });
+      // console.log("user", user)
       // check user existance or block field
       if (!user) {
         return res.status(400).json({
@@ -1029,6 +1030,7 @@ module.exports = {
       // get contract object by network_id  to verify
       const web3 = new Web3(WEB3_URL);
       let response = await web3.eth.accounts.recover(nonce, signature);
+      console.log("response", response)
       if (user.account.toLowerCase() != response.toLowerCase()) {
         return res.status(400).json({
           data: null,

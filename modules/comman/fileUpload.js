@@ -44,8 +44,7 @@ const fileUpload = async (files, localFileUnsync = false) => {
     if (Array.isArray(files) && files.length > 0) {
       for (let file of files) {
         const readableStreamForFile = fs.createReadStream(file.path);
-        const uploadedUrl = await uploadFileToPinata(readableStreamForFile);
-        
+        const uploadedUrl = await uploadFileToPinata(readableStreamForFile);        
         const uploadedS3 = await uploadImageOnS3(file.path);
         if(uploadedUrl){
           images.push(
