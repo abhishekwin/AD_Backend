@@ -35,7 +35,7 @@ const createNftWithTokenUri = async (data) => {
 
   for (let step = 1; step <= data.maxSupply; step++) {
     const id = step
-    updateUri = data.tokenURI+ id + ".json";
+    updateUri = data.tokenURI + id + ".json";
     baseResponse = await getBaseWebData(updateUri);
 
     let objNfts = {
@@ -53,14 +53,20 @@ const createNftWithTokenUri = async (data) => {
       attributes: baseResponse.attributes,
       compiler: baseResponse.compiler,
       currency: data.currency,
-      isFirstSale: true
+      isFirstSale: true,
+      mintCost: data.mintCost,
+      royalties: data.royalties,
+      status: "Active",
+      isActive: true,
+      networkId: data.networkId,
+      networkName: data.networkName,
     };
 
     let existNfts = await LaunchPadNft.findOne({
       collectionId: data._id,
       tokenId: id
     });
-    
+
     if (existNfts) {
       await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
     } else {

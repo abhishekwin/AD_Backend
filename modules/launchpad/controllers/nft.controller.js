@@ -275,8 +275,31 @@ const nftDetail = async (req, res) => {
   }
 };
 
+const getNftAttributes = async (req, res) => {
+  try {
+    const { collectionId } = req.body;
+   
+    if (!collectionId) {
+      return res.status(400).send(new ResponseObject(400, "Collection id is required"));
+    }
+
+    const nftsAttributes = await LaunchPadNft.find({_id: collectionId});
+
+    
+
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "Attributes display successfully", []));
+  } catch (error) {
+    res
+      .status(500)
+      .send(new ResponseObject(500, "Something went wrong", error));
+  }
+};
+
 module.exports = {
   uploadMultiJsonToPinata,
+  getNftAttributes,
   getNftList,
   getMyNftList,
   nftDetail,

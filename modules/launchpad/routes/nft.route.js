@@ -34,4 +34,5 @@ router.post("/upload-multi-json-to-pinata", upload.single("metadata"), nftContro
 router.post("/get-nft-list", nftController.getNftList);
 router.post("/get-my-nft-list", checkToken,  nftController.getMyNftList);
 router.get("/get-nft-detail/:id", nftController.nftDetail);
+router.post("/get-nft-attributes", nftController.getNftAttributes);
 module.exports = router;
