@@ -163,14 +163,14 @@ const collectionSchema = mongoose.Schema(
   }
 );
 
-collectionSchema.pre("save", async function (next) {
-  const collection = this;
-  if (collection.isModified("tokenURI")) {
-    collection.tokenURI =
-      "https://bleufi.mypinata.cloud/ipfs/" + collection.tokenURI;
-  }
-  next();
-});
+// collectionSchema.pre("save", async function (next) {
+//   const collection = this;
+//   if (collection.isModified("tokenURI")) {
+//     collection.tokenURI =
+//       "https://bleufi.mypinata.cloud/ipfs/" + collection.tokenURI;
+//   }
+//   next();
+// });
 
 collectionSchema.virtual('isWhiteListed', {
   ref: 'WhiteListedUser',
