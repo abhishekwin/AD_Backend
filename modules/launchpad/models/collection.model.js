@@ -41,11 +41,11 @@ const collectionSchema = mongoose.Schema(
     //   trim: true,
     //   default: null,
     // },
-    baseArtName: {
-      type: String,
-      trim: true,
-      default: null,
-    },
+    // baseArtName: {
+    //   type: String,
+    //   trim: true,
+    //   default: null,
+    // },
     nftDescription: {
       type: String,
       trim: true,

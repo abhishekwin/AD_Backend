@@ -1,5 +1,6 @@
 const httpStatus = require("http-status");
 const pick = require("../../comman/pick");
+const axios = require("axios");
 const jwt_decode = require("jwt-decode");
 // const ApiError = require('../../../utils/ApiError');
 const catchAsync = require("../../../utils/catchAsync");
@@ -19,6 +20,50 @@ const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 const customPagination = require("../../comman/customPagination");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
+
+
+const getBaseWebData = async (url) => {
+  const result = await axios.get(url);
+  if (result.status == 200) {
+    return result.data;
+  }
+  return null;
+};
+
+const createNftWithTokenUri = async(data) => {
+  
+
+  for (let step = 1; step <= data.maxSupply; step++) {
+     const id = step
+     updateUri = data.tokenURI+ "/" +id+ ".json";
+     baseResponse = await getBaseWebData(updateUri);
+     let objNfts = {
+      collectionAddress: data.collectionAddress,
+      royalties: data.royalties?data.royalties:0,
+      name: baseResponse.name,
+      description: baseResponse.description,
+      image: baseResponse.image,
+      tokenURI: updateUri?updateUri:null,
+      owner: data.creator,
+      creator: data.creator,
+      tokenId: id,
+      // dna: baseResponse.dna,
+      attributes: baseResponse.attributes,
+      compiler: baseResponse.compiler,
+      currency:data.currency,
+      isFirstSale:true
+    };
+   
+    let existNfts = await LaunchPadNft.findOne({
+      collectionId: data.id
+    });
+    if (existNfts) {
+      await LaunchPadNft.findOneAndUpdate({collectionId: data.id}, objNfts)  
+    } else {
+      await LaunchPadNft.create(objNfts)    
+    }
+  }
+}
 
 const createCollection = catchAsync(async (req, res) => {
   // const findCoolTime = await LaunchPadCoolTime.findOne({
@@ -95,6 +140,38 @@ const updateCollection = async (req, res) => {
         new: true,
       }
     );
+    return res
+      .status(200)
+      .send(new ResponseObject(200, "Collection update successfully"));
+  } catch (error) {
+    return res.status(500).send(new ResponseObject(500, error.message));
+  }
+};
+
+const updateCollectionWithCreateNft = async (req, res) => {
+  try {
+    const { collectionId, collectionAddress } = req.body;
+    if (!collectionId) {
+      return res
+        .status(400)
+        .send(new ResponseObject(400, "collectionId is required!"));
+    }
+    if (collectionAddress) {
+      await LaunchPadNft.updateMany(
+        { collectionId },
+        { collectionAddress, owner, creator }
+      );
+    }
+    
+    const result = await LaunchPadCollection.findOneAndUpdate(
+      { _id: collectionId },
+      req.body
+    );
+   
+    const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
+    
+    await createNftWithTokenUri(collectionDetails);
+
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
@@ -751,6 +828,7 @@ const collectionCreatorUsers = async (req, res) => {
 module.exports = {
   createCollection,
   updateCollection,
+  updateCollectionWithCreateNft,
   updateCollectionWithNft,
   deleteCollection,
   getCollection,

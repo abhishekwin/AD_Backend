@@ -109,7 +109,7 @@ const createNftData = async (tokenId, obj, collection_id) => {
 }
 
 const createNft = async (tokenId, obj, collection_id) => {  
-    await createNftData(tokenId, obj, collection_id);
+    //await createNftData(tokenId, obj, collection_id);
 }
 
 //createNft()
