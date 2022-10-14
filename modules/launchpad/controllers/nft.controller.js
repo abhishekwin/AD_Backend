@@ -21,7 +21,7 @@ const getjson = (file) => {
   return jsondata;
 };
 
-const createNftWithMultiJson = async (req, res) => {
+const uploadMultiJsonToPinata = async (req, res) => {
   try {
     const filename = "";
 
@@ -51,7 +51,7 @@ const createNftWithMultiJson = async (req, res) => {
     });
     res
       .status(200)
-      .send(new ResponseObject(200, "Nft create successfully", result));
+      .send(new ResponseObject(200, "Uploaded successfully", result));
   } catch (error) {
     console.log("error", error)
     res
@@ -276,7 +276,7 @@ const nftDetail = async (req, res) => {
 };
 
 module.exports = {
-  createNftWithMultiJson,
+  uploadMultiJsonToPinata,
   getNftList,
   getMyNftList,
   nftDetail,

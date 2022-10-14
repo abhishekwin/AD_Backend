@@ -29,7 +29,7 @@ const router = express.Router();
 //   );
 
 // router.post("/create-nft-with-upload-images", upload.array("files"), nftController.createNft);
-router.post("/create-nft-with-multi-json", upload.single("metadata"), nftController.createNftWithMultiJson);
+router.post("/upload-multi-json-to-pinata", upload.single("metadata"), nftController.uploadMultiJsonToPinata);
 
 router.post("/get-nft-list", nftController.getNftList);
 router.post("/get-my-nft-list", checkToken,  nftController.getMyNftList);
