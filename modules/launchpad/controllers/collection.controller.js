@@ -35,7 +35,7 @@ const createNftWithTokenUri = async (data) => {
 
   for (let step = 1; step <= data.maxSupply; step++) {
     const id = step
-    updateUri = data.tokenURI + "/" + id + ".json";
+    updateUri = data.tokenURI+ id + ".json";
     baseResponse = await getBaseWebData(updateUri);
 
     let objNfts = {
