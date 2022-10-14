@@ -30,37 +30,41 @@ const getBaseWebData = async (url) => {
   return null;
 };
 
-const createNftWithTokenUri = async(data) => {
-  
+const createNftWithTokenUri = async (data) => {
+
 
   for (let step = 1; step <= data.maxSupply; step++) {
-     const id = step
-     updateUri = data.tokenURI+ "/" +id+ ".json";
-     baseResponse = await getBaseWebData(updateUri);
-     let objNfts = {
+    const id = step
+    updateUri = data.tokenURI + "/" + id + ".json";
+    baseResponse = await getBaseWebData(updateUri);
+
+    let objNfts = {
+      collectionId: data._id,
       collectionAddress: data.collectionAddress,
-      royalties: data.royalties?data.royalties:0,
+      royalties: data.royalties ? data.royalties : 0,
       name: baseResponse.name,
       description: baseResponse.description,
       image: baseResponse.image,
-      tokenURI: updateUri?updateUri:null,
+      tokenURI: updateUri ? updateUri : null,
       owner: data.creator,
       creator: data.creator,
       tokenId: id,
       // dna: baseResponse.dna,
       attributes: baseResponse.attributes,
       compiler: baseResponse.compiler,
-      currency:data.currency,
-      isFirstSale:true
+      currency: data.currency,
+      isFirstSale: true
     };
-   
+
     let existNfts = await LaunchPadNft.findOne({
-      collectionId: data.id
+      collectionId: data._id,
+      tokenId: id
     });
+    
     if (existNfts) {
-      await LaunchPadNft.findOneAndUpdate({collectionId: data.id}, objNfts)  
+      await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
     } else {
-      await LaunchPadNft.create(objNfts)    
+      await LaunchPadNft.create(objNfts)
     }
   }
 }
@@ -87,7 +91,7 @@ const createCollection = catchAsync(async (req, res) => {
   //     }
   //   }
   // }
-  
+
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
@@ -156,26 +160,21 @@ const updateCollectionWithCreateNft = async (req, res) => {
         .status(400)
         .send(new ResponseObject(400, "collectionId is required!"));
     }
-    if (collectionAddress) {
-      await LaunchPadNft.updateMany(
-        { collectionId },
-        { collectionAddress, owner, creator }
-      );
-    }
-    
+
+
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
       req.body
     );
-   
+
     const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
-    
     await createNftWithTokenUri(collectionDetails);
 
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
   } catch (error) {
+    console.log("error", error)
     return res.status(500).send(new ResponseObject(500, error.message));
   }
 };
@@ -233,7 +232,7 @@ const getCollection = async (req, res) => {
     const resultFirst = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
-        match: {userAddress},
+        match: { userAddress },
       },
       {
         path: "whiteListedUsers",
@@ -243,15 +242,15 @@ const getCollection = async (req, res) => {
     const result = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
-        match: {userAddress},
+        match: { userAddress },
       },
       {
         path: "whiteListedUsers",
         select: "userAddress",
       },
     ]).lean();
-    if(result && result.isWhiteListed){
-      if(result.endDate <= await getUTCDate()){
+    if (result && result.isWhiteListed) {
+      if (result.endDate <= await getUTCDate()) {
         result.isWhiteListed = 0;
       }
     }
@@ -268,7 +267,7 @@ const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
   req.body.collectionAddress = { $ne: null }
-  filtercolumn.push("collectionAddress"); 
+  filtercolumn.push("collectionAddress");
 
   req.body.status = "completed";
   filtercolumn.push("status");
@@ -306,9 +305,9 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
   req.body.collectionAddress = { $ne: null }
-  filtercolumn.push("collectionAddress"); 
+  filtercolumn.push("collectionAddress");
 
-  
+
 
   // req.body.endDate = {$lt: new Date()}
   // filtercolumn.push("endDate");
@@ -318,15 +317,15 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
   req.body.approved = true;
   filtercolumn.push("approved");
-  
+
   // if (req.body.owner) {
   //   filtercolumn.push("owner");
   // }
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  
-  req.body.startDate = {$gt: await getUTCDate()};
+
+  req.body.startDate = { $gt: await getUTCDate() };
   filtercolumn.push("startDate")
 
   if (req.body.searchText) {
@@ -335,7 +334,7 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     req.body.$or = [{ collectionName: search }, { symbol: search }];
     filtercolumn.push("$or");
   }
-  
+
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -345,12 +344,12 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     options,
     req
   );
-  
+
   const response = {
-    type:"upcoming",
-    result:result
+    type: "upcoming",
+    result: result
   }
-  
+
   res
     .status(200)
     .send(new ResponseObject(200, "Collections display successfully", response));
@@ -358,9 +357,9 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
 const liveCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
-  
+
   req.body.collectionAddress = { $ne: null }
-  filtercolumn.push("collectionAddress"); 
+  filtercolumn.push("collectionAddress");
 
   req.body.status = "completed";
   filtercolumn.push("status");
@@ -372,7 +371,7 @@ const liveCollectionList = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  
+
   // let orArray = [{startDate: {$lte: await getUTCDate()}}, {startDate: null}];
   // if (req.body.searchText) {
   //   let search = await specialCharacter(req.body.searchText);
@@ -385,16 +384,16 @@ const liveCollectionList = catchAsync(async (req, res) => {
 
   let orArray = [
     {
-      "$or" : [{startDate: {$lte: await getUTCDate()}}, {startDate: null}]
+      "$or": [{ startDate: { $lte: await getUTCDate() } }, { startDate: null }]
     }
   ];
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
     //orArray.push(...[{ collectionName: search }, { symbol: search }]);
-    orArray.push({"$or":[{ collectionName: search }, { symbol: search }]})
+    orArray.push({ "$or": [{ collectionName: search }, { symbol: search }] })
   }
-  
+
   req.body.$and = orArray;
   filtercolumn.push("$and");
 
@@ -409,8 +408,8 @@ const liveCollectionList = catchAsync(async (req, res) => {
   );
 
   const response = {
-    type:"live",
-    result:result
+    type: "live",
+    result: result
   }
 
   res
@@ -424,8 +423,8 @@ const endCollectionList = catchAsync(async (req, res) => {
   filtercolumn.push("status");
 
   req.body.collectionAddress = { $ne: null }
-  filtercolumn.push("collectionAddress"); 
-  
+  filtercolumn.push("collectionAddress");
+
   req.body.approved = true;
   filtercolumn.push("approved");
   if (req.body.owner) {
@@ -451,8 +450,8 @@ const endCollectionList = catchAsync(async (req, res) => {
   );
 
   const response = {
-    type:"ended",
-    result:result
+    type: "ended",
+    result: result
   }
 
   res
@@ -468,7 +467,7 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   //   filtercolumn.push("approved");
   // }
   req.body.collectionAddress = { $ne: null }
-  filtercolumn.push("collectionAddress"); 
+  filtercolumn.push("collectionAddress");
 
   if (req.body.status) {
     filtercolumn.push("status");
@@ -538,10 +537,10 @@ const approvedCollection = async (req, res) => {
 const stashCollectionHeader = async (req, res) => {
   const { collectionAddress } = req.body;
   try {
-    const filter = { collectionAddress, isActive: true, collectionAddress : { $ne: null } };
+    const filter = { collectionAddress, isActive: true, collectionAddress: { $ne: null } };
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
-    const nftLowestPrice = await LaunchPadNft.findOne({...filter, ...{ mintCost: { $ne: null } }})
+    const nftLowestPrice = await LaunchPadNft.findOne({ ...filter, ...{ mintCost: { $ne: null } } })
       .sort({ mintCost: 1 })
       .limit(1);
 
@@ -582,7 +581,7 @@ const stashAllCollectionHeader = async (req, res) => {
     const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
-    const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null }, collectionAddress : { $ne: null } })
+    const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null }, collectionAddress: { $ne: null } })
       .sort({ mintCost: 1 })
       .limit(1);
 
@@ -673,14 +672,14 @@ const getLatestCollection = async (req, res) => {
   try {
     let filter = {
       approved: true,
-      collectionAddress : { $ne: null }
+      collectionAddress: { $ne: null }
     }
     if (req.body.networkId && req.body.networkName) {
       filter = {
         approved: true,
-        collectionAddress : { $ne: null },
+        collectionAddress: { $ne: null },
         networkId: req.body.networkId,
-        networkName : req.body.networkName
+        networkName: req.body.networkName
       }
     }
     const lanchpadCollection = await LaunchPadCollection.find(filter).sort({ created_at: -1 }).limit(4);
