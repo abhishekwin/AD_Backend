@@ -9,6 +9,7 @@ const createCollectionValidation = {
     launchCollectionLater: Joi.boolean().strict().required(),
     tokenURI: Joi.string().required(),
     nftDescription: Joi.string().required(),
+    maxSupply: Joi.number().strict().required(),
     mintCost: Joi.number().strict().required(),
     royalties: Joi.number().strict().required(),
     imageCover: Joi.string().required(),
