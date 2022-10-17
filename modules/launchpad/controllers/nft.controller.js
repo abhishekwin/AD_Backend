@@ -277,20 +277,57 @@ const nftDetail = async (req, res) => {
 
 const getNftAttributes = async (req, res) => {
   try {
-    const { collectionId } = req.body;
+    const { collectionId, nftId } = req.body;
    
     if (!collectionId) {
       return res.status(400).send(new ResponseObject(400, "Collection id is required"));
     }
+    if (!nftId) {
+      return res.status(400).send(new ResponseObject(400, "NFT id is required"));
+    }
 
-    const nftsAttributes = await LaunchPadNft.find({_id: collectionId});
+    const nftsAttributes = await LaunchPadNft.findOne({_id: nftId}).select("attributes");
+    const attributesArray = nftsAttributes.attributes
 
+    const allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId}).select("attributes");
+
+    const newArray = []
+    for (const iterator of allNftsAttributes) {
+      const attributes = iterator.attributes
+      for (const iteratorNew of attributes) {
+        newArray.push(iteratorNew)
+      }
+    }
+    const result = Object.values(newArray.reduce((item, index) => {
+      let key = `${index.trait_type}|${index.value}`;
+      if(!item[key]) item[key] = {...index, count: 1}
+      else item[key].count += 1;
+      return item;
+    }, {}))
+
+    const otherResult = Object.values(newArray.reduce((item, index) => {
+      let key = `${index.trait_type}`;
+      if(!item[key]) item[key] = {...index, count: 1}
+      else item[key].count += 1;
+      return item;
+    }, {}))
     
-
+   
+    let newAttributesArray = []
+    for (const iterator of attributesArray) {
+      let objWithCount = result.find(item => item.trait_type == iterator.trait_type);
+      iterator.count = objWithCount.count
+      let otherObjWithCount = otherResult.find(item => item.trait_type == iterator.trait_type);
+      iterator.totalCount = otherObjWithCount.count
+      iterator.percentage = objWithCount.count/otherObjWithCount.count*100
+      newAttributesArray.push(iterator)
+    }
+    
     return res
       .status(200)
-      .send(new ResponseObject(200, "Attributes display successfully", []));
+      .send(new ResponseObject(200, "Attributes display successfully", newAttributesArray));
   } catch (error) {
+    console.log("error", error)
     res
       .status(500)
       .send(new ResponseObject(500, "Something went wrong", error));
