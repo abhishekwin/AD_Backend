@@ -155,31 +155,17 @@ function sleep(ms) {
 //     }
 // }
 
-// const startCronForNftImage = async () => {
-//     try {
-//         // console.log("start collection on sale event")
-//         await createNftUsingMoralises();
-//     }
-//     catch (e) {
-//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-//     } 
-//     try {
-//         // console.log("start collection on sale event")
-//         await uploadImageOnS3();
-//         await uploadImageOnS3Update();
-//     }
-//     catch (e) {
-//         console.log("&& upload image error", e)
-//     } 
-//     try {
-//         // console.log("start collection on sale event")
-//         await launchpadTransferEvent();
-//     }
-//     catch (e) {
-//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-//     }  
-//     startCronForNftImage() 
-// }
+const startCronForNftImage = async () => {
+    try {
+        // console.log("start collection on sale event")
+        await uploadImageOnS3();
+        await uploadImageOnS3Update();
+    }
+    catch (e) {
+        console.log("&& upload image error", e)
+    }     
+    startCronForNftImage() 
+}
 
 const launchpadTransferEventCron = async () => {
     
@@ -223,7 +209,7 @@ const launchpadTransferEventCron = async () => {
     launchpadTransferEventCron() 
 }
 launchpadTransferEventCron();
+startCronForNftImage()
 // startCron();
-// startCronForNftImage()
 
 
