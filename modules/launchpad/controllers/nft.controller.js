@@ -287,10 +287,17 @@ const getNftAttributes = async (req, res) => {
     }
 
     const nftsAttributes = await LaunchPadNft.findOne({_id: nftId}).select("attributes");
+    if (!nftsAttributes) {
+      return res.status(400).send(new ResponseObject(400, "NFT not found"));
+    }
     const attributesArray = nftsAttributes.attributes
 
-    const allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId}).select("attributes");
+    const allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId, isMint: true}).select("attributes");
 
+    if(allNftsAttributes.length == 0 ){
+      return res.status(400).send(new ResponseObject(400, "Data not found"));
+    }
+    
     const newArray = []
     for (const iterator of allNftsAttributes) {
       const attributes = iterator.attributes
