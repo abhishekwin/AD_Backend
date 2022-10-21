@@ -68,6 +68,16 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: 0,
     },
+    mintCountPerUser:{
+      type: Number,
+      trim: true,
+      default: 0,
+    },
+    mintCountPerTransaction:{
+      type: Number,
+      trim: true,
+      default: 0,
+    },
     royalties: {
       type: Number,
       trim: true,

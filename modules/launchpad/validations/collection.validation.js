@@ -40,6 +40,8 @@ const createCollectionValidation = {
     networkId: Joi.number().optional(),
     networkName: Joi.string().optional(),
     currencyAddress: Joi.string().required(),
+    mintCountPerUser:Joi.number(),
+    mintCountPerTransaction:Joi.number(),
   }),
 };
 

@@ -469,17 +469,13 @@ const endCollectionList = catchAsync(async (req, res) => {
 const getMyCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
-  // if (req.body.approved || req.body.approved === false) {
-  //   filtercolumn.push("approved");
-  // }
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  // if (req.body.status) {
-  //   filtercolumn.push("status");
-  // }
+  req.body.$or =  [{ status: "completed" }, { status: "ended"  }];
+  filtercolumn.push("$or");
+  
   req.body.creator = req.userData.account.toLowerCase();
-  console.log("req.body.creator", req.body.creator)
   filtercolumn.push("creator");
 
   if (req.body.networkId && req.body.networkName) {
@@ -488,9 +484,10 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   // if (req.body.searchText) {
   //   let search = await specialCharacter(req.body.searchText);
   //   search = new RegExp(".*" + search + ".*", "i");
-  //   req.body.$or = [{ collectionName: search }, { symbol: search }];
-  //   filtercolumn.push("$or");
+  //   reqAndObj = {"$or": [{ collectionName: search }, { symbol: search }]}
+  
   // }
+ 
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
