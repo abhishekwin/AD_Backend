@@ -475,9 +475,9 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  if (req.body.status) {
-    filtercolumn.push("status");
-  }
+  // if (req.body.status) {
+  //   filtercolumn.push("status");
+  // }
   req.body.creator = req.userData.account.toLowerCase();
   console.log("req.body.creator", req.body.creator)
   filtercolumn.push("creator");
