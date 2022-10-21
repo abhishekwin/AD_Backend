@@ -235,6 +235,7 @@ const getCollection = async (req, res) => {
   try {
     const { id } = req.params;
     const { userAddress } = req.query;
+    
     const resultFirst = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
@@ -253,6 +254,10 @@ const getCollection = async (req, res) => {
       {
         path: "whiteListedUsers",
         select: "userAddress",
+      },
+      {
+        path: "userMintCount",
+        match:{userAddress}
       },
     ]).lean();
     if (result && result.isWhiteListed) {

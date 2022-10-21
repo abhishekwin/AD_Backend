@@ -195,6 +195,13 @@ collectionSchema.virtual('whiteListedUsers', {
   justOne: false
 });
 
+collectionSchema.virtual('userMintCount', {
+  ref: 'LaunchPadMintHistory',
+  localField: 'collectionAddress',
+  foreignField: 'collectionAddress',
+  count: true
+});
+
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   let whiteListedUsers = []
   if(this.whiteListedUsers){
