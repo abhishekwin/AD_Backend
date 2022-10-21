@@ -277,7 +277,7 @@ const nftDetail = async (req, res) => {
 
 const getNftAttributes = async (req, res) => {
   try {
-    const { collectionId, nftId, isVisible } = req.body;
+    const { collectionId, nftId } = req.body;
    
     if (!collectionId) {
       return res.status(400).send(new ResponseObject(400, "Collection id is required"));
@@ -294,9 +294,9 @@ const getNftAttributes = async (req, res) => {
     
     let allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId, isMint: true}).select("attributes");
     
-    if(isVisible == false){
-      allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId}).select("attributes");
-    }
+    // if(isVisible == false){
+    //   allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId}).select("attributes");
+    // }
 
     if(allNftsAttributes.length == 0 ){
       return res.status(400).send(new ResponseObject(400, "Data not found"));
