@@ -76,11 +76,13 @@ const manageData = async (transferdata) => {
         const findAddress = await LaunchPadMintHistory.findOne({
           collectionAddress: data.collection_address,
           userAddress: data.to,
+          mintSubId: data.id,
         });
         if (!findAddress) {
           await LaunchPadMintHistory.create({
             collectionAddress: data.collection_address,
             userAddress: data.to,
+            mintSubId: data.id,
           });
         }
         const UserDetails = await Users.findOne({ account: data.to.toLowerCase() })

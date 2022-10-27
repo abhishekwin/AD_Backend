@@ -14,6 +14,11 @@ const mintHistorySchema = mongoose.Schema(
         trim: true,
         default: null, 
         lowercase: true
+    },
+    mintSubId: {
+        type: String,
+        trim: true,
+        default: null
       },
   },
   {
