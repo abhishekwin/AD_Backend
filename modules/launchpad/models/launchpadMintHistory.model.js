@@ -7,11 +7,13 @@ const mintHistorySchema = mongoose.Schema(
       type: String,
       trim: true,
       default: null, 
+      lowercase: true
     },
     userAddress: {
         type: String,
         trim: true,
         default: null, 
+        lowercase: true
       },
   },
   {
