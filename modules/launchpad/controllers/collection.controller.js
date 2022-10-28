@@ -477,8 +477,7 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  req.body.$or =  [{ status: "completed" }, { status: "ended"  }];
-  filtercolumn.push("$or");
+  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }]
   
   req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
@@ -486,13 +485,18 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  // if (req.body.searchText) {
-  //   let search = await specialCharacter(req.body.searchText);
-  //   search = new RegExp(".*" + search + ".*", "i");
-  //   reqAndObj = {"$or": [{ collectionName: search }, { symbol: search }]}
-  
-  // }
+  let searchObj = {};
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    searchObj = {"$or": [{ collectionName: search }, { symbol: search }]}  
+  }
  
+  req.body.$and =[{"$or":statusOrFilter}]
+  if(searchObj){
+    req.body.$and.push(searchObj)
+  }
+  filtercolumn.push("$and");
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
