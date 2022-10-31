@@ -4,7 +4,7 @@ const uniqid = require('uniqid');
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 const client = require('https');
-const { Nfts, ImageUploadLogs} = require("../../models");
+const { LaunchPadNft, LaunchPadImageUploadLogs} = require("../../modules/launchpad/models");
 require('dotenv').config({path: '../../.env'});
 const mongoose = require('mongoose');
 request = require('request');
@@ -29,13 +29,13 @@ const thumbnailSize = [
 //         if(err){
 //           console.log("err", err)
 //         }else if(!res.headers['content-type'].includes("image")){
-//           await ImageUploadLogs.create({
+//           await LaunchPadImageUploadLogs.create({
 //             tokenURI:nft.tokenURI,
 //             imageUrl:uri,
 //             nftId:nft.id,
 //             error: res.headers['content-type']
 //           });
-//           await Nfts.findOneAndUpdate({_id:nft.id}, {
+//           await LaunchPadNft.findOneAndUpdate({_id:nft.id}, {
 //             awsImagesUpdated:true
 //           });
 //         }
@@ -155,9 +155,9 @@ const getImageUrlFromTokenUri = async (tokenURIUrl) => {
 
 
 const uploadImageOnS3 = async () => {
-    // console.log("*****S3*****")
     const filter = {$or: [{awsImagesUpdated:false}, {awsImagesUpdated: {$exists:false}}]}
-    const nfts = await Nfts.find(filter).limit(1).sort({"createdAt":-1});
+    const nfts = await LaunchPadNft.find(filter).limit(1).sort({"createdAt":-1});
+   
     let nftImageDir = appDir+'/public/nft-image-upload'
     
     if (fs.existsSync(nftImageDir)) {
@@ -166,27 +166,26 @@ const uploadImageOnS3 = async () => {
       })    
     }
     for (const nft of nfts) {
-      // console.log("Token-URI", nft.tokenURI, nft.id)
       if(nft && nft.tokenURI){
         try{
           const imageUrl = await getImageUrlFromTokenUri(nft.tokenURI);
           if(imageUrl){
             if(isNaN(imageUrl)){
               const nftImage = await storeImageOnLocal(imageUrl, nft);
-              await Nfts.findOneAndUpdate({_id:nft.id}, {
+              await LaunchPadNft.findOneAndUpdate({_id:nft._id}, {
                 awsImage: nftImage,
                 awsImagesUpdated:true
               });
             }else{
-              await Nfts.findOneAndUpdate({_id:nft.id}, {
+              await LaunchPadNft.findOneAndUpdate({_id:nft.id}, {
                 awsImagesUpdated:true
               });
             }
           }else{
-              await Nfts.findOneAndUpdate({_id:nft.id}, {
+              await LaunchPadNft.findOneAndUpdate({_id:nft.id}, {
                   awsImagesUpdated:true
               });
-              await ImageUploadLogs.create({
+              await LaunchPadImageUploadLogs.create({
                   tokenURI:nft.tokenURI,
                   nftId:nft.id,
                   error: "Image url not found"
@@ -195,13 +194,13 @@ const uploadImageOnS3 = async () => {
           
         }catch(e){
           //console.log("ett")
-          await Nfts.findOneAndUpdate({_id:nft.id}, {
+          await LaunchPadNft.findOneAndUpdate({_id:nft.id}, {
             awsImagesUpdated:true
           });
         } 
           //console.log("Done")
       }else{
-        await Nfts.findOneAndUpdate({_id:nft.id}, {
+        await LaunchPadNft.findOneAndUpdate({_id:nft._id}, {
           awsImagesUpdated:true
         });
       }

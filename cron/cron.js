@@ -48,121 +48,114 @@ function sleep(ms) {
     });
 }
 
-const startCron = async () => {
-    try{
+// const startCron = async () => {
+//     try{
 
-        console.log("*** start cron ***")
-        sleep(10000)
-        try {
-            // console.log("start collection")
-            await createCollection();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& createCollection ", e)
-        }
+//         console.log("*** start cron ***")
+//         sleep(10000)
+//         try {
+//             // console.log("start collection")
+//             await createCollection();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& createCollection ", e)
+//         }
 
-        try {
-            // console.log("start auction bid")
-            await auctionBid();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& auctionBid ", e)
-        }
+//         try {
+//             // console.log("start auction bid")
+//             await auctionBid();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& auctionBid ", e)
+//         }
                 
-        try {
-            // console.log("start auction cancel")
-            await auctionCancel();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& auctionCancel ", e)
-        }
-        try {
-            // console.log("start auction create")
-            await auctionCreate();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& auctionCreate ", e)
-        }
-        try {
-            // console.log("start auction end")
-            await auctionEnd();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& auctionEnd ", e)
-        }
+//         try {
+//             // console.log("start auction cancel")
+//             await auctionCancel();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& auctionCancel ", e)
+//         }
+//         try {
+//             // console.log("start auction create")
+//             await auctionCreate();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& auctionCreate ", e)
+//         }
+//         try {
+//             // console.log("start auction end")
+//             await auctionEnd();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& auctionEnd ", e)
+//         }
 
-        try {
-            // console.log("start get transfer")
-            await getTransferFunction();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& getTransferFunction ", e)
-        }
+//         try {
+//             // console.log("start get transfer")
+//             await getTransferFunction();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& getTransferFunction ", e)
+//         }
 
-        try {
-            // console.log("start off sale")
-            await offSale();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& offSale ", e)
-        }
+//         try {
+//             // console.log("start off sale")
+//             await offSale();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& offSale ", e)
+//         }
 
-        try {
-            // console.log("start on sale")
-            await onSale();
-        }
-        catch (e) {
-            Sentry.captureException(e)
-            console.error("&&&&&&&&&&&&&&&&&&& onSale ", e)
-        }
+//         try {
+//             // console.log("start on sale")
+//             await onSale();
+//         }
+//         catch (e) {
+//             Sentry.captureException(e)
+//             console.error("&&&&&&&&&&&&&&&&&&& onSale ", e)
+//         }
 
         
                 
-        try {
-            // console.log("start auction sold")
-            await sold();
-        }
-        catch (e) {
-            // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-        }
+//         try {
+//             // console.log("start auction sold")
+//             await sold();
+//         }
+//         catch (e) {
+//             // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//         }
 
-        try {
-            // console.log("start collection on sale event")
-            await collectionSalesEvent();
-        }
-        catch (e) {
-            // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-        } 
-        try {
-            // console.log("start collection on sale event")
-            await transferEventV2();
-        }
-        catch (e) {
-            // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-        }      
-        startCron() 
-    }catch(e) {
-        Sentry.captureException(e)
-        console.error("%%%%%%%%%%%%%% e ", e)
-        await startCron()
-    }
-}
+//         try {
+//             // console.log("start collection on sale event")
+//             await collectionSalesEvent();
+//         }
+//         catch (e) {
+//             // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//         } 
+//         try {
+//             // console.log("start collection on sale event")
+//             await transferEventV2();
+//         }
+//         catch (e) {
+//             // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//         }      
+//         startCron() 
+//     }catch(e) {
+//         Sentry.captureException(e)
+//         console.error("%%%%%%%%%%%%%% e ", e)
+//         await startCron()
+//     }
+// }
 
 const startCronForNftImage = async () => {
-    try {
-        // console.log("start collection on sale event")
-        await createNftUsingMoralises();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    } 
     try {
         // console.log("start collection on sale event")
         await uploadImageOnS3();
@@ -170,14 +163,7 @@ const startCronForNftImage = async () => {
     }
     catch (e) {
         console.log("&& upload image error", e)
-    } 
-    try {
-        // console.log("start collection on sale event")
-        await launchpadTransferEvent();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }  
+    }     
     startCronForNftImage() 
 }
 
@@ -223,7 +209,7 @@ const launchpadTransferEventCron = async () => {
     launchpadTransferEventCron() 
 }
 launchpadTransferEventCron();
+startCronForNftImage()
 // startCron();
-// startCronForNftImage()
 
 

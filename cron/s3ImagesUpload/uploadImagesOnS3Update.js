@@ -4,7 +4,7 @@ const uniqid = require('uniqid');
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 const client = require('https');
-const { Nfts, ImageUploadLogs} = require("../../models");
+const { LaunchPadNft, LaunchPadImageUploadLogs} = require("../../modules/launchpad/models");
 require('dotenv').config({path: '../../.env'});
 const mongoose = require('mongoose');
 request = require('request');
@@ -13,18 +13,18 @@ const appDir = dirname(require.main.filename);
 
 const uploadImageOnS3Update = async () => {
     const filter = {awsImagesUpdated:true, awsImage: null}
-    const nfts = await Nfts.find(filter, {
+    const nfts = await LaunchPadNft.find(filter, {
         awsImagesUpdated:false
     });
     for (const nft of nfts) {
         let count = nft.awsImagesTryCount;
         if(nft.awsImagesTryCount < 3){
-            await Nfts.updateOne({_id:nft.id}, {
+            await LaunchPadNft.updateOne({_id:nft._id}, {
                 awsImagesUpdated:false,
                 awsImagesTryCount:count+1
             });
         }else{
-            await Nfts.updateOne({_id:nft.id}, {
+            await LaunchPadNft.updateOne({_id:nft._id}, {
                 awsImagesUpdated:true
             });
         }

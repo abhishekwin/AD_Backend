@@ -36,6 +36,9 @@ router.route("/update-whiteListedUser").post( checkToken, updateWhiteListUser);
 router.route("/create-signature").post(checkToken, validate( createWhiteListedValidation), createSignature);
 
 router.route("/update-collection").patch(collectionController.updateCollection);
+
+router.route("/update-collection-with-create-nft").patch(collectionController.updateCollectionWithCreateNft);
+
 router
   .route("/update-collection-with-nft")
   .patch(

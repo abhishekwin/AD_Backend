@@ -7,8 +7,9 @@ const createCollectionValidation = {
     collectionName: Joi.string().required(),
     symbol: Joi.string().required(),
     launchCollectionLater: Joi.boolean().strict().required(),
-    baseArtName: Joi.string().required(),
+    tokenURI: Joi.string().required(),
     nftDescription: Joi.string().required(),
+    maxSupply: Joi.number().strict().required(),
     mintCost: Joi.number().strict().required(),
     royalties: Joi.number().strict().required(),
     imageCover: Joi.string().required(),
@@ -39,6 +40,8 @@ const createCollectionValidation = {
     networkId: Joi.number().optional(),
     networkName: Joi.string().optional(),
     currencyAddress: Joi.string().required(),
+    mintCountPerUser:Joi.number(),
+    mintCountPerTransaction:Joi.number(),
   }),
 };
 

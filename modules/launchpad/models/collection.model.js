@@ -41,11 +41,11 @@ const collectionSchema = mongoose.Schema(
     //   trim: true,
     //   default: null,
     // },
-    baseArtName: {
-      type: String,
-      trim: true,
-      default: null,
-    },
+    // baseArtName: {
+    //   type: String,
+    //   trim: true,
+    //   default: null,
+    // },
     nftDescription: {
       type: String,
       trim: true,
@@ -64,6 +64,16 @@ const collectionSchema = mongoose.Schema(
       lowercase: true
     },
     mintCost: {
+      type: Number,
+      trim: true,
+      default: 0,
+    },
+    mintCountPerUser:{
+      type: Number,
+      trim: true,
+      default: 0,
+    },
+    mintCountPerTransaction:{
       type: Number,
       trim: true,
       default: 0,
@@ -163,14 +173,14 @@ const collectionSchema = mongoose.Schema(
   }
 );
 
-collectionSchema.pre("save", async function (next) {
-  const collection = this;
-  if (collection.isModified("tokenURI")) {
-    collection.tokenURI =
-      "https://bleufi.mypinata.cloud/ipfs/" + collection.tokenURI;
-  }
-  next();
-});
+// collectionSchema.pre("save", async function (next) {
+//   const collection = this;
+//   if (collection.isModified("tokenURI")) {
+//     collection.tokenURI =
+//       "https://bleufi.mypinata.cloud/ipfs/" + collection.tokenURI;
+//   }
+//   next();
+// });
 
 collectionSchema.virtual('isWhiteListed', {
   ref: 'WhiteListedUser',
@@ -183,6 +193,13 @@ collectionSchema.virtual('whiteListedUsers', {
   localField: '_id',
   foreignField: 'collectionId',
   justOne: false
+});
+
+collectionSchema.virtual('userMintCount', {
+  ref: 'LaunchPadMintHistory',
+  localField: 'collectionAddress',
+  foreignField: 'collectionAddress',
+  count: true
 });
 
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
