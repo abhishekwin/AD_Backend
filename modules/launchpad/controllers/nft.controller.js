@@ -371,7 +371,6 @@ const updateManyStaticNft = catchAsync(async (req, res) => {
   }
 
   const results = await LaunchPadNft.find(filter);
-  console.log("results", results.length)
   for (const iterator of results) {
     if(iterator.collectionId == "6362d5d61c1ea0ed77686ff9"){
       await LaunchPadNft.findOneAndUpdate({_id:iterator._id},{collectionId:req.body.collectionId});
