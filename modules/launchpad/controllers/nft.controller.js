@@ -390,7 +390,7 @@ module.exports = {
   getNftList,
   getMyNftList,
   nftDetail,
-  createStaticNft,
-  updateStaticNft,
-  updateManyStaticNft
+  // createStaticNft,
+  // updateStaticNft,
+  // updateManyStaticNft
 };

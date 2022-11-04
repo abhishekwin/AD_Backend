@@ -109,13 +109,13 @@ router
   .route("/add-top-creator")
   .post(checkAdminToken, validate(topCreatorValidation), collectionController.addTopCreator);
 
-router
-  .route("/create-static-collection")
-  .post(checkToken, collectionController.createStaticCollection);
+// router
+//   .route("/create-static-collection")
+//   .post(checkToken, collectionController.createStaticCollection);
 
-router
-  .route("/update-static-collection")
-  .post(checkToken, collectionController.updateStaticCollection);
+// router
+//   .route("/update-static-collection")
+//   .post(checkToken, collectionController.updateStaticCollection);
 
   router
   .route("/get-user-latest-collection")

@@ -855,23 +855,23 @@ const collectionCreatorUsers = async (req, res) => {
 };
 
 
-const createStaticCollection = catchAsync(async (req, res) => {
-  const result = await LaunchPadCollection.create(req.body)
-  res
-    .status(200)
-    .send(new ResponseObject(200, "Collection created successfully", result));
-});
+// const createStaticCollection = catchAsync(async (req, res) => {
+//   const result = await LaunchPadCollection.create(req.body)
+//   res
+//     .status(200)
+//     .send(new ResponseObject(200, "Collection created successfully", result));
+// });
 
-const updateStaticCollection = catchAsync(async (req, res) => {
-  const id = req.body.id
-  delete req.body.id;
-  const result = await LaunchPadCollection.findOneAndUpdate({_id:id}, req.body, {
-    new: true
-  })
-  res
-    .status(200)
-    .send(new ResponseObject(200, "Collection updated successfully", result));
-});
+// const updateStaticCollection = catchAsync(async (req, res) => {
+//   const id = req.body.id
+//   delete req.body.id;
+//   const result = await LaunchPadCollection.findOneAndUpdate({_id:id}, req.body, {
+//     new: true
+//   })
+//   res
+//     .status(200)
+//     .send(new ResponseObject(200, "Collection updated successfully", result));
+// });
 
 const getUserLatestCollection = catchAsync(async (req, res) => {
   let userAddress = req.userData.account.toLowerCase();
@@ -903,7 +903,7 @@ module.exports = {
   getTopBuyers,
   addTopCreator,
   collectionCreatorUsers,
-  createStaticCollection,
-  updateStaticCollection,
+  // createStaticCollection,
+  // updateStaticCollection,
   getUserLatestCollection
 };
