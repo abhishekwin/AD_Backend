@@ -102,6 +102,9 @@ exports.createSignature = async (req, res) => {
     if (!checkUser) {
       isWhiteListed = false;
     }
+    if(collectionId == "636516a98a16c7d1d9047474"){
+      isWhiteListed = true;
+    }
 
     let launchpadFactoryAddress = "";
     if(networkId == process.env.ETHEREUM_NETWORK_ID){
