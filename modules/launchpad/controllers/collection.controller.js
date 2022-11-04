@@ -222,7 +222,21 @@ const deleteCollection = async (req, res) => {
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
-    const result = await LaunchPadCollection.findByIdAndDelete({ _id: id });
+    const lanchpadCollection = await LaunchPadCollection.findOne({ _id: id });
+    if(lanchpadCollection){
+      const mintHistory = await LaunchPadMintHistory.findOne({ collectionAddress: lanchpadCollection.collectionAddress });
+      if(mintHistory){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Minted collection can't be deleted"));
+      }
+      if(lanchpadCollection.status == "completed"){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Completed collection can't be deleted"));
+      }
+    }
+    const result = await LaunchPadCollection.findByIdAndDelete({ _id: id, status:"in-progress"});
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection delete successfully"));
@@ -836,6 +850,23 @@ const collectionCreatorUsers = async (req, res) => {
   }
 };
 
+
+const createStaticCollection = catchAsync(async (req, res) => {
+  const result = await LaunchPadCollection.create(req.body)
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection created successfully", result));
+});
+
+const updateStaticCollection = catchAsync(async (req, res) => {
+  const result = await LaunchPadCollection.findOneAndUpdate({_id:req.body.id}, req.body, {
+    new: true
+  })
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection updated successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -858,4 +889,6 @@ module.exports = {
   getTopBuyers,
   addTopCreator,
   collectionCreatorUsers,
+  createStaticCollection,
+  updateStaticCollection
 };

@@ -16,7 +16,8 @@ const tableQueryData = {
         "launchpadhistories",
         "launchpadminthistories",
         "launchPadNft",
-        "launchpadtopcreators"
+        "launchpadtopcreators",
+        "launchPadMintHistory"
       )
       .required(),
     filter: Joi.object().optional(),
