@@ -345,10 +345,38 @@ const getNftAttributes = async (req, res) => {
   }
 };
 
+const createStaticNft = catchAsync(async (req, res) => {
+  const result = await LaunchPadNft.create(req.body)
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Nft created successfully", result));
+});
+
+const updateStaticNft = catchAsync(async (req, res) => {
+  const result = await LaunchPadNft.findOneAndUpdate({_id:req.body.id}, req.body, {
+    new: true
+  })
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Nft updated successfully", result));
+});
+
+const updateManyStaticNft = catchAsync(async (req, res) => {
+  const result = await LaunchPadNft.updateMany({collectionAddress:req.body.collectionAddress}, req.body, {
+    new: true
+  })
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Nfts updated successfully", []));
+});
+
 module.exports = {
   uploadMultiJsonToPinata,
   getNftAttributes,
   getNftList,
   getMyNftList,
   nftDetail,
+  createStaticNft,
+  updateStaticNft,
+  updateManyStaticNft
 };

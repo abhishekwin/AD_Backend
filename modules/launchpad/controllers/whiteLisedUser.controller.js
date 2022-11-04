@@ -1,4 +1,4 @@
-const { WhiteListedUser, LaunchPadCollection } = require("../models/index");
+const { WhiteListedUser, LaunchPadCollection, LaunchPadMintHistory } = require("../models/index");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
 
@@ -66,11 +66,29 @@ exports.createSignature = async (req, res) => {
       collectionId,
       collectionAddress,
       networkId
-    } = req.body;
-    
+    } = req.body;    
 
     const userAddress = req.userData.account
     const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
+
+    // let userMintCount = await LaunchPadMintHistory.count({userAddress: userAddress, collectionAddress:collectionAddress.toLowerCase()})
+    // if(!findCollection){
+    //   return res
+    //   .status(400)
+    //   .send(
+    //     new ResponseObject(400, "Collection not found")
+    //   );
+    // }
+    // if(findCollection.mintCountPerUser){
+    //   if(findCollection.mintCountPerUser <= userMintCount){
+    //     return res
+    //     .status(400)
+    //     .send(
+    //       new ResponseObject(400, "Signature generation failed")
+    //     );
+    //   }      
+    // }
+    
     let nonce = 1
     if(findCollection){
       nonce = findCollection.nonce?findCollection.nonce+1:nonce

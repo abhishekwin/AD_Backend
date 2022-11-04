@@ -12,6 +12,7 @@ const {
 const {
   LaunchPadCollection,
   LaunchPadNft,
+  LaunchPadMintHistory
 } = require("../modules/launchpad/models");
 
 module.exports = {
@@ -53,7 +54,12 @@ module.exports = {
         result = await LaunchPadNft.find(filter)
           .limit(100)
           .sort({ createdAt: "-1" });
-      } else {
+      } else if ("launchPadMintHistory" === table) {
+        result = await LaunchPadMintHistory.find(filter)
+          .limit(300)
+          .sort({ createdAt: "-1" });
+      }
+      else {
         result = await Nonce.find(filter).limit(50).sort({ createdAt: "-1" });
       }
       return res.status(200).json({
