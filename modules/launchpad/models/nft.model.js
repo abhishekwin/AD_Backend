@@ -167,6 +167,10 @@ const nftSchema = mongoose.Schema(
     attributes:{
       type:Array,
       default: null
+    },
+    deletedAt:{
+      type: Date,
+      default: null,
     }
   },
   {
@@ -178,6 +182,10 @@ const nftSchema = mongoose.Schema(
 nftSchema.set("toJSON", { getters: true, virtuals: true });
 nftSchema.plugin(toJSON);
 nftSchema.plugin(paginate);
+
+nftSchema.pre('find', function() {
+  this.where({ deletedAt: null });
+});
 
 /**
  * @typedef LaunchPadNft

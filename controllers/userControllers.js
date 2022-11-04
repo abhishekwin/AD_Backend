@@ -346,7 +346,7 @@ module.exports = {
       //   .sort({"followers":1})
       //   .skip((page - 1) * limit)
       //   .limit(limit);
-      let sortObj = {}
+      let sortObj = {createdAt: -1 }
       if(sort == "follwoing"){
         sortObj = {follower_count: 1 }
       }
