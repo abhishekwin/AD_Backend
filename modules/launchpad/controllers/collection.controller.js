@@ -219,10 +219,25 @@ const deleteCollection = async (req, res) => {
     const authenticateUser = await LaunchPadCollection.findOne({
       creator: req.userData.account.toLowerCase(),
     });
+    console.log("req.userData.account.toLowerCase()", req.userData.account.toLowerCase())
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
-    const result = await LaunchPadCollection.findByIdAndDelete({ _id: id });
+    const lanchpadCollection = await LaunchPadCollection.findOne({ _id: id });
+    if(lanchpadCollection){
+      const mintHistory = await LaunchPadMintHistory.findOne({ collectionAddress: lanchpadCollection.collectionAddress });
+      if(mintHistory){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Minted collection can't be deleted"));
+      }
+      if(lanchpadCollection.status == "completed"){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Completed collection can't be deleted"));
+      }
+    }
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id: id, status:"in-progress"}, {deletedAt:new Date()});
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection delete successfully"));
@@ -836,6 +851,33 @@ const collectionCreatorUsers = async (req, res) => {
   }
 };
 
+
+const createStaticCollection = catchAsync(async (req, res) => {
+  const result = await LaunchPadCollection.create(req.body)
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection created successfully", result));
+});
+
+const updateStaticCollection = catchAsync(async (req, res) => {
+  const id = req.body.id
+  delete req.body.id;
+  const result = await LaunchPadCollection.findOneAndUpdate({_id:id}, req.body, {
+    new: true
+  })
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection updated successfully", result));
+});
+
+const getUserLatestCollection = catchAsync(async (req, res) => {
+  let userAddress = req.userData.account.toLowerCase();
+  const result = await LaunchPadCollection.findOne({creator:userAddress, status:"in-progress"}).sort({created_at: -1})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection display successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -858,4 +900,7 @@ module.exports = {
   getTopBuyers,
   addTopCreator,
   collectionCreatorUsers,
+  createStaticCollection,
+  updateStaticCollection,
+  getUserLatestCollection
 };

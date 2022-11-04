@@ -35,4 +35,8 @@ router.post("/get-nft-list", nftController.getNftList);
 router.post("/get-my-nft-list", checkToken,  nftController.getMyNftList);
 router.get("/get-nft-detail/:id", nftController.nftDetail);
 router.post("/get-nft-attributes", nftController.getNftAttributes);
+
+router.post("/create-static-nft", checkToken, nftController.createStaticNft);
+router.post("/update-static-nft", checkToken, nftController.updateStaticNft);
+router.post("/update-multi-static-nft", checkToken, nftController.updateManyStaticNft);
 module.exports = router;

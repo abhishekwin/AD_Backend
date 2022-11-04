@@ -302,7 +302,7 @@ module.exports = {
     }
   },
   getCreatorListControllerV2: async (req, res) => {
-    const { page, limit } = req.body;
+    const { page, limit, sort } = req.body;
     try {
       let loginuserdata;
       const bearerHeaders = req.headers["authorization"];
@@ -328,27 +328,60 @@ module.exports = {
         };
       }
       filter = { ...filter, ...searchdata };
-
       let follower_id = null;
       if (loginuserdata) {
         follower_id = loginuserdata._id;
       }
-      //console.log("follower_id", follower_id)
-      let userdata = await Users.find(filter)
-        .populate([
-          {
-            path: "follower_count",
-          },
-          {
-            path: "is_followed",
-            match: { follower_id: follower_id },
-          },
-        ])
-        .skip((page - 1) * limit)
-        .limit(limit);
+      
+      // let userdata = await Users.find(filter)
+      //   .populate([
+      //     {
+      //       path: "follower_count",
+      //     },
+      //     {
+      //       path: "is_followed",
+      //       match: { follower_id: follower_id },
+      //     },
+      //   ])
+      //   .sort({"followers":1})
+      //   .skip((page - 1) * limit)
+      //   .limit(limit);
+      let sortObj = {}
+      if(sort == "follwoing"){
+        sortObj = {follower_count: 1 }
+      }
+      if(sort == "-follwoing"){
+        sortObj = {follower_count: -1 }
+      }
+      if(sort == "created"){
+        sortObj = {createdAt: 1 }
+      }
+      if(sort == "-created"){
+        sortObj = {createdAt: -1 }
+      }
+
+      let userdata = await Users.aggregate([
+        {$match: filter },
+        {
+            $lookup:
+              {
+                from: "userfollowers",
+                localField: "_id",
+                foreignField: "user_id",
+                as: "followers"
+              }
+        },
+        { $addFields: {follower_count: {$size: "$followers"}}},
+        {$sort:  sortObj},
+        // {$setWindowFields: {output: {totalCount: {$count: {}}}}}
+        {$skip: (page - 1) * limit },
+        {$limit: limit } 
+    ])
 
       let count = await Users.countDocuments(filter);
+
       let data = customPagination(userdata, page, limit, count);
+      
       if (data) {
         return res.status(200).send({
           status: 200,

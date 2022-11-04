@@ -167,6 +167,10 @@ const collectionSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
@@ -200,6 +204,10 @@ collectionSchema.virtual('userMintCount', {
   localField: 'collectionAddress',
   foreignField: 'collectionAddress',
   count: true
+});
+
+collectionSchema.pre('find', function() {
+  this.where({ deletedAt: null });
 });
 
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
