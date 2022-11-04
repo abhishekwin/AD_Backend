@@ -219,7 +219,6 @@ const deleteCollection = async (req, res) => {
     const authenticateUser = await LaunchPadCollection.findOne({
       creator: req.userData.account.toLowerCase(),
     });
-    console.log("req.userData.account.toLowerCase()", req.userData.account.toLowerCase())
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
@@ -238,6 +237,10 @@ const deleteCollection = async (req, res) => {
       }
     }
     const result = await LaunchPadCollection.findOneAndUpdate({ _id: id, status:"in-progress"}, {deletedAt:new Date()});
+    if(result){
+      await LaunchPadNft.updateMany({ collectionId: result._id}, {deletedAt:new Date()})
+    }
+    
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection delete successfully"));

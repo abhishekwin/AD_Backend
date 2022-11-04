@@ -362,9 +362,23 @@ const updateStaticNft = catchAsync(async (req, res) => {
 });
 
 const updateManyStaticNft = catchAsync(async (req, res) => {
-  const result = await LaunchPadNft.updateMany({collectionAddress:req.body.collectionAddress}, req.body, {
-    new: true
-  })
+  let filter = req.body.filter
+  if(!filter){
+    return res.status(400).send(new ResponseObject(400, "Please provide update filter"));
+  }
+  if(Object.keys(filter).length == 0){
+    return res.status(400).send(new ResponseObject(400, "Please provide update filter"));
+  }
+
+  const results = await LaunchPadNft.find(filter);
+  for (const iterator of results) {
+    if(iterator.collectionId == "6362d5d61c1ea0ed77686ff9"){
+      await LaunchPadNft.findOneAndUpdate({_id:iterator._id},{collectionId:req.body.collectionId});
+    }
+  }
+  // const result = await LaunchPadNft.updateMany(filter, req.body, {
+  //   new: true
+  // })
   res
     .status(200)
     .send(new ResponseObject(200, "Nfts updated successfully", []));
