@@ -14,7 +14,7 @@ mongoose
 const launchpadCollectionEnd = async () => {
     const lanchpadCollectionlist = await LaunchPadCollection.find({status:{$ne:"ended"}});
     for (const iterator of lanchpadCollectionlist) {
-        await LaunchPadCollection.findOneAndUpdate({_id:iterator._id}, {status:"completed"});
+       // await LaunchPadCollection.findOneAndUpdate({_id:iterator._id}, {status:"completed"});
         if(iterator.maxSupply == iterator.nftMintCount){
             await LaunchPadCollection.findOneAndUpdate({_id:iterator._id}, {status:"ended"});
         }

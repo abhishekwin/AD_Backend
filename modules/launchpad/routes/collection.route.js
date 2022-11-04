@@ -117,4 +117,8 @@ router
   .route("/update-static-collection")
   .post(checkToken, collectionController.updateStaticCollection);
 
+  router
+  .route("/get-user-latest-collection")
+  .get(checkToken, collectionController.getUserLatestCollection);
+  
 module.exports = router;

@@ -42,6 +42,7 @@ const createCollectionValidation = {
     currencyAddress: Joi.string().required(),
     mintCountPerUser:Joi.number(),
     mintCountPerTransaction:Joi.number(),
+    status: Joi.string().optional(),
   }),
 };
 

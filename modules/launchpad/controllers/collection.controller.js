@@ -219,6 +219,7 @@ const deleteCollection = async (req, res) => {
     const authenticateUser = await LaunchPadCollection.findOne({
       creator: req.userData.account.toLowerCase(),
     });
+    console.log("req.userData.account.toLowerCase()", req.userData.account.toLowerCase())
     if (!authenticateUser) {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
@@ -236,7 +237,7 @@ const deleteCollection = async (req, res) => {
         .send(new ResponseObject(400, "Completed collection can't be deleted"));
       }
     }
-    const result = await LaunchPadCollection.findByIdAndDelete({ _id: id, status:"in-progress"});
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id: id, status:"in-progress"}, {deletedAt:new Date()});
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection delete successfully"));
@@ -859,12 +860,22 @@ const createStaticCollection = catchAsync(async (req, res) => {
 });
 
 const updateStaticCollection = catchAsync(async (req, res) => {
-  const result = await LaunchPadCollection.findOneAndUpdate({_id:req.body.id}, req.body, {
+  const id = req.body.id
+  delete req.body.id;
+  const result = await LaunchPadCollection.findOneAndUpdate({_id:id}, req.body, {
     new: true
   })
   res
     .status(200)
     .send(new ResponseObject(200, "Collection updated successfully", result));
+});
+
+const getUserLatestCollection = catchAsync(async (req, res) => {
+  let userAddress = req.userData.account.toLowerCase();
+  const result = await LaunchPadCollection.findOne({creator:userAddress, status:"in-progress"}).sort({created_at: -1})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
 module.exports = {
@@ -890,5 +901,6 @@ module.exports = {
   addTopCreator,
   collectionCreatorUsers,
   createStaticCollection,
-  updateStaticCollection
+  updateStaticCollection,
+  getUserLatestCollection
 };
