@@ -867,6 +867,14 @@ const updateStaticCollection = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection updated successfully", result));
 });
 
+const getUserLatestCollection = catchAsync(async (req, res) => {
+  let userAddress = req.userData.account.toLowerCase();
+  const result = await LaunchPadCollection.findOne({creator:userAddress, status:"in-progress"}).sort({created_at: -1})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection display successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -890,5 +898,6 @@ module.exports = {
   addTopCreator,
   collectionCreatorUsers,
   createStaticCollection,
-  updateStaticCollection
+  updateStaticCollection,
+  getUserLatestCollection
 };
