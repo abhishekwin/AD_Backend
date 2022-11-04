@@ -119,6 +119,6 @@ router
 
   router
   .route("/get-user-latest-collection")
-  .post(checkToken, collectionController.getUserLatestCollection);
+  .get(checkToken, collectionController.getUserLatestCollection);
   
 module.exports = router;
