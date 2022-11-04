@@ -859,7 +859,10 @@ const createStaticCollection = catchAsync(async (req, res) => {
 });
 
 const updateStaticCollection = catchAsync(async (req, res) => {
-  const result = await LaunchPadCollection.findOneAndUpdate({_id:req.body.id}, req.body, {
+  const id = req.body.id
+  delete req.body.id;
+  console.log("id", id)
+  const result = await LaunchPadCollection.findOneAndUpdate({_id:id}, req.body, {
     new: true
   })
   res
