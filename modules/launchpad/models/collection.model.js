@@ -210,6 +210,10 @@ collectionSchema.pre('find', function() {
   this.where({ deletedAt: null });
 });
 
+collectionSchema.pre('findOne', function() {
+  this.where({ deletedAt: null });
+});
+
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   let whiteListedUsers = []
   if(this.whiteListedUsers){

@@ -187,6 +187,10 @@ nftSchema.pre('find', function() {
   this.where({ deletedAt: null });
 });
 
+nftSchema.pre('findOne', function() {
+  this.where({ deletedAt: null });
+});
+
 /**
  * @typedef LaunchPadNft
  */

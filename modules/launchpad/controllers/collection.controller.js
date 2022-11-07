@@ -278,12 +278,16 @@ const getCollection = async (req, res) => {
         match:{userAddress}
       },
     ]).lean();
+
     if (result && result.isWhiteListed) {
       if (result.endDate <= await getUTCDate()) {
         result.isWhiteListed = 0;
       }
     }
-    result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
+    
+    if(resultFirst && resultFirst.whiteListedUsersInArray){
+      result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
+    }
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", result));

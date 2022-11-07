@@ -77,4 +77,62 @@ module.exports = {
       });
     }
   },
+  checkTableQueryDataCount: async (req, res) => {
+    try {
+      const { table, filter = "" } = req.body;
+      let result = [];
+      if ("collectionNFTs" === table) {
+        result = await CollectionNFTs.count(filter)
+          .limit(50)
+          .sort({ createdAt: "-1" });
+      } else if ("nfts" === table) {
+        result = await Nfts.count(filter);        
+      } else if ("users" === table) {
+        result = await Users.count(filter);
+      } else if ("history" === table) {
+        result = await History.count(filter);
+      } else if ("userFollower" === table) {
+        result = await UserFollower.count(filter)
+          .limit(50)
+          .sort({ createdAt: "-1" });
+      } else if ("userFollower" === table) {
+        result = await ImageUploadLogs.count(filter)
+          .limit(50)
+          .sort({ createdAt: "-1" });
+      } else if ("eventManager" === table) {
+        result = await EventManager.count(filter)
+          .limit(50)
+          .sort({ createdAt: "-1" });
+      } else if ("launchPadCollection" === table) {
+        result = await LaunchPadCollection.count(filter)
+          .limit(100)
+          .sort({ createdAt: "-1" });
+      } else if ("launchPadNft" === table) {
+        result = await LaunchPadNft.count(filter)
+          .limit(100)
+          .sort({ createdAt: "-1" });
+      } else if ("launchPadMintHistory" === table) {
+        result = await LaunchPadMintHistory.count(filter)
+          .limit(300)
+          .sort({ createdAt: "-1" });
+      }
+      else {
+        result = await Nonce.count(filter);
+      }
+      
+      return res.status(200).json({
+        message: "",
+        success: true,
+        error: false,
+        statusCode: 200,
+        data: result,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        message: error.message,
+        success: false,
+        statusCode: 400,
+      });
+    }
+  },
 };
