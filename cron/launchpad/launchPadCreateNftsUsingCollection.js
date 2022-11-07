@@ -12,36 +12,43 @@ mongoose
     console.log("error", e);
   });
 
-const getBaseWebData = async (url) => {
-  try{
-    const result = await axios.get(url);
-    if (result.status == 200) {
-      return result.data;
-    }
-  }catch(e){
-    return null;
-  }
-  
-  
-};
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
+
+const getBaseWebDataUsingAxios = async (url, count = 0) => {
+  let promise = new Promise(async function (resolve, reject) {
+    let result = await axios.get(url).then(function (response) {
+      resolve(response.data)
+    })
+      .catch(function (error) {
+        resolve(null)    
+      })
+  });
+  return promise;
+};
+
 const createNftUsingCollectionFuncation = async () => {
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
+  
   if (data) {
     let failedNfts = [];
-    await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "syncing"  })
-    let count = 0;
+    await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "syncing" })
     for (let step = 1; step <= data.maxSupply; step++) {
       const id = step
       updateUri = data.tokenURI + id + ".json";
-      if(count){
-        await sleep(1000)
+     
+      let baseResponse = await getBaseWebDataUsingAxios(updateUri);
+      if(baseResponse == null){
+        await sleep(3000)
+        baseResponse = await getBaseWebDataUsingAxios(updateUri);
       }
-      baseResponse = await getBaseWebData(updateUri);
+      if(baseResponse == null){
+        await sleep(3000)
+        baseResponse = await getBaseWebDataUsingAxios(updateUri);
+      }
       
       if (baseResponse) {
         let objNfts = {
@@ -73,27 +80,22 @@ const createNftUsingCollectionFuncation = async () => {
           tokenId: id
         });
 
-        if (existNfts) {
-          //await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
-        } else {
+        if (!existNfts) {
           await LaunchPadNft.create(objNfts)
-        }
-        count = 0;
+        } 
+
       }else{
-        if(count == 3){
-          failedNfts.push(id)
-        }
-        step--;
-        count++;
+        failedNfts.push(id)
       }
     }
-    await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed", failedNfts: failedNfts })
+    // console.log("Done")
+    await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
   }
 
 };
 
-// createNftUsingCollectionFuncation();
+createNftUsingCollectionFuncation();
 
-module.exports = {
-    createNftUsingCollectionFuncation
-};
+// module.exports = {
+//     createNftUsingCollectionFuncation
+// };
