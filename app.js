@@ -48,13 +48,7 @@ app.use(Sentry.Handlers.requestHandler());
 
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api", function(req, res, next) {
-  res.setTimeout(1000000, function(){
-    console.log('Request has timed out.');
-        res.send(408);
-    });
-  next();
-}, uploadFileRoutes);
+app.use("/api", uploadFileRoutes);
 app.use("/api", tableQuery);
 
 app.use("/api/launchpad", routes);

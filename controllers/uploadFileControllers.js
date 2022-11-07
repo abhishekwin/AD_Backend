@@ -24,6 +24,12 @@ const getjson = (file) => {
 };
 const appRoot = require("app-root-path");
 
+function sleep() {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 100000);
+  });
+}
+
 module.exports = {
   uploadFile: async (req, res) => {
     try {
@@ -115,6 +121,13 @@ module.exports = {
     }
   },
   uploadMultiJsonData: async (req, res) => {
+    let result = await sleep();
+    return res.status(200).json({
+      data: [],
+      status: 200,
+      success: true,
+      message: "url sent",
+    });
     try {
       const filename = "";
 
