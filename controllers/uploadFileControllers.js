@@ -137,7 +137,7 @@ module.exports = {
       }
 
       let result = await uploadDir(folderPath);
-
+     
       fs.rmSync(folderPath, { recursive: true, force: true });
       fs.rmSync(appRoot.path + "/" + req.file.path, {
         recursive: true,
