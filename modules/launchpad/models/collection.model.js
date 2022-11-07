@@ -147,7 +147,7 @@ const collectionSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [null, "in-progress", "ready-to-syncup", "completed", "ended"],
+      enum: [null, "in-progress", "ready-to-syncup", "syncing", "completed", "ended"],
       default: null,
     },
     nonce:{

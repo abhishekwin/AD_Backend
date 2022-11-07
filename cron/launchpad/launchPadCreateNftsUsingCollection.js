@@ -30,15 +30,19 @@ function sleep(ms) {
   });
 }
 const createNftUsingCollectionFuncation = async () => {
-  console.log("start")
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
   if (data) {
     let failedNfts = [];
+    await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "syncing"  })
+    let count = 0;
     for (let step = 1; step <= data.maxSupply; step++) {
       const id = step
       updateUri = data.tokenURI + id + ".json";
-      await sleep(1000)
+      if(count){
+        await sleep(1000)
+      }
       baseResponse = await getBaseWebData(updateUri);
+      
       if (baseResponse) {
         let objNfts = {
           collectionId: data._id,
@@ -74,8 +78,13 @@ const createNftUsingCollectionFuncation = async () => {
         } else {
           await LaunchPadNft.create(objNfts)
         }
+        count = 0;
       }else{
-        failedNfts.push(id)
+        if(count == 3){
+          failedNfts.push(id)
+        }
+        step--;
+        count++;
       }
     }
     await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed", failedNfts: failedNfts })
