@@ -39,7 +39,7 @@ const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEther
 const {launchPadCreatedEventsBsc} = require('./launchpad/launchPadCreatedEventsBsc')
 const {launchPadCreatedEventsEthereum} = require('./launchpad/launchPadCreatedEventsEthereum')
 const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
-const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
+//const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
 
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
@@ -220,24 +220,24 @@ const launchpadTransferEventCron = async () => {
     launchpadTransferEventCron() 
 }
 
-const createLaunchpadNfts = async () => {
+// const createLaunchpadNfts = async () => {
     
-    try {
-        // console.log("start collection on sale event")
-        await createNftUsingCollectionFuncation();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    } 
+//     try {
+//         // console.log("start collection on sale event")
+//         await createNftUsingCollectionFuncation();
+//     }
+//     catch (e) {
+//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//     } 
 
      
     
-    createLaunchpadNfts() 
-}
+//     createLaunchpadNfts() 
+// }
 
 launchpadTransferEventCron();
 startCronForNftImage()
-createLaunchpadNfts();
+//createLaunchpadNfts();
 // startCron();
 
 

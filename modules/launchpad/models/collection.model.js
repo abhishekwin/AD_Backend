@@ -171,6 +171,10 @@ const collectionSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
+    failedNfts:{
+      type: Array,
+      default: null,
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
