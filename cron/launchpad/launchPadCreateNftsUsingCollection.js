@@ -20,6 +20,7 @@ const getBaseWebData = async (url) => {
   return null;
 };
 const createNftUsingCollectionFuncation = async () => {
+  console.log("Nft create start")
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
   if (data) {
     for (let step = 1; step <= data.maxSupply; step++) {

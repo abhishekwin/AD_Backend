@@ -219,8 +219,25 @@ const launchpadTransferEventCron = async () => {
     
     launchpadTransferEventCron() 
 }
+
+const createLaunchpadNfts = async () => {
+    
+    try {
+        // console.log("start collection on sale event")
+        await createNftUsingCollectionFuncation();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    } 
+
+     
+    
+    createLaunchpadNfts() 
+}
+
 launchpadTransferEventCron();
 startCronForNftImage()
+createLaunchpadNfts();
 // startCron();
 
 
