@@ -181,7 +181,7 @@ const updateCollectionWithCreateNft = async (req, res) => {
     );
 
     const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
-    await createNftWithTokenUri(collectionDetails);
+    //await createNftWithTokenUri(collectionDetails);
     
     return res
       .status(200)
@@ -506,7 +506,7 @@ const getMyCollectionList = catchAsync(async (req, res) => {
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
-  
+
   let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }]
   
   req.body.creator = req.userData.account.toLowerCase();
