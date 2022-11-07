@@ -121,13 +121,13 @@ module.exports = {
     }
   },
   uploadMultiJsonData: async (req, res) => {
-    let result = await sleep();
-    return res.status(200).json({
-      data: [],
-      status: 200,
-      success: true,
-      message: "url sent",
-    });
+    // let result = await sleep();
+    // return res.status(200).json({
+    //   data: [],
+    //   status: 200,
+    //   success: true,
+    //   message: "url sent",
+    // });
     try {
       const filename = "";
 
