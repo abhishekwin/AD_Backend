@@ -46,9 +46,9 @@ app.use(cors(), function (req, res, next) {
 app.use(Sentry.Handlers.requestHandler());
 // app.use(expressUpload());
 
+app.use("/api", uploadFileRoutes);
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api", uploadFileRoutes);
 app.use("/api", tableQuery);
 
 app.use("/api/launchpad", routes);
@@ -85,10 +85,10 @@ app.use(Sentry.Handlers.errorHandler());
 // cron.schedule('*/05 * * * * *', () => {
 //   //startCron()
 // });
+
 app.listen(port).on("error", function (err) {
   console.log("err", err);
 });
-
 // app.setTimeout(500000);
 
 module.exports = app;
