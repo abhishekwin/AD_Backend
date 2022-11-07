@@ -215,26 +215,26 @@ const launchpadTransferEventCron = async () => {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     } 
 
-     
-    
-    launchpadTransferEventCron() 
-}
-
-const createLaunchpadNfts = async () => {
-    
     try {
         // console.log("start collection on sale event")
         await createNftUsingCollectionFuncation();
     }
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }     
-    createLaunchpadNfts() 
+    }
+    
+    launchpadTransferEventCron() 
 }
+
+// const createLaunchpadNfts = async () => {
+    
+        
+//     createLaunchpadNfts() 
+// }
 
 launchpadTransferEventCron();
 startCronForNftImage()
-createLaunchpadNfts();
+//createLaunchpadNfts();
 // startCron();
 
 
