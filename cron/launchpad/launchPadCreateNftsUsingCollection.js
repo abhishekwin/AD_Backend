@@ -37,7 +37,7 @@ const createNftUsingCollectionFuncation = async () => {
     for (let step = 1; step <= data.maxSupply; step++) {
       const id = step
       updateUri = data.tokenURI + id + ".json";
-      await sleep(2000)
+      await sleep(1000)
       baseResponse = await getBaseWebData(updateUri);
       if (baseResponse) {
         let objNfts = {
