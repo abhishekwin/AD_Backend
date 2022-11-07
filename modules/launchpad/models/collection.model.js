@@ -147,7 +147,7 @@ const collectionSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [null, "in-progress", "completed", "ended"],
+      enum: [null, "in-progress", "ready-to-syncup", "completed", "ended"],
       default: null,
     },
     nonce:{
@@ -203,6 +203,13 @@ collectionSchema.virtual('userMintCount', {
   ref: 'LaunchPadMintHistory',
   localField: 'collectionAddress',
   foreignField: 'collectionAddress',
+  count: true
+});
+
+collectionSchema.virtual('nftCount', {
+  ref: 'LaunchPadNft',
+  localField: '_id',
+  foreignField: 'collectionId',
   count: true
 });
 

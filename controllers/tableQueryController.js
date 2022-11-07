@@ -83,8 +83,6 @@ module.exports = {
       let result = [];
       if ("collectionNFTs" === table) {
         result = await CollectionNFTs.count(filter)
-          .limit(50)
-          .sort({ createdAt: "-1" });
       } else if ("nfts" === table) {
         result = await Nfts.count(filter);        
       } else if ("users" === table) {

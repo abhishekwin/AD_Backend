@@ -32,46 +32,46 @@ const getBaseWebData = async (url) => {
 
 const createNftWithTokenUri = async (data) => {
 
-
   for (let step = 1; step <= data.maxSupply; step++) {
     const id = step
     updateUri = data.tokenURI + id + ".json";
     baseResponse = await getBaseWebData(updateUri);
-
-    let objNfts = {
-      collectionId: data._id,
-      collectionAddress: data.collectionAddress,
-      royalties: data.royalties ? data.royalties : 0,
-      name: baseResponse.name,
-      description: baseResponse.description,
-      image: baseResponse.image,
-      tokenURI: updateUri ? updateUri : null,
-      owner: data.creator,
-      creator: data.creator,
-      tokenId: id,
-      // dna: baseResponse.dna,
-      attributes: baseResponse.attributes,
-      compiler: baseResponse.compiler,
-      currency: data.currency,
-      isFirstSale: true,
-      mintCost: data.mintCost,
-      royalties: data.royalties,
-      status: "Active",
-      isActive: true,
-      networkId: data.networkId,
-      networkName: data.networkName,
-    };
-
-    let existNfts = await LaunchPadNft.findOne({
-      collectionId: data._id,
-      tokenId: id
-    });
-
-    if (existNfts) {
-      await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
-    } else {
-      await LaunchPadNft.create(objNfts)
-    }
+    if(baseResponse){
+      let objNfts = {
+        collectionId: data._id,
+        collectionAddress: data.collectionAddress,
+        royalties: data.royalties ? data.royalties : 0,
+        name: baseResponse.name,
+        description: baseResponse.description,
+        image: baseResponse.image,
+        tokenURI: updateUri ? updateUri : null,
+        owner: data.creator,
+        creator: data.creator,
+        tokenId: id,
+        // dna: baseResponse.dna,
+        attributes: baseResponse.attributes,
+        compiler: baseResponse.compiler,
+        currency: data.currency,
+        isFirstSale: true,
+        mintCost: data.mintCost,
+        royalties: data.royalties,
+        status: "Active",
+        isActive: true,
+        networkId: data.networkId,
+        networkName: data.networkName,
+      };
+  
+      let existNfts = await LaunchPadNft.findOne({
+        collectionId: data._id,
+        tokenId: id
+      });
+  
+      if (existNfts) {
+        await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
+      } else {
+        await LaunchPadNft.create(objNfts)
+      }
+    }    
   }
 }
 
@@ -172,9 +172,9 @@ const updateCollectionWithCreateNft = async (req, res) => {
       { _id: collectionId },
       req.body
     );
+    // const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
 
-    const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
-    await createNftWithTokenUri(collectionDetails);
+    // await createNftWithTokenUri(collectionDetails);
 
     return res
       .status(200)
@@ -277,6 +277,9 @@ const getCollection = async (req, res) => {
         path: "userMintCount",
         match:{userAddress}
       },
+      {
+        path: "nftCount",
+      },
     ]).lean();
 
     if (result && result.isWhiteListed) {
@@ -339,8 +342,6 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
-
-
 
   // req.body.endDate = {$lt: new Date()}
   // filtercolumn.push("endDate");
