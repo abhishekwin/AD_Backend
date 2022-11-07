@@ -506,8 +506,8 @@ const getMyCollectionList = catchAsync(async (req, res) => {
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
-
-  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }]
+  
+  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }]
   
   req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
