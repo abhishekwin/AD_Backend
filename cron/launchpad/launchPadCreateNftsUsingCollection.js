@@ -13,16 +13,21 @@ mongoose
   });
 
 const getBaseWebData = async (url) => {
-  const result = await axios.get(url);
-  if (result.status == 200) {
-    return result.data;
+  try{
+    const result = await axios.get(url);
+    if (result.status == 200) {
+      return result.data;
+    }
+  }catch(e){
+    return null;
   }
-  return null;
+  
+  
 };
 const createNftUsingCollectionFuncation = async () => {
-  console.log("Nft create start")
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
   if (data) {
+    let failedNfts = [];
     for (let step = 1; step <= data.maxSupply; step++) {
       const id = step
       updateUri = data.tokenURI + id + ".json";
@@ -62,9 +67,11 @@ const createNftUsingCollectionFuncation = async () => {
         } else {
           await LaunchPadNft.create(objNfts)
         }
+      }else{
+        failedNfts.push(id)
       }
     }
-    await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed" })
+    await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed", failedNfts: failedNfts })
   }
 
 };
