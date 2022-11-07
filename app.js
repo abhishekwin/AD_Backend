@@ -23,6 +23,9 @@ const app = express();
 const Sentry = require("@sentry/node");
 const SentryTracing = require("@sentry/tracing");
 
+let timeout = require('connect-timeout');
+
+
 Sentry.init({
   dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095",
 });
@@ -46,6 +49,10 @@ app.use(cors(), function (req, res, next) {
 app.use(Sentry.Handlers.requestHandler());
 // app.use(expressUpload());
 
+app.use(function(req, res, next) {
+  res.setTimeout(100000);
+  next();
+});
 app.use("/api", uploadFileRoutes);
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
