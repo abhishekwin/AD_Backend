@@ -174,6 +174,10 @@ const collectionSchema = mongoose.Schema(
     failedNfts:{
       type: Array,
       default: null,
+    },
+    failedNftsCheckCount:{
+      type: Number,
+      default: 0,
     }
   },
   {
