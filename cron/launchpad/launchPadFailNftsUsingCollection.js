@@ -93,7 +93,7 @@ const failNftUsingCollectionFuncation = async () => {
             { failedNftsCheckCount: { $exists: false } }
         ]
     });
-    
+    console.log("data", data)
     if (data) {
         let failedNfts = [];
         let failedNftsCheckCount = data.failedNftsCheckCount+1;
