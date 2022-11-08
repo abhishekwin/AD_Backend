@@ -181,7 +181,14 @@ const updateCollectionWithCreateNft = async (req, res) => {
     );
 
     const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
-    await createNftWithTokenUri(collectionDetails);
+    if(collectionDetails){
+      if(collectionDetails.maxSupply < 200){
+        await LaunchPadCollection.findOneAndUpdate({ _id: collectionDetails._id }, { status: "syncing" })
+        await createNftWithTokenUri(collectionDetails);
+        await LaunchPadCollection.findOneAndUpdate({ _id: collectionDetails._id }, { status: "completed" })
+      }      
+    }
+    
     
     return res
       .status(200)

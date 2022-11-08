@@ -32,7 +32,6 @@ const getBaseWebDataUsingAxios = async (url, count = 0) => {
 
 const createNftUsingCollectionFuncation = async () => {
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
-  
   if (data) {
     let failedNfts = [];
     await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "syncing" })
@@ -94,8 +93,8 @@ const createNftUsingCollectionFuncation = async () => {
 
 };
 
-createNftUsingCollectionFuncation();
+// createNftUsingCollectionFuncation();
 
-// module.exports = {
-//     createNftUsingCollectionFuncation
-// };
+module.exports = {
+    createNftUsingCollectionFuncation
+};
