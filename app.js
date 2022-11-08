@@ -8,7 +8,7 @@ require("./config/db.config");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { EventManager } = require("./models");
-const { startCron } = require("./cron/cron");
+const { startCron, createLaunchpadNfts, failLaunchpadNfts } = require("./cron/cron");
 const adminRouter = require("./routes/adminRoutes");
 const usersRouter = require("./routes/userRoutes");
 const uploadFileRoutes = require("./routes/uploadFileRoutes");
@@ -86,6 +86,11 @@ app.use(function onError(err, req, res, next) {
   // and optionally displayed to the user for support.
   res.statusCode = 500;
   res.end(res.sentry + "\n");
+});
+
+cron.schedule('* * * * *', () => {
+  console.log("---cron running---")
+  createLaunchpadNfts()
 });
 
 app.use(Sentry.Handlers.errorHandler());
