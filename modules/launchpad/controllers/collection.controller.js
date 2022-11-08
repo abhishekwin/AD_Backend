@@ -907,11 +907,11 @@ const getCollectionMintCount = catchAsync(async (req, res) => {
           .status(400)
           .send(new ResponseObject(400, "Collection id is required"));
   }
-  if(!userAddress){
-    return res
-          .status(400)
-          .send(new ResponseObject(400, "User address is required"));
-  }
+  // if(!userAddress){
+  //   return res
+  //         .status(400)
+  //         .send(new ResponseObject(400, "User address is required"));
+  // }
   const result = await LaunchPadCollection.findOne({_id:collectionId})
   .select('nftMintCount collectionAddress')
   .populate([
