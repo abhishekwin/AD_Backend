@@ -19,7 +19,7 @@ function sleep(ms) {
 }
 
 const getBaseWebDataUsingAxios = async (url, count = 0) => {
-  console.log("url", url)
+  
   let promise = new Promise(async function (resolve, reject) {
     let result = await axios.get(url).then(function (response) {
       resolve(response.data)

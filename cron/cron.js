@@ -220,7 +220,6 @@ const launchpadTransferEventCron = async () => {
 }
 
 const createLaunchpadNfts = async () => {
-    console.log("---RRRRR---")
     try {
         await createNftUsingCollectionFuncation();
     }
