@@ -900,6 +900,31 @@ const getUserLatestCollection = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
+const getCollectionMintCount = catchAsync(async (req, res) => {
+  const { collectionId, userAddress } = req.body;
+  if(!collectionId){
+    return res
+          .status(400)
+          .send(new ResponseObject(400, "Collection id is required"));
+  }
+  if(!userAddress){
+    return res
+          .status(400)
+          .send(new ResponseObject(400, "User address is required"));
+  }
+  const result = await LaunchPadCollection.findOne({_id:collectionId})
+  .select('nftMintCount collectionAddress')
+  .populate([
+    {
+      path: "userMintCount",
+      match:{userAddress}
+    }
+  ])
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection display successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -924,5 +949,6 @@ module.exports = {
   collectionCreatorUsers,
   // createStaticCollection,
   // updateStaticCollection,
-  getUserLatestCollection
+  getUserLatestCollection,
+  getCollectionMintCount
 };

@@ -52,6 +52,7 @@ router
 router
   .route("/get-collection-detail/:id")
   .get(collectionController.getCollection);
+
 router
   .route("/get-collection-list")
   .post(collectionController.getCollectionList);
@@ -95,6 +96,7 @@ router
 router
   .route("/get-latest-collection")
   .post(collectionController.getLatestCollection);  
+
 router
   .route("/get-top-sellers")
   .get(collectionController.getTopSellers); 
@@ -120,5 +122,9 @@ router
   router
   .route("/get-user-latest-collection")
   .get(checkToken, collectionController.getUserLatestCollection);
+
+  router
+  .route("/get-collection-mint-count")
+  .post(collectionController.getCollectionMintCount);
   
 module.exports = router;
