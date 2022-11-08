@@ -319,7 +319,7 @@ const getCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  req.body.status = ["completed", "ready-to-syncup"];
+  req.body.status = ["completed", "ready-to-syncup", "syncing"];
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
@@ -514,7 +514,7 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }]
+  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }, { status: "syncing"  }]
   
   req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
