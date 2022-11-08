@@ -33,7 +33,9 @@ const getBaseWebDataUsingAxios = async (url, count = 0) => {
 
 const createNftWithUri = async (id, updateUri, data, failedNfts) => {
   await new Promise(async function (resolve, reject) {
+    
     let baseResponse = await getBaseWebDataUsingAxios(updateUri);
+   
     if (baseResponse == null) {
       await sleep(3000)
       baseResponse = await getBaseWebDataUsingAxios(updateUri);
@@ -42,7 +44,6 @@ const createNftWithUri = async (id, updateUri, data, failedNfts) => {
       await sleep(3000)
       baseResponse = await getBaseWebDataUsingAxios(updateUri);
     }
-
     if (baseResponse) {
       let objNfts = {
         collectionId: data._id,
@@ -87,14 +88,15 @@ const createNftWithUri = async (id, updateUri, data, failedNfts) => {
 
 const createNftUsingCollectionFuncation = async () => {
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
-
   if (data) {
     let failedNfts = [];
     await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "syncing" })
     for (let step = 1; step <= data.maxSupply; step++) {
       const id = step
+      //console.log("id", id)
       updateUri = data.tokenURI + id + ".json";
       let nftCreated = await createNftWithUri(id, updateUri, data, failedNfts);
+      failedNfts = nftCreated
     }
     await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
   }
