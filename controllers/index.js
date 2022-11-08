@@ -37,7 +37,7 @@ const { approveCollectionController, deactivateNftsController, blockUserControll
 
 const { uploadFile, uploadJson, uploadMultiJsonData, pinHash } = require("./uploadFileControllers");
 
-const { checkTableQueryData } = require('./tableQueryController')
+const { checkTableQueryData, checkTableQueryDataCount } = require('./tableQueryController')
 
 module.exports = {
   getTopCollectionController,
@@ -79,5 +79,6 @@ module.exports = {
   saveCollectionWithCollectionAddress,
   getMyCollectionListController,
   checkTableQueryData,
-  getCollectionHeaders
+  getCollectionHeaders,
+  checkTableQueryDataCount
 };

@@ -8,6 +8,7 @@ async function uploadDir(folderPath) {
             resolve(result);
         }).catch((err) => {
             //handle error here
+            console.log("Pinata upload error", err)
             reject(err);
         });
     })    

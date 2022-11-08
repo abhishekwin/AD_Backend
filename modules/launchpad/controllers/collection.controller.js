@@ -23,56 +23,63 @@ const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 
 const getBaseWebData = async (url) => {
-  const result = await axios.get(url);
-  if (result.status == 200) {
-    return result.data;
+  try{
+    const result = await axios.get(url);
+    if (result.status == 200) {
+      return result.data;
+    }
+  }catch(e){
+    return null;
   }
-  return null;
-};
+}
 
 const createNftWithTokenUri = async (data) => {
 
-
+  let failedNfts = [];
   for (let step = 1; step <= data.maxSupply; step++) {
     const id = step
     updateUri = data.tokenURI + id + ".json";
     baseResponse = await getBaseWebData(updateUri);
-
-    let objNfts = {
-      collectionId: data._id,
-      collectionAddress: data.collectionAddress,
-      royalties: data.royalties ? data.royalties : 0,
-      name: baseResponse.name,
-      description: baseResponse.description,
-      image: baseResponse.image,
-      tokenURI: updateUri ? updateUri : null,
-      owner: data.creator,
-      creator: data.creator,
-      tokenId: id,
-      // dna: baseResponse.dna,
-      attributes: baseResponse.attributes,
-      compiler: baseResponse.compiler,
-      currency: data.currency,
-      isFirstSale: true,
-      mintCost: data.mintCost,
-      royalties: data.royalties,
-      status: "Active",
-      isActive: true,
-      networkId: data.networkId,
-      networkName: data.networkName,
-    };
-
-    let existNfts = await LaunchPadNft.findOne({
-      collectionId: data._id,
-      tokenId: id
-    });
-
-    if (existNfts) {
-      await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
-    } else {
-      await LaunchPadNft.create(objNfts)
-    }
+    if(baseResponse){
+      let objNfts = {
+        collectionId: data._id,
+        collectionAddress: data.collectionAddress,
+        royalties: data.royalties ? data.royalties : 0,
+        name: baseResponse.name,
+        description: baseResponse.description,
+        image: baseResponse.image,
+        tokenURI: updateUri ? updateUri : null,
+        owner: data.creator,
+        creator: data.creator,
+        tokenId: id,
+        // dna: baseResponse.dna,
+        attributes: baseResponse.attributes,
+        compiler: baseResponse.compiler,
+        currency: data.currency,
+        isFirstSale: true,
+        mintCost: data.mintCost,
+        royalties: data.royalties,
+        status: "Active",
+        isActive: true,
+        networkId: data.networkId,
+        networkName: data.networkName,
+      };
+  
+      let existNfts = await LaunchPadNft.findOne({
+        collectionId: data._id,
+        tokenId: id
+      });
+  
+      if (existNfts) {
+        await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
+      } else {
+        await LaunchPadNft.create(objNfts)
+      }
+    } else{
+      failedNfts.push(id)
+    }   
   }
+  await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed", failedNfts: failedNfts })
 }
 
 const createCollection = catchAsync(async (req, res) => {
@@ -173,9 +180,16 @@ const updateCollectionWithCreateNft = async (req, res) => {
       req.body
     );
 
-    const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
-    await createNftWithTokenUri(collectionDetails);
-
+    // const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId });
+    // if(collectionDetails){
+    //   if(collectionDetails.maxSupply < 200){
+    //     await LaunchPadCollection.findOneAndUpdate({ _id: collectionDetails._id }, { status: "syncing" })
+    //     await createNftWithTokenUri(collectionDetails);
+    //     await LaunchPadCollection.findOneAndUpdate({ _id: collectionDetails._id }, { status: "completed" })
+    //   }      
+    // }
+    
+    
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
@@ -277,13 +291,20 @@ const getCollection = async (req, res) => {
         path: "userMintCount",
         match:{userAddress}
       },
+      {
+        path: "nftCount",
+      },
     ]).lean();
+
     if (result && result.isWhiteListed) {
       if (result.endDate <= await getUTCDate()) {
         result.isWhiteListed = 0;
       }
     }
-    result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
+    
+    if(resultFirst && resultFirst.whiteListedUsersInArray){
+      result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
+    }
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection found successfully", result));
@@ -298,7 +319,7 @@ const getCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  req.body.status = "completed";
+  req.body.status = ["completed", "ready-to-syncup", "syncing"];
   filtercolumn.push("status");
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
@@ -335,8 +356,6 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
-
-
 
   // req.body.endDate = {$lt: new Date()}
   // filtercolumn.push("endDate");
@@ -495,7 +514,7 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }]
+  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }, { status: "syncing"  }]
   
   req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
@@ -881,6 +900,31 @@ const getUserLatestCollection = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
+const getCollectionMintCount = catchAsync(async (req, res) => {
+  const { collectionId, userAddress } = req.body;
+  if(!collectionId){
+    return res
+          .status(400)
+          .send(new ResponseObject(400, "Collection id is required"));
+  }
+  if(!userAddress){
+    return res
+          .status(400)
+          .send(new ResponseObject(400, "User address is required"));
+  }
+  const result = await LaunchPadCollection.findOne({_id:collectionId})
+  .select('nftMintCount collectionAddress')
+  .populate([
+    {
+      path: "userMintCount",
+      match:{userAddress}
+    }
+  ])
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection display successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -905,5 +949,6 @@ module.exports = {
   collectionCreatorUsers,
   // createStaticCollection,
   // updateStaticCollection,
-  getUserLatestCollection
+  getUserLatestCollection,
+  getCollectionMintCount
 };

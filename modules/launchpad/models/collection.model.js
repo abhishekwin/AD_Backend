@@ -147,7 +147,7 @@ const collectionSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [null, "in-progress", "completed", "ended"],
+      enum: [null, "in-progress", "ready-to-syncup", "syncing", "completed", "ended"],
       default: null,
     },
     nonce:{
@@ -171,6 +171,14 @@ const collectionSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
+    failedNfts:{
+      type: Array,
+      default: null,
+    },
+    failedNftsCheckCount:{
+      type: Number,
+      default: 0,
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
@@ -206,7 +214,18 @@ collectionSchema.virtual('userMintCount', {
   count: true
 });
 
+collectionSchema.virtual('nftCount', {
+  ref: 'LaunchPadNft',
+  localField: '_id',
+  foreignField: 'collectionId',
+  count: true
+});
+
 collectionSchema.pre('find', function() {
+  this.where({ deletedAt: null });
+});
+
+collectionSchema.pre('findOne', function() {
   this.where({ deletedAt: null });
 });
 

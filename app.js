@@ -8,7 +8,7 @@ require("./config/db.config");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { EventManager } = require("./models");
-const { startCron } = require("./cron/cron");
+const { startCron, createLaunchpadNfts, failLaunchpadNfts } = require("./cron/cron");
 const adminRouter = require("./routes/adminRoutes");
 const usersRouter = require("./routes/userRoutes");
 const uploadFileRoutes = require("./routes/uploadFileRoutes");
@@ -22,6 +22,9 @@ const collectionERC721Abi = require("./config/collectionERC721.json");
 const app = express();
 const Sentry = require("@sentry/node");
 const SentryTracing = require("@sentry/tracing");
+
+let timeout = require('connect-timeout');
+
 
 Sentry.init({
   dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095",
@@ -46,9 +49,13 @@ app.use(cors(), function (req, res, next) {
 app.use(Sentry.Handlers.requestHandler());
 // app.use(expressUpload());
 
+app.use(function(req, res, next) {
+  res.setTimeout(100000);
+  next();
+});
+app.use("/api", uploadFileRoutes);
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api", uploadFileRoutes);
 app.use("/api", tableQuery);
 
 app.use("/api/launchpad", routes);
@@ -81,12 +88,19 @@ app.use(function onError(err, req, res, next) {
   res.end(res.sentry + "\n");
 });
 
+cron.schedule('* * * * *', () => {
+  console.log("---cron running---")
+  createLaunchpadNfts()
+});
+
 app.use(Sentry.Handlers.errorHandler());
 // cron.schedule('*/05 * * * * *', () => {
 //   //startCron()
 // });
+
 app.listen(port).on("error", function (err) {
   console.log("err", err);
 });
+// app.setTimeout(500000);
 
 module.exports = app;
