@@ -91,6 +91,7 @@ app.use(function onError(err, req, res, next) {
 cron.schedule('* * * * *', () => {
   console.log("---cron running---")
   createLaunchpadNfts()
+  failLaunchpadNfts()
 });
 
 app.use(Sentry.Handlers.errorHandler());

@@ -89,11 +89,10 @@ const createNftWithUri = async (id, updateUri, data, failedNfts) => {
 const failNftUsingCollectionFuncation = async () => {
     const data = await LaunchPadCollection.findOne({
         failedNfts: { "$gt": 0 }, $or: [
-            { failedNftsCheckCount: { "$lt": 2 } },
+            { failedNftsCheckCount: { "$lt": 3 } },
             { failedNftsCheckCount: { $exists: false } }
         ]
     });
-    
     if (data) {
         let failedNfts = [];
         let failedNftsCheckCount = data.failedNftsCheckCount+1;
@@ -104,7 +103,10 @@ const failNftUsingCollectionFuncation = async () => {
             let nftCreated = await createNftWithUri(id, updateUri, data, failedNfts);
             failedNfts = nftCreated
         }
-        await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
+        
+        if(failedNfts.length <= 0){
+            await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
+        }
     }
 
 };
