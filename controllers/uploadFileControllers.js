@@ -45,7 +45,7 @@ async function uploadFileInPublicFolder(filedatas) {
   for (const data of filedatas) {
     let fileUploadPath = `./public/${randomNum}/` + count + ".json";
     let content = JSON.stringify(data)       
-    await fsPromises.writeFile(fileUploadPath, content, function (err) {});
+    fs.writeFile(fileUploadPath, content, function (err) {});
     count++;
   }  
   return {folderPath, count:count-1}
@@ -143,7 +143,6 @@ module.exports = {
   },
   uploadMultiJsonData: async (req, res) => {
     try {
-      
       
       let filedatas = getjson(req.file);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
