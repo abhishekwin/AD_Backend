@@ -14,6 +14,7 @@ const pinata = pinataSDK(
   process.env.PINATAAPISECRETAPIKEY
 );
 const fs = require("fs");
+const fsPromises = require('fs').promises; 
 const { uploadDir } = require("../services/pinata");
 
 const getjson = (file) => {
@@ -28,6 +29,26 @@ function sleep() {
   return new Promise((resolve) => {
     setTimeout(resolve, 100000);
   });
+}
+
+async function uploadFileInPublicFolder(filedatas) {
+  let count = 1;
+  let randomNum = (Math.random() + 1).toString(36).substring(7);
+  fs.mkdir(path.join("./public/", randomNum), (err) => {
+    if (err) {
+      return console.error(err);
+    }
+    console.log("Directory created successfully!");
+  });
+
+  let folderPath = appRoot.path + `/public/${randomNum}`;
+  for (const data of filedatas) {
+    let fileUploadPath = `./public/${randomNum}/` + count + ".json";
+    let content = JSON.stringify(data)       
+    await fsPromises.writeFile(fileUploadPath, content, function (err) {});
+    count++;
+  }  
+  return {folderPath, count:count-1}
 }
 
 module.exports = {
@@ -121,48 +142,43 @@ module.exports = {
     }
   },
   uploadMultiJsonData: async (req, res) => {
-    // let result = await sleep();
-    // return res.status(200).json({
-    //   data: [],
-    //   status: 200,
-    //   success: true,
-    //   message: "url sent",
-    // });
     try {
-      const filename = "";
-
+      
+      
       let filedatas = getjson(req.file);
-
-      let count = 1;
-      let randomNum = (Math.random() + 1).toString(36).substring(7);
-      fs.mkdir(path.join("./public/", randomNum), (err) => {
-        if (err) {
-          return console.error(err);
+      let uploadedData = await uploadFileInPublicFolder(filedatas)
+      if(uploadedData){
+        if(uploadedData.count == filedatas.length){
+          const folderPath = uploadedData.folderPath;
+          let result = await uploadDir(folderPath);
+          fs.rmSync(folderPath, { recursive: true, force: true });
+          fs.rmSync(appRoot.path + "/" + req.file.path, {
+            recursive: true,
+            force: true,
+          });
+    
+          return res.status(200).json({
+            data: result,
+            status: 200,
+            success: true,
+            message: "Url sent",
+          });
+        }else{
+          return res.status(400).send({
+            error: true,
+            status: 400,
+            success: false,
+            message: "Failed To upload json",
+          });
         }
-        console.log("Directory created successfully!");
-      });
-
-      let folderPath = appRoot.path + `/public/${randomNum}`;
-      for (const data of filedatas) {
-        let fileUploadPath = `./public/${randomNum}/` + count + ".json";
-        fs.writeFile(fileUploadPath, JSON.stringify(data), function (err) {});
-        count++;
-      }
-
-      let result = await uploadDir(folderPath);
-     
-      fs.rmSync(folderPath, { recursive: true, force: true });
-      fs.rmSync(appRoot.path + "/" + req.file.path, {
-        recursive: true,
-        force: true,
-      });
-
-      return res.status(200).json({
-        data: result,
-        status: 200,
-        success: true,
-        message: "url sent",
-      });
+      }else{
+        return res.status(400).send({
+          error: true,
+          status: 400,
+          success: false,
+          message: "Failed To upload json",
+        });
+      }     
     } catch (error) {
       console.error("error.message", error);
       return res.status(400).json({

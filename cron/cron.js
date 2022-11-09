@@ -234,16 +234,16 @@ const failLaunchpadNfts = async () => {
     }
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }     
-    failLaunchpadNfts() 
+    }
 }
 
 launchpadTransferEventCron();
 startCronForNftImage()
-failLaunchpadNfts();
+// failLaunchpadNfts();
 // startCron();
 module.exports = {
-    createLaunchpadNfts
+    createLaunchpadNfts,
+    failLaunchpadNfts
 };
 
 
