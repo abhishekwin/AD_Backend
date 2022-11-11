@@ -316,6 +316,9 @@ const getCollection = async (req, res) => {
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
@@ -353,6 +356,9 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const upcomingCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -405,6 +411,9 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
 const liveCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -467,6 +476,10 @@ const liveCollectionList = catchAsync(async (req, res) => {
 
 const endCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
   req.body.status = "ended";
   filtercolumn.push("status");
 
@@ -510,6 +523,9 @@ const endCollectionList = catchAsync(async (req, res) => {
 
 const getMyCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -894,7 +910,7 @@ const collectionCreatorUsers = async (req, res) => {
 
 const getUserLatestCollection = catchAsync(async (req, res) => {
   let userAddress = req.userData.account.toLowerCase();
-  const result = await LaunchPadCollection.findOne({creator:userAddress, status:"in-progress"}).sort({created_at: -1})
+  const result = await LaunchPadCollection.findOne({creator:userAddress, deletedAt:null, status:"in-progress"}).sort({created_at: -1})
   res
     .status(200)
     .send(new ResponseObject(200, "Collection display successfully", result));
@@ -925,6 +941,42 @@ const getCollectionMintCount = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
+const getHideCollection = catchAsync(async (req, res) => {
+  // let userAddress = req.userData.account.toLowerCase();
+  const result = await LaunchPadCollection.find({deletedAt:{$ne:null}}).sort({deletedAt: -1})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Hide collection display successfully", result));
+});
+
+const hideMultipuleCollection = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  const {collectionIds} = req.body
+  if(!collectionIds.length > 0 ){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Please provide collection ids"));
+  }
+  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:new Date, hideByAdmin:userAddress})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection hide successfully", collectionIds));
+});
+
+const unHideMultipuleCollection = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  const {collectionIds} = req.body
+  if(!collectionIds.length > 0 ){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Please provide collection ids"));
+  }
+  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:null, unHideByAdmin:userAddress})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection unhide successfully", collectionIds));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -950,5 +1002,8 @@ module.exports = {
   // createStaticCollection,
   // updateStaticCollection,
   getUserLatestCollection,
-  getCollectionMintCount
+  getCollectionMintCount,
+  getHideCollection,
+  hideMultipuleCollection,
+  unHideMultipuleCollection
 };

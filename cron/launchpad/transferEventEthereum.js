@@ -6,6 +6,9 @@ const { LaunchPadNft, LaunchPadCollection, LaunchPadMintHistory, LaunchPadHistor
 let LAUNCHPAD_SUBGRAPH_URL_ETHEREUM = process.env.LAUNCHPAD_SUBGRAPH_URL_ETHEREUM;
 let DB_URL = process.env.DB_URL;
 let ETHEREUM_NETWORK_ID = process.env.ETHEREUM_NETWORK_ID
+let LAUNCHPAD_ETH_WEB3_URL = process.env.LAUNCHPAD_ETH_WEB3_URL;
+const Web3 = require("web3");
+const LaunchpadAbi = require("../../config/launchpad/abi.json");
 
 mongoose
   .connect(DB_URL)
@@ -16,10 +19,10 @@ mongoose
     console.log("error", e);
   });
 
-const transferFunctionQuery = async (from) => {
+const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_ETHEREUM;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}, tokenId_gt: ${gt}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
@@ -43,6 +46,7 @@ const transferFunctionQuery = async (from) => {
 const manageData = async (transferdata) => {
   try {
     let timestamp = transferdata[0].timestamp;
+    let collectionAddressForMintCount = ""
     for ( data of transferdata) {
       timestamp = data.timestamp
       
@@ -68,10 +72,25 @@ const manageData = async (transferdata) => {
         });
         
         if(findCollection){
-          await LaunchPadCollection.findOneAndUpdate({
-            collectionAddress: data.collection_address.toLowerCase(),
-            networkId: +ETHEREUM_NETWORK_ID
-          }, {nftMintCount:findCollection.nftMintCount?findCollection.nftMintCount+1:1});
+          if (collectionAddressForMintCount != data.collection_address.toLowerCase()) {
+            if (findCollection.maxSupply != findCollection.nftMintCount) {
+              const web3 = new Web3(LAUNCHPAD_ETH_WEB3_URL)
+              const contractInstance = new web3.eth.Contract(LaunchpadAbi.abi, data.collection_address.toLowerCase())
+              const mintCountBlockChain = await contractInstance.methods.tokenCounter().call()
+              if (mintCountBlockChain) {
+                await LaunchPadCollection.findOneAndUpdate({
+                  collectionAddress: data.collection_address.toLowerCase(),
+                  networkId: +ETHEREUM_NETWORK_ID
+                }, { nftMintCount: mintCountBlockChain });
+              }
+
+            }
+            collectionAddressForMintCount = data.collection_address;
+          }
+          // await LaunchPadCollection.findOneAndUpdate({
+          //   collectionAddress: data.collection_address.toLowerCase(),
+          //   networkId: +ETHEREUM_NETWORK_ID
+          // }, {nftMintCount:findCollection.nftMintCount?findCollection.nftMintCount+1:1});
         }
 
         const findAddress = await LaunchPadMintHistory.findOne({
@@ -109,20 +128,25 @@ const manageData = async (transferdata) => {
   }
 
 };
-const launchpadTransferEventEthereum = async () => {
+const launchpadTransferEventEthereum = async (from = 0, gt = 0) => {
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferEthereum" })
-  let from = 0
-  if (transfereventDetails) {
+  if(gt >= 100){
+    from = from
+  }else if (transfereventDetails) {
     from = transfereventDetails.lastcrontime;
   } else {
     await EventManager.create({ name: "launchpadTransferEthereum", lastcrontime: 0 })
   }
 
   try {
-    let transferdata = await transferFunctionQuery(from);
+    let transferdata = await transferFunctionQuery(from, gt);
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
       await manageData(transferdata);
+      if (transferdata.length >= 100) {
+        gt = gt + 100;
+        launchpadTransferEventEthereum(from, gt)
+      }
     }
   } catch (error) {
     console.log("error", error);
