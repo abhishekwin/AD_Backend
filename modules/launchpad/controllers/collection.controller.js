@@ -941,6 +941,46 @@ const getCollectionMintCount = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
+
+const getAllCollectionForAdmin = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress");
+
+  req.body.status = ["completed", "ready-to-syncup", "syncing"];
+  filtercolumn.push("status");
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+  
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
 const getHideCollection = catchAsync(async (req, res) => {
   // let userAddress = req.userData.account.toLowerCase();
   const result = await LaunchPadCollection.find({deletedAt:{$ne:null}}).sort({deletedAt: -1})
@@ -1005,5 +1045,6 @@ module.exports = {
   getCollectionMintCount,
   getHideCollection,
   hideMultipuleCollection,
-  unHideMultipuleCollection
+  unHideMultipuleCollection,
+  getAllCollectionForAdmin
 };

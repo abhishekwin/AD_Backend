@@ -147,6 +147,7 @@ module.exports = {
       let filedatas = getjson(req.file);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
+        console.log("uploadedData.count == filedatas.length", uploadedData.count, filedatas.length)
         if(uploadedData.count == filedatas.length){
           const folderPath = uploadedData.folderPath;
           let result = await uploadDir(folderPath);

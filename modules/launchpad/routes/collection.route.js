@@ -128,6 +128,10 @@ router
   .post(collectionController.getCollectionMintCount);
   
   router
+  .route("/get-all-collection-for-admin")
+  .post(checkAdminToken, collectionController.getAllCollectionForAdmin);
+
+  router
   .route("/get-hide-collection")
   .get(checkAdminToken, collectionController.getHideCollection);
 
