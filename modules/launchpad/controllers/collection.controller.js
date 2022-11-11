@@ -7,6 +7,7 @@ const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
+
 const {
   LaunchPadCollection,
   LaunchPadNft,
@@ -983,7 +984,28 @@ const getAllCollectionForAdmin = catchAsync(async (req, res) => {
 
 const getHideCollection = catchAsync(async (req, res) => {
   // let userAddress = req.userData.account.toLowerCase();
-  const result = await LaunchPadCollection.find({deletedAt:{$ne:null}}).sort({deletedAt: -1})
+  var filtercolumn = [];
+
+  req.body.deletedAt = {$ne:null}
+  filtercolumn.push("deletedAt");
+
+  req.body.hideByAdmin = {$ne:null}
+  filtercolumn.push("hideByAdmin");
+
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getHideCollectionList(
+    filter,
+    options,
+    req
+  );
+
   res
     .status(200)
     .send(new ResponseObject(200, "Hide collection display successfully", result));

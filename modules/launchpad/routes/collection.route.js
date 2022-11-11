@@ -133,7 +133,7 @@ router
 
   router
   .route("/get-hide-collection")
-  .get(checkAdminToken, collectionController.getHideCollection);
+  .post(checkAdminToken, collectionController.getHideCollection);
 
   router
   .route("/hide-multipule-collection")
