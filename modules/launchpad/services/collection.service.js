@@ -22,13 +22,18 @@ const createCollectionService = async (reqBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
- const getLaunchPadCollectionList = async (filter, options, req) => {
+const getLaunchPadCollectionList = async (filter, options, req) => {
   let page = options.page;
   let limit = options.limit;
-  let sort_by_name = options.sortBy?options.sortBy.name:"";
-  let sort_by_order = options.sortBy?options.sortBy.order:"";
- // console.log("filter", JSON.stringify(filter, null, 4))
+  let sort_by_name = options.sortBy ? options.sortBy.name : "";
+  let sort_by_order = options.sortBy ? options.sortBy.order : "";
+  // console.log("filter", JSON.stringify(filter, null, 4))
   const tableData = await LaunchPadCollection.find(filter)
+    .populate([
+      {
+        path: "nftCount",
+      },
+    ])
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
     .limit(limit);
@@ -62,11 +67,30 @@ const getLaunchPadLiveCollectionList = async (filter, options, req) => {
 const getLaunchPadEndCollectionList = async (filter, options, req) => {
   let page = options.page;
   let limit = options.limit;
-  let sort_by_name = options.sortBy?options.sortBy.name:"";
-  let sort_by_order = options.sortBy?options.sortBy.order:"";
+  let sort_by_name = options.sortBy ? options.sortBy.name : "";
+  let sort_by_order = options.sortBy ? options.sortBy.order : "";
 
   //const endCollectionData = await LaunchPadCollection.find({ $expr: { $gte: [ "$nftMintCount" , "$maxSupply" ] } });
   let collectionIds = []
+  const tableData = await LaunchPadCollection.find(filter)
+    .sort({ [sort_by_name]: sort_by_order })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const row_count = await LaunchPadCollection.count(filter);
+
+  const result = customPagination.customPagination(tableData, page, limit, row_count);
+
+  return result;
+};
+
+const getHideCollectionList = async (filter, options, req) => {
+  let page = options.page;
+  let limit = options.limit;
+  let sort_by_name = options.sortBy?options.sortBy.name:"";
+  let sort_by_order = options.sortBy?options.sortBy.order:"";
+
+  //console.log("filter", filter)
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
@@ -83,5 +107,6 @@ module.exports = {
   createCollectionService,
   getLaunchPadCollectionList,
   getLaunchPadLiveCollectionList,
-  getLaunchPadEndCollectionList
+  getLaunchPadEndCollectionList,
+  getHideCollectionList
 };

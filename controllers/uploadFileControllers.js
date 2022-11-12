@@ -45,7 +45,7 @@ async function uploadFileInPublicFolder(filedatas) {
   for (const data of filedatas) {
     let fileUploadPath = `./public/${randomNum}/` + count + ".json";
     let content = JSON.stringify(data)       
-    fs.writeFile(fileUploadPath, content, function (err) {});
+    fsPromises.writeFile(fileUploadPath, content, function (err) {});
     count++;
   }  
   return {folderPath, count:count-1}
@@ -147,6 +147,7 @@ module.exports = {
       let filedatas = getjson(req.file);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
+        console.log("uploadedData.count == filedatas.length", uploadedData.count, filedatas.length)
         if(uploadedData.count == filedatas.length){
           const folderPath = uploadedData.folderPath;
           let result = await uploadDir(folderPath);

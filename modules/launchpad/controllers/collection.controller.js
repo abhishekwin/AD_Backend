@@ -7,6 +7,7 @@ const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
+
 const {
   LaunchPadCollection,
   LaunchPadNft,
@@ -316,6 +317,9 @@ const getCollection = async (req, res) => {
 const getCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
 
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
@@ -353,6 +357,9 @@ const getCollectionList = catchAsync(async (req, res) => {
 
 const upcomingCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -405,6 +412,9 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
 
 const liveCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -467,6 +477,10 @@ const liveCollectionList = catchAsync(async (req, res) => {
 
 const endCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
   req.body.status = "ended";
   filtercolumn.push("status");
 
@@ -510,6 +524,9 @@ const endCollectionList = catchAsync(async (req, res) => {
 
 const getMyCollectionList = catchAsync(async (req, res) => {
   var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
 
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
@@ -894,7 +911,7 @@ const collectionCreatorUsers = async (req, res) => {
 
 const getUserLatestCollection = catchAsync(async (req, res) => {
   let userAddress = req.userData.account.toLowerCase();
-  const result = await LaunchPadCollection.findOne({creator:userAddress, status:"in-progress"}).sort({created_at: -1})
+  const result = await LaunchPadCollection.findOne({creator:userAddress, deletedAt:null, status:"in-progress"}).sort({created_at: -1})
   res
     .status(200)
     .send(new ResponseObject(200, "Collection display successfully", result));
@@ -925,6 +942,103 @@ const getCollectionMintCount = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection display successfully", result));
 });
 
+
+const getAllCollectionForAdmin = catchAsync(async (req, res) => {
+  var filtercolumn = [];
+
+  req.body.deletedAt = null
+  filtercolumn.push("deletedAt");
+
+  req.body.collectionAddress = { $ne: null }
+  filtercolumn.push("collectionAddress");
+
+  req.body.status = ["completed", "ready-to-syncup", "syncing"];
+  filtercolumn.push("status");
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+  
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  if (req.body.searchText) {
+    let search = await specialCharacter(req.body.searchText);
+    search = new RegExp(".*" + search + ".*", "i");
+    req.body.$or = [{ collectionName: search }, { symbol: search }];
+    filtercolumn.push("$or");
+  }
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getLaunchPadCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collections display successfully", result));
+});
+
+const getHideCollection = catchAsync(async (req, res) => {
+  // let userAddress = req.userData.account.toLowerCase();
+  var filtercolumn = [];
+
+  req.body.deletedAt = {$ne:null}
+  filtercolumn.push("deletedAt");
+
+  req.body.hideByAdmin = {$ne:null}
+  filtercolumn.push("hideByAdmin");
+
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getHideCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Hide collection display successfully", result));
+});
+
+const hideMultipuleCollection = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  const {collectionIds} = req.body
+  if(!collectionIds.length > 0 ){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Please provide collection ids"));
+  }
+  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:new Date, hideByAdmin:userAddress})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection hide successfully", collectionIds));
+});
+
+const unHideMultipuleCollection = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  const {collectionIds} = req.body
+  if(!collectionIds.length > 0 ){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Please provide collection ids"));
+  }
+  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:null, unHideByAdmin:userAddress})
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection unhide successfully", collectionIds));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -950,5 +1064,9 @@ module.exports = {
   // createStaticCollection,
   // updateStaticCollection,
   getUserLatestCollection,
-  getCollectionMintCount
+  getCollectionMintCount,
+  getHideCollection,
+  hideMultipuleCollection,
+  unHideMultipuleCollection,
+  getAllCollectionForAdmin
 };

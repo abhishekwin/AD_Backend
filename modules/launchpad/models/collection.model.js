@@ -171,6 +171,14 @@ const collectionSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
+    hideByAdmin: {
+      type: String,
+      default: null,
+    },
+    unHideByAdmin: {
+      type: String,
+      default: null,
+    },
     failedNfts:{
       type: Array,
       default: null,
@@ -221,13 +229,13 @@ collectionSchema.virtual('nftCount', {
   count: true
 });
 
-collectionSchema.pre('find', function() {
-  this.where({ deletedAt: null });
-});
+// collectionSchema.pre('find', function() {
+//     this.where({ deletedAt: null });
+// });
 
-collectionSchema.pre('findOne', function() {
-  this.where({ deletedAt: null });
-});
+// collectionSchema.pre('findOne', function() {
+//   this.where({ deletedAt: null });
+// });
 
 collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   let whiteListedUsers = []

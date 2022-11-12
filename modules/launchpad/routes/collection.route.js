@@ -127,4 +127,20 @@ router
   .route("/get-collection-mint-count")
   .post(collectionController.getCollectionMintCount);
   
+  router
+  .route("/get-all-collection-for-admin")
+  .post(checkAdminToken, collectionController.getAllCollectionForAdmin);
+
+  router
+  .route("/get-hide-collection")
+  .post(checkAdminToken, collectionController.getHideCollection);
+
+  router
+  .route("/hide-multipule-collection")
+  .post(checkToken, checkAdminToken, collectionController.hideMultipuleCollection);
+
+  router
+  .route("/unhide-multipule-collection")
+  .post(checkToken, checkAdminToken, collectionController.unHideMultipuleCollection);
+  
 module.exports = router;
