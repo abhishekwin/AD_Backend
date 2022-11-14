@@ -98,8 +98,8 @@ cron.schedule('*/10 * * * * *', () => {
   console.log("---mint cron running---")
   bscMint()
   ethMint()
-  mintCountUpdateUsingCollectionBsc()
-  mintCountUpdateUsingCollectionEth()
+  // mintCountUpdateUsingCollectionBsc()
+  // mintCountUpdateUsingCollectionEth()
 });
 
 
