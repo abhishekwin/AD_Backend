@@ -42,6 +42,10 @@ const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
 const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
 const {failNftUsingCollectionFuncation} = require('./launchpad/launchPadFailNftsUsingCollection')
 
+const {launchpadMintCountTransferEventBsc} = require('./launchpad/mintCountTransferEventBsc')
+const {launchpadMintCountTransferEventEthereum} = require('./launchpad/mintCountTransferEventEth')
+
+
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
 function sleep(ms) {
@@ -209,14 +213,6 @@ const launchpadTransferEventCron = async () => {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }    
 
-    // try {
-    //     // console.log("start collection on sale event")
-    //     await createNftUsingCollectionFuncation();
-    //     await failNftUsingCollectionFuncation();
-    // }
-    // catch (e) {
-    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    // }     
     launchpadTransferEventCron() 
 }
 
@@ -257,6 +253,24 @@ const failLaunchpadNfts = async () => {
     }
 }
 
+const mintCountUpdateUsingCollectionBsc = async () => {
+    try {
+        await launchpadMintCountTransferEventBsc()
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+}
+
+const mintCountUpdateUsingCollectionEth = async () => {
+    try {
+        await launchpadMintCountTransferEventEthereum()
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+}
+
 launchpadTransferEventCron();
 startCronForNftImage()
 // failLaunchpadNfts();
@@ -265,7 +279,9 @@ module.exports = {
     createLaunchpadNfts,
     failLaunchpadNfts,
     bscMint,
-    ethMint
+    ethMint,
+    mintCountUpdateUsingCollectionBsc,
+    mintCountUpdateUsingCollectionEth
 };
 
 

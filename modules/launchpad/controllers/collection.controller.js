@@ -952,8 +952,11 @@ const getAllCollectionForAdmin = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  req.body.status = ["completed", "ready-to-syncup", "syncing", "ended"];
-  filtercolumn.push("status");
+  // req.body.status = ["completed", "ready-to-syncup", "syncing", "ended"];
+  // filtercolumn.push("status");
+  if (req.body.status ) {
+    filtercolumn.push("status");
+  }
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
   }
