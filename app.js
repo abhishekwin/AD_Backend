@@ -8,7 +8,7 @@ require("./config/db.config");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { EventManager } = require("./models");
-const { startCron, createLaunchpadNfts, failLaunchpadNfts } = require("./cron/cron");
+const { startCron, createLaunchpadNfts, failLaunchpadNfts, bscMint, ethMint, mintCountUpdateUsingCollectionBsc, mintCountUpdateUsingCollectionEth } = require("./cron/cron");
 const adminRouter = require("./routes/adminRoutes");
 const usersRouter = require("./routes/userRoutes");
 const uploadFileRoutes = require("./routes/uploadFileRoutes");
@@ -93,6 +93,15 @@ cron.schedule('* * * * *', () => {
   createLaunchpadNfts()
   failLaunchpadNfts()
 });
+
+cron.schedule('*/10 * * * * *', () => {
+  console.log("---mint cron running---")
+  bscMint()
+  ethMint()
+  // mintCountUpdateUsingCollectionBsc()
+  // mintCountUpdateUsingCollectionEth()
+});
+
 
 app.use(Sentry.Handlers.errorHandler());
 // cron.schedule('*/05 * * * * *', () => {

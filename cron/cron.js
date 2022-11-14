@@ -42,6 +42,10 @@ const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
 const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
 const {failNftUsingCollectionFuncation} = require('./launchpad/launchPadFailNftsUsingCollection')
 
+const {launchpadMintCountTransferEventBsc} = require('./launchpad/mintCountTransferEventBsc')
+const {launchpadMintCountTransferEventEthereum} = require('./launchpad/mintCountTransferEventEth')
+
+
 Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
 
 function sleep(ms) {
@@ -171,20 +175,21 @@ const startCronForNftImage = async () => {
 
 const launchpadTransferEventCron = async () => {
     
-    try {
-        // console.log("start collection on sale event")
-        await launchpadTransferEventBsc();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    } 
-    try {
-        // console.log("start collection on sale event")
-        await launchpadTransferEventEthereum();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    } 
+    // try {
+    //     // console.log("start collection on sale event")
+    //     await launchpadTransferEventBsc();
+    // }
+    // catch (e) {
+    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    // } 
+    // try {
+    //     // console.log("start collection on sale event")
+    //     await launchpadTransferEventEthereum();
+    // }
+    // catch (e) {
+    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    // } 
+
     try {
         // console.log("start collection on sale event")
         await launchPadCreatedEventsBsc();
@@ -208,15 +213,26 @@ const launchpadTransferEventCron = async () => {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }    
 
+    launchpadTransferEventCron() 
+}
+
+
+const bscMint = async () => {
     try {
-        // console.log("start collection on sale event")
-        await createNftUsingCollectionFuncation();
-        await failNftUsingCollectionFuncation();
+        await launchpadTransferEventBsc();
     }
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }     
-    launchpadTransferEventCron() 
+    }
+}
+
+const ethMint = async () => {
+    try {
+        await launchpadTransferEventEthereum();
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
 }
 
 const createLaunchpadNfts = async () => {
@@ -237,13 +253,35 @@ const failLaunchpadNfts = async () => {
     }
 }
 
+const mintCountUpdateUsingCollectionBsc = async () => {
+    try {
+        await launchpadMintCountTransferEventBsc()
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+}
+
+const mintCountUpdateUsingCollectionEth = async () => {
+    try {
+        await launchpadMintCountTransferEventEthereum()
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+}
+
 launchpadTransferEventCron();
 startCronForNftImage()
 // failLaunchpadNfts();
 // startCron();
 module.exports = {
     createLaunchpadNfts,
-    failLaunchpadNfts
+    failLaunchpadNfts,
+    bscMint,
+    ethMint,
+    mintCountUpdateUsingCollectionBsc,
+    mintCountUpdateUsingCollectionEth
 };
 
 

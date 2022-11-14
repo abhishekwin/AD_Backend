@@ -103,10 +103,30 @@ const getHideCollectionList = async (filter, options, req) => {
   return result;
 };
 
+const getFailedCollectionList = async (filter, options, req) => {
+  let page = options.page;
+  let limit = options.limit;
+  let sort_by_name = options.sortBy?options.sortBy.name:"";
+  let sort_by_order = options.sortBy?options.sortBy.order:"";
+
+  //console.log("filter", filter)
+  const tableData = await LaunchPadCollection.find(filter)
+    .sort({ [sort_by_name]: sort_by_order })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const row_count = await LaunchPadCollection.count(filter);
+
+  const result = customPagination.customPagination(tableData, page, limit, row_count);
+
+  return result;
+};
+
 module.exports = {
   createCollectionService,
   getLaunchPadCollectionList,
   getLaunchPadLiveCollectionList,
   getLaunchPadEndCollectionList,
-  getHideCollectionList
+  getHideCollectionList,
+  getFailedCollectionList
 };

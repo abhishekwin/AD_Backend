@@ -136,6 +136,10 @@ router
   .post(checkAdminToken, collectionController.getHideCollection);
 
   router
+  .route("/get-failed-collection")
+  .post(checkAdminToken, collectionController.getFailedCollection);
+
+  router
   .route("/hide-multipule-collection")
   .post(checkToken, checkAdminToken, collectionController.hideMultipuleCollection);
 
