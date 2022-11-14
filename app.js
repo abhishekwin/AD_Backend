@@ -92,6 +92,10 @@ cron.schedule('* * * * *', () => {
   console.log("---cron running---")
   createLaunchpadNfts()
   failLaunchpadNfts()
+});
+
+cron.schedule('*/10 * * * * *', () => {
+  console.log("---min cron running---")
   bscMint()
   ethMint()
 });
