@@ -587,7 +587,7 @@ const approvedCollection = async (req, res) => {
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
-      { approved: true },
+      { approved: true, status:"completed" },
       { new: true }
     );
     res
