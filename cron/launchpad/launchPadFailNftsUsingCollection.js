@@ -104,8 +104,12 @@ const failNftUsingCollectionFuncation = async () => {
             failedNfts = nftCreated
         }
         
-        if(failedNfts.length <= 0){
-            await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
+        if(failedNfts.length > 0 && failedNftsCheckCount > 2){
+            await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "failed", failedNfts: failedNfts })
+        }else{
+            if(failedNfts.length <= 0 ){
+                await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
+            }
         }
     }
 

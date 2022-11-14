@@ -992,6 +992,10 @@ const getHideCollection = catchAsync(async (req, res) => {
   req.body.hideByAdmin = {$ne:null}
   filtercolumn.push("hideByAdmin");
 
+  if (req.body.status) {
+    filtercolumn.push("status");
+  }
+
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
@@ -1001,6 +1005,43 @@ const getHideCollection = catchAsync(async (req, res) => {
 
   // const result = await NewsPostService.getNewsPost
   const result = await Collection.getHideCollectionList(
+    filter,
+    options,
+    req
+  );
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Hide collection display successfully", result));
+});
+
+const getFailedCollection = catchAsync(async (req, res) => {
+  // let userAddress = req.userData.account.toLowerCase();
+  var filtercolumn = [];
+
+  req.body.deletedAt = {$ne:null}
+  filtercolumn.push("deletedAt");
+
+  // req.body.hideByAdmin = {$ne:null}
+  // filtercolumn.push("hideByAdmin");
+  
+  if (req.body.status) {
+    filtercolumn.push("status");
+  }
+
+  if (req.body.approved || req.body.approved === false) {
+    filtercolumn.push("approved");
+  }
+
+  if (req.body.networkId && req.body.networkName) {
+    filtercolumn.push("networkId", "networkName");
+  }
+  
+  const filter = pick(req.body, filtercolumn);
+  const options = pick(req.body, ["sortBy", "limit", "page"]);
+
+  // const result = await NewsPostService.getNewsPost
+  const result = await Collection.getFailedCollectionList(
     filter,
     options,
     req
@@ -1066,6 +1107,7 @@ module.exports = {
   getUserLatestCollection,
   getCollectionMintCount,
   getHideCollection,
+  getFailedCollection,
   hideMultipuleCollection,
   unHideMultipuleCollection,
   getAllCollectionForAdmin

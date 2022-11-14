@@ -95,7 +95,7 @@ cron.schedule('* * * * *', () => {
 });
 
 cron.schedule('*/10 * * * * *', () => {
-  console.log("---min cron running---")
+  console.log("---mint cron running---")
   bscMint()
   ethMint()
 });
