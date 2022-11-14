@@ -209,14 +209,14 @@ const launchpadTransferEventCron = async () => {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }    
 
-    try {
-        // console.log("start collection on sale event")
-        await createNftUsingCollectionFuncation();
-        await failNftUsingCollectionFuncation();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }     
+    // try {
+    //     // console.log("start collection on sale event")
+    //     await createNftUsingCollectionFuncation();
+    //     await failNftUsingCollectionFuncation();
+    // }
+    // catch (e) {
+    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    // }     
     launchpadTransferEventCron() 
 }
 
