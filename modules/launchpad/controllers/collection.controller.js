@@ -738,12 +738,14 @@ const getLatestCollection = async (req, res) => {
   try {
     let filter = {
       approved: true,
-      collectionAddress: { $ne: null }
+      collectionAddress: { $ne: null },
+      deletedAt: null,
     }
     if (req.body.networkId && req.body.networkName) {
       filter = {
         approved: true,
         collectionAddress: { $ne: null },
+        deletedAt: null,
         networkId: req.body.networkId,
         networkName: req.body.networkName
       }
