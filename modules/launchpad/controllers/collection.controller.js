@@ -647,25 +647,26 @@ const stashAllCollectionHeader = async (req, res) => {
     const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
+    const launchPadCollection = await LaunchPadCollection.count({approved:true, deletedAt:null});
     const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null }, collectionAddress: { $ne: null } })
       .sort({ mintCost: 1 })
       .limit(1);
 
     let nftsOwnerIds = [];
     let nftsOwnerCount = 0;
-    let totalVolume = 0;
-    for (const iterator of nftsOwner) {
-      if (!nftsOwnerIds.includes(iterator.owner)) {
-        nftsOwnerIds.push(iterator.owner);
-        nftsOwnerCount += 1;
-      }
-      totalVolume += iterator.mintCost;
-    }
+    // let totalVolume = 0;
+    // for (const iterator of nftsOwner) {
+    //   if (!nftsOwnerIds.includes(iterator.owner)) {
+    //     nftsOwnerIds.push(iterator.owner);
+    //     nftsOwnerCount += 1;
+    //   }
+    //   totalVolume += iterator.mintCost;
+    // }
     response = {
       items: nftsCount,
       owners: nftsOwnerCount,
       floorPrice: nftLowestPrice ? nftLowestPrice.mintCost : 0,
-      volumeTraded: totalVolume,
+      volumeTraded: launchPadCollection,
     };
     return res
       .status(200)
