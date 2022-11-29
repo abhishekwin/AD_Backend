@@ -17,6 +17,14 @@ const currencySchema = new mongoose.Schema(
             type: String,
             default: null
         },
+        currencyIcon: {
+            type: String,
+            default: null
+        },
+        currencyDecimalValue: {
+            type: Number,
+            default: null
+        },
         isActive: {
             type: Boolean,
             default: true
