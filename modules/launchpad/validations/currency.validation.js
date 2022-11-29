@@ -10,7 +10,13 @@ const currencyValidation = {
         isActive: Joi.boolean(),
     })
 }
+const updateIsActiveValidation = {
+    body: Joi.object().keys({
+        isActive: Joi.boolean().required()
+    })
+}
 
 module.exports = {
-    currencyValidation
+    currencyValidation,
+    updateIsActiveValidation
 };

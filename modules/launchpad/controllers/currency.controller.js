@@ -4,10 +4,10 @@ const ResponseObject = require("../../../utils/ResponseObject");
 
 const createCurrency = async (req, res) => {
     try {
-        await LaunchPadCurrency.create(req.body)
+        const newCurrency = await LaunchPadCurrency.create(req.body)
         return res
             .status(200)
-            .send(new ResponseObject(200, "Curreency details save Successfully", []));
+            .send(new ResponseObject(200, "Curreency details save Successfully", newCurrency));
 
     }
     catch (err) {
@@ -35,7 +35,7 @@ const getCurrency = async (req, res) => {
 
 const removeCurrency = async (req, res) => {
     try {
-        const id = req.query.id;
+        const { id } = req.params;
         const isCurrencyExist = await LaunchPadCurrency.findOne({ _id: id });
 
         if (!isCurrencyExist) {
@@ -57,7 +57,7 @@ const removeCurrency = async (req, res) => {
 
 const updateCurrency = async (req, res) => {
     try {
-        const { id } = req.query;
+        const { id } = req.params;
 
         const isCurrencyExist = await LaunchPadCurrency.findOne({ _id: id });
 
@@ -70,17 +70,38 @@ const updateCurrency = async (req, res) => {
             .status(200)
             .send(new ResponseObject(200, "Currency updated sucessfully", upadatedCurrency))
     }
-    catch (error) {
+    catch (err) {
         console.log("error", err)
         return res
             .status(500)
             .send(new ResponseObject(500, "Something Went Wrong"));
     }
 }
+const updateIsActiveCurrency = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const isCurrencyExist = await LaunchPadCurrency.findOne({ _id: id });
 
+        if (!isCurrencyExist) {
+            return res.status(400).send(new ResponseObject(400, "Invalid Currency id"));
+        }
+        const upadatedIsActiveCurrency = await LaunchPadCurrency.findByIdAndUpdate({ _id: id }, req.body)
+        return res
+            .status(200)
+            .send(new ResponseObject(200, "Currency updated sucessfully", upadatedIsActiveCurrency))
+
+    }
+    catch (err) {
+        onsole.log("error", err)
+        return res
+            .status(500)
+            .send(new ResponseObject(500, "Something Went Wrong"));
+    }
+}
 module.exports = {
     createCurrency,
     getCurrency,
     removeCurrency,
-    updateCurrency
+    updateCurrency,
+    updateIsActiveCurrency
 };
