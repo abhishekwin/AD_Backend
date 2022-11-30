@@ -7,6 +7,8 @@ const currencyValidation = {
         currencyAddress: Joi.string().required(),
         currencyIcon: Joi.string().required(),
         currencyDecimalValue: Joi.number().required(),
+        currencySymbol: Joi.string().required(),
+        currencyNetwork: Joi.string().required(),
         isActive: Joi.boolean(),
     })
 }

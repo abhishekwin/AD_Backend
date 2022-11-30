@@ -25,6 +25,15 @@ const currencySchema = new mongoose.Schema(
             type: Number,
             default: null
         },
+        currencySymbol: {
+            type: String,
+            default: null,
+            uppercase: true
+        },
+        currencyNetwork: {
+            type: String,
+            default: null
+        },
         isActive: {
             type: Boolean,
             default: true
