@@ -136,6 +136,10 @@ const collectionSchema = mongoose.Schema(
       type: Array,
       default: null,
     },
+    currencyDetailsForWhiteListed: {
+      type: Array,
+      default: null,
+    },
     currencyAddress: {
       type: String,
       trim: true,
