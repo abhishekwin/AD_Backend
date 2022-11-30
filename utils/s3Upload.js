@@ -36,5 +36,27 @@ async function uploadFile(filepath, fileName) {
     });
 }
 
+async function uploadSingleFile(filepath, folderName, fileName) {
+    const fileContent = fs.readFileSync(filepath);
+    const params = {
+        Bucket: bucketName,
+        Key: 'satcat.jpg', // File name you want to save as in S3
+        Body: fileContent,
+        ContentType: fileContent.type,
+        Key: folderName+'/'+fileName,
+        ACL: 'public-read',
+        Bucket: bucketName
+    };
+
+    return await new Promise(function (resolve, reject) {
+        s3.upload(params, function(err, data) {
+            if (err) {
+                throw err;
+            }
+            resolve(data.key)
+        }); 
+    });
+}
+
 // uploadFile();
-module.exports={uploadFile}
+module.exports={uploadFile, uploadSingleFile}

@@ -1,6 +1,8 @@
 //const CurrencyTable = require('../models/currency.model')
 const { LaunchPadCurrency } = require("../models");
 const ResponseObject = require("../../../utils/ResponseObject");
+const { uploadSingleFile } = require('../../../utils/s3Upload')
+const uniqid = require('uniqid'); 
 
 const createCurrency = async (req, res) => {
     try {
@@ -98,10 +100,31 @@ const updateIsActiveCurrency = async (req, res) => {
             .send(new ResponseObject(500, "Something Went Wrong"));
     }
 }
+
+const uploadCurrencyIcon = async (req, res) => {
+    try {
+      let filePathUrl = req.file.path;
+      let folderName = "currency-icon";
+      let fileName = uniqid()+req.file.filename 
+      let result = await uploadSingleFile(filePathUrl, folderName, fileName);
+      result = process.env.AWS_CDN_URL+ result
+      return res
+      .status(200)
+      .send(new ResponseObject(200, "Icon uploaded successfully", result))
+    } catch (error) {
+      return res.status(400).json({
+        data: null,
+        error: error.message,
+        status: 400,
+        success: false,
+      });
+    }
+  }
 module.exports = {
     createCurrency,
     getCurrency,
     removeCurrency,
     updateCurrency,
-    updateIsActiveCurrency
+    updateIsActiveCurrency,
+    uploadCurrencyIcon
 };
