@@ -129,8 +129,12 @@ const collectionSchema = mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ["ETH", "BNB", "SAFEMOON", "DOGE", "USDC"],
+      enum: ["ETH", "BNB", "SAFEMOON", "DOGE", "USDC", "AD"],
       default: "BNB",
+    },
+    currencyDetails: {
+      type: Array,
+      default: null,
     },
     currencyAddress: {
       type: String,
