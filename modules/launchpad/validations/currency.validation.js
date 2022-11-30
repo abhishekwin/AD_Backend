@@ -2,13 +2,13 @@ const Joi = require("joi");
 
 const currencyValidation = {
     body: Joi.object().keys({
-        currencyName: Joi.string().required(),
-        currencyValue: Joi.number().required(),
-        currencyAddress: Joi.string().required(),
-        currencyIcon: Joi.string().required(),
-        currencyDecimalValue: Joi.number().required(),
-        currencySymbol: Joi.string().required(),
-        currencyNetwork: Joi.string().required(),
+        name: Joi.string().required(),
+        value: Joi.number().required(),
+        address: Joi.string().required(),
+        icon: Joi.string().required(),
+        decimalValue: Joi.number().required(),
+        symbol: Joi.string().required(),
+        network: Joi.string().required(),
         isActive: Joi.boolean(),
     })
 }

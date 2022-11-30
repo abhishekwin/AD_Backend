@@ -3,34 +3,34 @@ const { toJSON, paginate } = require("./plugins");
 
 const currencySchema = new mongoose.Schema(
     {
-        currencyName: {
+        name: {
             type: String,
             trim: true,
             default: null,
             lowercase: true
         },
-        currencyValue: {
+        value: {
             type: Number,
             default: null
         },
-        currencyAddress: {
+        address: {
             type: String,
             default: null
         },
-        currencyIcon: {
+        icon: {
             type: String,
             default: null
         },
-        currencyDecimalValue: {
+        decimalValue: {
             type: Number,
             default: null
         },
-        currencySymbol: {
+        symbol: {
             type: String,
             default: null,
             uppercase: true
         },
-        currencyNetwork: {
+        network: {
             type: String,
             default: null
         },
