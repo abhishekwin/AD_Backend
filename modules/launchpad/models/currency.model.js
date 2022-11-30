@@ -6,8 +6,7 @@ const currencySchema = new mongoose.Schema(
         name: {
             type: String,
             trim: true,
-            default: null,
-            lowercase: true
+            default: null
         },
         value: {
             type: Number,
@@ -27,11 +26,14 @@ const currencySchema = new mongoose.Schema(
         },
         symbol: {
             type: String,
-            default: null,
-            uppercase: true
+            default: null
         },
         network: {
             type: String,
+            default: null
+        },
+        position: {
+            type: Number,
             default: null
         },
         isActive: {
