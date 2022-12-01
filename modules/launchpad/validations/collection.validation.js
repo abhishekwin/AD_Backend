@@ -10,7 +10,7 @@ const createCollectionValidation = {
     tokenURI: Joi.string().required(),
     nftDescription: Joi.string().required(),
     maxSupply: Joi.number().strict().required(),
-    mintCost: Joi.number().strict().required(),
+    mintCost: Joi.number().optional(),
     royalties: Joi.number().strict().required(),
     imageCover: Joi.string().required(),
     bannerImages: Joi.string().required(),
@@ -43,6 +43,8 @@ const createCollectionValidation = {
     mintCountPerUser:Joi.number(),
     mintCountPerTransaction:Joi.number(),
     status: Joi.string().optional(),
+    currencyDetails:Joi.array().optional(),
+    currencyDetailsForWhiteListed:Joi.array().optional(),
   }),
 };
 
