@@ -102,6 +102,7 @@ cron.schedule('*/10 * * * * *', () => {
   // mintCountUpdateUsingCollectionEth()
 });
 
+
 // cron.schedule(`*/${process.env.DB_BACKUP_START} * * *`, () => {
 //   console.log("---dump cron---")
 //   if(process.env.DB_BACKUP_START){
