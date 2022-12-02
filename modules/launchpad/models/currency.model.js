@@ -47,7 +47,7 @@ const currencySchema = new mongoose.Schema(
         slug: {
             type: String,
             required: true,
-            unique: true,
+            default: null
         },
         isActive: {
             type: Boolean,
