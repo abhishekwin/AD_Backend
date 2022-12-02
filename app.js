@@ -22,7 +22,7 @@ const collectionERC721Abi = require("./config/collectionERC721.json");
 const app = express();
 const Sentry = require("@sentry/node");
 const SentryTracing = require("@sentry/tracing");
-
+const { dumpDataBase} = require("./cron/mongodbDump");
 let timeout = require('connect-timeout');
 
 
@@ -100,6 +100,14 @@ cron.schedule('*/10 * * * * *', () => {
   ethMint()
   // mintCountUpdateUsingCollectionBsc()
   // mintCountUpdateUsingCollectionEth()
+});
+
+
+cron.schedule(`0 */${process.env.DB_BACKUP_START} * * *`, () => {
+  console.log("---dump cron---")
+  if(process.env.DB_BACKUP_START){
+    dumpDataBase()
+  }  
 });
 
 
