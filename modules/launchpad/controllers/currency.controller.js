@@ -127,13 +127,29 @@ const uploadCurrencyIcon = async (req, res) => {
         });
     }
 }
-const getCurrenciesDetails = async (req, res) => {
-    const slug = req.params.slug;
-
+const getCurrencyDetails = async (req, res) => {
+    const { slug } = req.body;
+    try {
+        const result = await LaunchPadCurrency.findOne({ slug })
+        // console.log(result)
+        if (!result) {
+            return res
+                .status(400)
+                .send(new ResponseObject(400, "invalid slug", result))
+        }
+        return res
+            .status(200)
+            .send(new ResponseObject(200, "Get currency detail by slug successfully", result))
+    } catch (err) {
+        onsole.log("error", err)
+        return res
+            .status(500)
+            .send(new ResponseObject(500, "Something Went Wrong"));
+    }
 }
 const getCurrencyWithFilter = async (req, res) => {
     try {
-        console.log("hi")
+        //console.log("hi")
         const { filter } = req.body
 
         const result = await LaunchPadCurrency.find(filter);
@@ -155,6 +171,6 @@ module.exports = {
     updateCurrency,
     updateIsActiveCurrency,
     uploadCurrencyIcon,
-    getCurrenciesDetails,
+    getCurrencyDetails,
     getCurrencyWithFilter
 };
