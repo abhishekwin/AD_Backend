@@ -32,9 +32,22 @@ const currencySchema = new mongoose.Schema(
             type: String,
             default: null
         },
+        networkId: {
+            type: Number,
+            default: null
+        },
+        networkType: {
+            type: String,
+            default: null
+        },
         position: {
             type: Number,
             default: null
+        },
+        slug: {
+            type: String,
+            required: true,
+            unique: true,
         },
         isActive: {
             type: Boolean,

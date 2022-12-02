@@ -6,6 +6,12 @@ const uniqid = require('uniqid');
 
 const createCurrency = async (req, res) => {
     try {
+        const existSlug = await LaunchPadCurrency.findOne({ slug: req.body.slug })
+        if (existSlug) {
+            return res
+                .status(400)
+                .send(new ResponseObject(400, "Slug already exist", existSlug));
+        }
         const newCurrency = await LaunchPadCurrency.create(req.body)
         return res
             .status(200)
@@ -120,11 +126,16 @@ const uploadCurrencyIcon = async (req, res) => {
         });
     }
 }
+const getCurrenciesOfSlug = async (req, res) => {
+    const slug = req.params.slug;
+
+}
 module.exports = {
     createCurrency,
     getCurrency,
     removeCurrency,
     updateCurrency,
     updateIsActiveCurrency,
-    uploadCurrencyIcon
+    uploadCurrencyIcon,
+    getCurrenciesOfSlug
 };

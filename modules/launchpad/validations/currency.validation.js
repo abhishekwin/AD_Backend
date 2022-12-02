@@ -9,8 +9,11 @@ const currencyValidation = {
         decimalValue: Joi.number().unsafe().required(),
         symbol: Joi.string().required(),
         network: Joi.string().required(),
+        networkId: Joi.number().required(),
+        networkType: Joi.string().required(),
         position: Joi.number().required(),
         isActive: Joi.boolean(),
+        slug: Joi.string().required()
     })
 }
 const updateIsActiveValidation = {
