@@ -17,14 +17,8 @@ const createCollectionValidation = {
     isWhiteListedUser: Joi.boolean().strict().required(),
     creator: Joi.string().required(),
     owner: Joi.string().required(),
-    currency: Joi.when("isWhiteListedUser", {
-      is: true,
-      then: Joi.string().required(),
-    }),
-    whitelistedFee: Joi.when("isWhiteListedUser", {
-      is: true,
-      then: Joi.number().required(),
-    }),
+    currency: Joi.string().optional(),
+    whitelistedFee: Joi.number().optional(),
     WhiteListedUser: Joi.when("isWhiteListedUser", {
       is: true,
       then: Joi.array().required(),
@@ -40,11 +34,11 @@ const createCollectionValidation = {
     networkId: Joi.number().optional(),
     networkName: Joi.string().optional(),
     currencyAddress: Joi.string().required(),
-    mintCountPerUser:Joi.number(),
-    mintCountPerTransaction:Joi.number(),
+    mintCountPerUser: Joi.number(),
+    mintCountPerTransaction: Joi.number(),
     status: Joi.string().optional(),
-    currencyDetails:Joi.array().optional(),
-    currencyDetailsForWhiteListed:Joi.array().optional(),
+    currencyDetails: Joi.array().optional(),
+    currencyDetailsForWhiteListed: Joi.array().optional(),
   }),
 };
 

@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage })
 
-const { createCurrency, getCurrency, removeCurrency, updateCurrency, updateIsActiveCurrency, uploadCurrencyIcon, getCurrenciesOfSlug } = require("../controllers/index");
+const { createCurrency, getCurrency, removeCurrency, updateCurrency, updateIsActiveCurrency, uploadCurrencyIcon, getCurrenciesDetails, getCurrencyWithFilter } = require("../controllers/index");
 const validate = require("../../../middleware/validate");
 const { currencyValidation, updateIsActiveValidation } = require("../validations/currency.validation")
 
@@ -26,5 +26,6 @@ router.delete('/removeCurrency/:id', removeCurrency)
 router.put('/updateCurrency/:id', validate(currencyValidation), updateCurrency)
 router.patch('/updateIsActiveCurrency/:id', validate(updateIsActiveValidation), updateIsActiveCurrency)
 router.post('/uploadCurrencyIcon', upload.single("icon"), uploadCurrencyIcon);
-router.get("/getCurrenciesOfSlug/:slug", getCurrenciesOfSlug)
+//router.get("/getCurrenciesOfSlug/:slug", getCurrenciesDetails)
+router.post("/getCurrencyWithFilter", getCurrencyWithFilter)
 module.exports = router;

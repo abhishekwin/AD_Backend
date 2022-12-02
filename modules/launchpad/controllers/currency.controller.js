@@ -7,6 +7,7 @@ const uniqid = require('uniqid');
 const createCurrency = async (req, res) => {
     try {
         const existSlug = await LaunchPadCurrency.findOne({ slug: req.body.slug })
+        console.log(existSlug)
         if (existSlug) {
             return res
                 .status(400)
@@ -126,8 +127,25 @@ const uploadCurrencyIcon = async (req, res) => {
         });
     }
 }
-const getCurrenciesOfSlug = async (req, res) => {
+const getCurrenciesDetails = async (req, res) => {
     const slug = req.params.slug;
+
+}
+const getCurrencyWithFilter = async (req, res) => {
+    try {
+        console.log("hi")
+        const { filter } = req.body
+
+        const result = await LaunchPadCurrency.find(filter);
+        return res
+            .status(200)
+            .send(new ResponseObject(200, "Currency get sucessfully", result))
+    } catch (err) {
+        onsole.log("error", err)
+        return res
+            .status(500)
+            .send(new ResponseObject(500, "Something Went Wrong"));
+    }
 
 }
 module.exports = {
@@ -137,5 +155,6 @@ module.exports = {
     updateCurrency,
     updateIsActiveCurrency,
     uploadCurrencyIcon,
-    getCurrenciesOfSlug
+    getCurrenciesDetails,
+    getCurrencyWithFilter
 };
