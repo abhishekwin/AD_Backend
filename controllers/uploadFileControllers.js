@@ -148,9 +148,8 @@ module.exports = {
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
         if(uploadedData.count == filedatas.length){
-          const folderPath = uploadedData.folderPath;
-          try{
-            let result = await uploadDir(folderPath);
+          const folderPath = uploadedData.folderPath;          
+          let result = await uploadDir(folderPath);
             fs.rmSync(folderPath, { recursive: true, force: true });
             fs.rmSync(appRoot.path + "/" + req.file.path, {
               recursive: true,
@@ -161,23 +160,7 @@ module.exports = {
               status: 200,
               success: true,
               message: "Url sent",
-            });
-          }catch(e){
-            fs.rmSync(folderPath, { recursive: true, force: true });
-            fs.rmSync(appRoot.path + "/" + req.file.path, {
-              recursive: true,
-              force: true,
-            });
-            return res.status(400).json({
-              data: null,
-              error: e.message,
-              status: 400,
-              success: false,
-            });
-          }
-          
-    
-          
+            });       
         }else{
           return res.status(400).send({
             error: true,
