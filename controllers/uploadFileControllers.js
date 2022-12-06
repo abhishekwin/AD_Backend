@@ -147,22 +147,32 @@ module.exports = {
       let filedatas = getjson(req.file);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
-        console.log("uploadedData.count == filedatas.length", uploadedData.count, filedatas.length)
         if(uploadedData.count == filedatas.length){
           const folderPath = uploadedData.folderPath;
-          let result = await uploadDir(folderPath);
-          fs.rmSync(folderPath, { recursive: true, force: true });
-          fs.rmSync(appRoot.path + "/" + req.file.path, {
-            recursive: true,
-            force: true,
-          });
+          try{
+            let result = await uploadDir(folderPath);
+            return res.status(200).json({
+              data: result,
+              status: 200,
+              success: true,
+              message: "Url sent",
+            });
+          }catch(e){
+            fs.rmSync(folderPath, { recursive: true, force: true });
+            fs.rmSync(appRoot.path + "/" + req.file.path, {
+              recursive: true,
+              force: true,
+            });
+            return res.status(400).json({
+              data: null,
+              error: e.message,
+              status: 400,
+              success: false,
+            });
+          }
+          
     
-          return res.status(200).json({
-            data: result,
-            status: 200,
-            success: true,
-            message: "Url sent",
-          });
+          
         }else{
           return res.status(400).send({
             error: true,

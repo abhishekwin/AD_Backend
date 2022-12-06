@@ -1,5 +1,6 @@
 /node_modules
 /public
+/dbbackup
 .env
 .env.testnet
 .env.local
