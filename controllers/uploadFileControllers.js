@@ -151,6 +151,11 @@ module.exports = {
           const folderPath = uploadedData.folderPath;
           try{
             let result = await uploadDir(folderPath);
+            fs.rmSync(folderPath, { recursive: true, force: true });
+            fs.rmSync(appRoot.path + "/" + req.file.path, {
+              recursive: true,
+              force: true,
+            });
             return res.status(200).json({
               data: result,
               status: 200,
