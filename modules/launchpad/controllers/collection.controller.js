@@ -106,6 +106,38 @@ const createCollection = catchAsync(async (req, res) => {
   //   }
   // }
 
+  //validation 
+  if(req.body.currencyDetails.length > 0){
+    for (currencyDetail of req.body.currencyDetails) {
+      let result = await LaunchPadCurrency.findOne({
+        name:currencyDetail.currency,
+        address:currencyDetail.address,
+        symbol:currencyDetail.symbol,
+      })
+      
+      if(!result){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Currency not exist"));
+      }
+    }
+  }
+  if(req.body.currencyDetailsForWhiteListed.length > 0){
+    for (currencyWhiteListedDetail of req.body.currencyDetailsForWhiteListed) {
+      let result = await LaunchPadCurrency.findOne({
+        name:currencyWhiteListedDetail.currency,
+        address:currencyWhiteListedDetail.address,
+        symbol:currencyWhiteListedDetail.symbol,
+      })
+      
+      if(!result){
+        return res
+        .status(400)
+        .send(new ResponseObject(400, "Currency not exist"));
+      }
+    }
+  }
+ 
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
@@ -126,6 +158,8 @@ const createCollection = catchAsync(async (req, res) => {
     WhiteListUser.push({ collectionId, userAddress });
   }
   await WhiteListedUser.insertMany(WhiteListUser);
+
+
   res
     .status(200)
     .send(new ResponseObject(200, "Collection create successfully", result));
