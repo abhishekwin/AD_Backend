@@ -16,6 +16,7 @@ const {
   LaunchPadMintHistory,
   LaunchPadCoolTime,
   LaunchPadAdminSetting,
+  LaunchPadCurrency
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
