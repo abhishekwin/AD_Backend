@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const { dirname } = require("path");
+const { checkAdminToken } = require("../../middleware/auth");
 const appDir = dirname(require.main.filename);
 const fs = require("fs")
 const storage = multer.diskStorage({
@@ -20,12 +21,12 @@ const { createCurrency, getCurrency, removeCurrency, updateCurrency, updateIsAct
 const validate = require("../../../middleware/validate");
 const { currencyValidation, updateIsActiveValidation } = require("../validations/currency.validation")
 
-router.post('/createCurrency', validate(currencyValidation), createCurrency)
+router.post('/createCurrency', checkAdminToken, validate(currencyValidation), createCurrency)
 router.get("/getCurrencies", getCurrency)
 router.delete('/removeCurrency/:id', removeCurrency)
-router.put('/updateCurrency/:id', validate(currencyValidation), updateCurrency)
-router.patch('/updateIsActiveCurrency/:id', validate(updateIsActiveValidation), updateIsActiveCurrency)
-router.post('/uploadCurrencyIcon', upload.single("icon"), uploadCurrencyIcon);
+router.put('/updateCurrency/:id', checkAdminToken, validate(currencyValidation), updateCurrency)
+router.patch('/updateIsActiveCurrency/:id', checkAdminToken,  validate(updateIsActiveValidation), updateIsActiveCurrency)
+router.post('/uploadCurrencyIcon', checkAdminToken, upload.single("icon"), uploadCurrencyIcon);
 router.post("/getCurrencyDetail", getCurrencyDetails)
 router.post("/getCurrencyWithFilter", getCurrencyWithFilter)
 module.exports = router;
