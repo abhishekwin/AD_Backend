@@ -129,7 +129,7 @@ const manageData = async (transferdata) => {
 
 };
 const launchpadTransferEventEthereum = async (from = 0, gt = 0) => {
-  //console.log("cron eth")
+  console.log("-----eth mint cron-----")
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferEthereum" })
   if(gt >= 100){
     from = from
