@@ -17,7 +17,12 @@ const {
   LaunchPadCoolTime,
   LaunchPadAdminSetting,
   LaunchPadCurrency,
+  LaunchPadCollectionPhase,
+  LaunchPadCollectionCurrencyDetailsForWhiteListed,
+  LaunchPadCollectionCurrencyDetails
 } = require("../models");
+
+// const {LaunchPadCollectionPhase } = require("../models/collectionPhase.model");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 const customPagination = require("../../comman/customPagination");
@@ -25,12 +30,12 @@ const { specialCharacter } = require("../../../helpers/RegexHelper");
 
 
 const getBaseWebData = async (url) => {
-  try{
+  try {
     const result = await axios.get(url);
     if (result.status == 200) {
       return result.data;
     }
-  }catch(e){
+  } catch (e) {
     return null;
   }
 }
@@ -42,7 +47,7 @@ const createNftWithTokenUri = async (data) => {
     const id = step
     updateUri = data.tokenURI + id + ".json";
     baseResponse = await getBaseWebData(updateUri);
-    if(baseResponse){
+    if (baseResponse) {
       let objNfts = {
         collectionId: data._id,
         collectionAddress: data.collectionAddress,
@@ -66,22 +71,22 @@ const createNftWithTokenUri = async (data) => {
         networkId: data.networkId,
         networkName: data.networkName,
       };
-  
+
       let existNfts = await LaunchPadNft.findOne({
         collectionId: data._id,
         tokenId: id
       });
-  
+
       if (existNfts) {
         await LaunchPadNft.findOneAndUpdate({ collectionId: data._id, tokenId: id }, objNfts)
       } else {
         await LaunchPadNft.create(objNfts)
       }
-    } else{
+    } else {
       failedNfts.push(id)
-    }   
+    }
   }
-  await LaunchPadCollection.findOneAndUpdate({ _id: data._id}, { status: "completed", failedNfts: failedNfts })
+  await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "completed", failedNfts: failedNfts })
 }
 
 const createCollection = catchAsync(async (req, res) => {
@@ -109,41 +114,44 @@ const createCollection = catchAsync(async (req, res) => {
   // }
 
   //validation 
-  
-  if(req.body.currencyDetails.length > 0){
+
+  if (req.body.currencyDetails && req.body.currencyDetails.length > 0) {
     for (currencyDetail of req.body.currencyDetails) {
       // console.log(currencyDetail,">><><><><><><<<");
       let result = await LaunchPadCurrency.findOne({
-        name:currencyDetail.currency,
-        address:currencyDetail.address,
-        symbol:currencyDetail.symbol,
+        name: currencyDetail.currency,
+        address: currencyDetail.address,
+        symbol: currencyDetail.symbol,
       })
-      if(!result){
+      if (!result) {
         return res
-        .status(400)
-        .send(new ResponseObject(400, "Currency not exist"));
+          .status(400)
+          .send(new ResponseObject(400, "Currency not exist"));
       }
     }
   }
-  if(req.body.currencyDetailsForWhiteListed.length > 0){
+  if (req.body.currencyDetailsForWhiteListed && req.body.currencyDetailsForWhiteListed.length > 0) {
     for (currencyWhiteListedDetail of req.body.currencyDetailsForWhiteListed) {
       let result = await LaunchPadCurrency.findOne({
-        name:currencyWhiteListedDetail.currency,
-        address:currencyWhiteListedDetail.address,
-        symbol:currencyWhiteListedDetail.symbol,
+        name: currencyWhiteListedDetail.currency,
+        address: currencyWhiteListedDetail.address,
+        symbol: currencyWhiteListedDetail.symbol,
       })
-      
-      if(!result){
+
+      if (!result) {
         return res
-        .status(400)
-        .send(new ResponseObject(400, "Currency not exist"));
+          .status(400)
+          .send(new ResponseObject(400, "Currency not exist"));
       }
     }
   }
- 
+
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
+ 
+  // cool time work start
+
   // if (findCoolTime) {
   //   findCoolTime.collectionAddress = result.collectionAddress;
   //   findCoolTime.time = new Date();
@@ -163,15 +171,47 @@ const createCollection = catchAsync(async (req, res) => {
   // }
   // await CollectionPhase.insertMany(collectionPhase)
 
- 
-  let WhiteListUser = [];
-  for (userAddress of req.body.WhiteListedUser ) {
-  
+  // cool time work end
 
-    WhiteListUser.push({ collectionId, userAddress });
+  let insertPhases = [];
+  for (phase of req.body.phases) {
+    insertPhases.push({
+      collectionId,
+      phase: phase.phase,
+      startTime: phase.startTime ? phase.startTime : null,
+      endTime: phase.endTime ? phase.endTime : null,
+      mintCountPerUser: phase.mintCountPerUser ? phase.mintCountPerUser : null,
+      mintCountPerTransaction: phase.mintCountPerTransaction ? phase.mintCountPerTransaction : null,
+      isWhiteListedUser: phase.isWhiteListedUser ? phase.isWhiteListedUser : false,
+      currencyDetails: phase.currencyDetails ? phase.currencyDetails : null,
+      currencyDetailsForWhiteListed: phase.currencyDetailsForWhiteListed ? phase.currencyDetailsForWhiteListed : null,
+      whiteListedUsers: phase.whiteListedUsers
+    });
   }
-  await WhiteListedUser.insertMany(WhiteListUser);
 
+  const insertPhasesCurrencies = []
+  const insertPhasesWhiteListedCurrencies = []
+  const whiteListUsers = []
+  if (insertPhases && insertPhases.length > 0) {
+    for (const iterator of insertPhases) {
+      let phaseresult =  await LaunchPadCollectionPhase.create(iterator) 
+      for (const currencyDetail of iterator.currencyDetails) {
+        let obj = {phaseId: phaseresult._id, ...currencyDetail}
+        insertPhasesCurrencies.push(obj)
+      }
+      for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
+        let obj = {phaseId: phaseresult._id, ...whiteListedCurrencyDetail}
+        insertPhasesWhiteListedCurrencies.push(obj)
+      }
+      for (const userAddress of iterator.whiteListedUsers) {
+        whiteListUsers.push({userAddress, phaseId:phaseresult._id, collectionId})
+      }
+    }
+  }
+  await LaunchPadCollectionCurrencyDetails.insertMany(insertPhasesCurrencies)
+  await LaunchPadCollectionCurrencyDetailsForWhiteListed.insertMany(insertPhasesWhiteListedCurrencies)
+  await WhiteListedUser.insertMany(whiteListUsers);
+  //process.exit();
 
   res
     .status(200)
@@ -236,8 +276,8 @@ const updateCollectionWithCreateNft = async (req, res) => {
     //     await LaunchPadCollection.findOneAndUpdate({ _id: collectionDetails._id }, { status: "completed" })
     //   }      
     // }
-    
-    
+
+
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection update successfully"));
@@ -285,24 +325,24 @@ const deleteCollection = async (req, res) => {
       return res.status(400).send(new ResponseObject(400, "Invalid User"));
     }
     const lanchpadCollection = await LaunchPadCollection.findOne({ _id: id });
-    if(lanchpadCollection){
+    if (lanchpadCollection) {
       const mintHistory = await LaunchPadMintHistory.findOne({ collectionAddress: lanchpadCollection.collectionAddress });
-      if(mintHistory){
+      if (mintHistory) {
         return res
-        .status(400)
-        .send(new ResponseObject(400, "Minted collection can't be deleted"));
+          .status(400)
+          .send(new ResponseObject(400, "Minted collection can't be deleted"));
       }
-      if(lanchpadCollection.status == "completed"){
+      if (lanchpadCollection.status == "completed") {
         return res
-        .status(400)
-        .send(new ResponseObject(400, "Completed collection can't be deleted"));
+          .status(400)
+          .send(new ResponseObject(400, "Completed collection can't be deleted"));
       }
     }
-    const result = await LaunchPadCollection.findOneAndUpdate({ _id: id, status:"in-progress"}, {deletedAt:new Date()});
-    if(result){
-      await LaunchPadNft.updateMany({ collectionId: result._id}, {deletedAt:new Date()})
+    const result = await LaunchPadCollection.findOneAndUpdate({ _id: id, status: "in-progress" }, { deletedAt: new Date() });
+    if (result) {
+      await LaunchPadNft.updateMany({ collectionId: result._id }, { deletedAt: new Date() })
     }
-    
+
     return res
       .status(200)
       .send(new ResponseObject(200, "Collection delete successfully"));
@@ -337,7 +377,7 @@ const getCollection = async (req, res) => {
       },
       {
         path: "userMintCount",
-        match:{userAddress}
+        match: { userAddress }
       },
       {
         path: "nftCount",
@@ -349,8 +389,8 @@ const getCollection = async (req, res) => {
         result.isWhiteListed = 0;
       }
     }
-    
-    if(resultFirst && resultFirst.whiteListedUsersInArray){
+
+    if (resultFirst && resultFirst.whiteListedUsersInArray) {
       result.whiteListedUsersInArray = resultFirst.whiteListedUsersInArray
     }
     return res
@@ -578,8 +618,8 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   req.body.collectionAddress = { $ne: null }
   filtercolumn.push("collectionAddress");
 
-  let statusOrFilter =[{ status: "completed" }, { status: "ended"  }, { status: "ready-to-syncup"  }, { status: "syncing"  }]
-  
+  let statusOrFilter = [{ status: "completed" }, { status: "ended" }, { status: "ready-to-syncup" }, { status: "syncing" }]
+
   req.body.creator = req.userData.account.toLowerCase();
   filtercolumn.push("creator");
 
@@ -590,11 +630,11 @@ const getMyCollectionList = catchAsync(async (req, res) => {
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
     search = new RegExp(".*" + search + ".*", "i");
-    searchObj = {"$or": [{ collectionName: search }, { symbol: search }]}  
+    searchObj = { "$or": [{ collectionName: search }, { symbol: search }] }
   }
- 
-  req.body.$and =[{"$or":statusOrFilter}]
-  if(searchObj){
+
+  req.body.$and = [{ "$or": statusOrFilter }]
+  if (searchObj) {
     req.body.$and.push(searchObj)
   }
   filtercolumn.push("$and");
@@ -634,7 +674,7 @@ const approvedCollection = async (req, res) => {
     }
     const result = await LaunchPadCollection.findOneAndUpdate(
       { _id: collectionId },
-      { approved: true, status:"completed" },
+      { approved: true, status: "completed" },
       { new: true }
     );
     res
@@ -694,7 +734,7 @@ const stashAllCollectionHeader = async (req, res) => {
     const filter = {};
     const nftsCount = await LaunchPadNft.count(filter);
     const nftsOwner = await LaunchPadNft.find(filter).select("owner mintCost");
-    const launchPadCollection = await LaunchPadCollection.count({approved:true, deletedAt:null});
+    const launchPadCollection = await LaunchPadCollection.count({ approved: true, deletedAt: null });
     const nftLowestPrice = await LaunchPadNft.findOne({ mintCost: { $ne: null }, collectionAddress: { $ne: null } })
       .sort({ mintCost: 1 })
       .limit(1);
@@ -961,7 +1001,7 @@ const collectionCreatorUsers = async (req, res) => {
 
 const getUserLatestCollection = catchAsync(async (req, res) => {
   let userAddress = req.userData.account.toLowerCase();
-  const result = await LaunchPadCollection.findOne({creator:userAddress, deletedAt:null, status:"in-progress"}).sort({created_at: -1})
+  const result = await LaunchPadCollection.findOne({ creator: userAddress, deletedAt: null, status: "in-progress" }).sort({ created_at: -1 })
   res
     .status(200)
     .send(new ResponseObject(200, "Collection display successfully", result));
@@ -969,24 +1009,24 @@ const getUserLatestCollection = catchAsync(async (req, res) => {
 
 const getCollectionMintCount = catchAsync(async (req, res) => {
   const { collectionId, userAddress } = req.body;
-  if(!collectionId){
+  if (!collectionId) {
     return res
-          .status(400)
-          .send(new ResponseObject(400, "Collection id is required"));
+      .status(400)
+      .send(new ResponseObject(400, "Collection id is required"));
   }
   // if(!userAddress){
   //   return res
   //         .status(400)
   //         .send(new ResponseObject(400, "User address is required"));
   // }
-  const result = await LaunchPadCollection.findOne({_id:collectionId})
-  .select('nftMintCount collectionAddress')
-  .populate([
-    {
-      path: "userMintCount",
-      match:{userAddress}
-    }
-  ])
+  const result = await LaunchPadCollection.findOne({ _id: collectionId })
+    .select('nftMintCount collectionAddress')
+    .populate([
+      {
+        path: "userMintCount",
+        match: { userAddress }
+      }
+    ])
   res
     .status(200)
     .send(new ResponseObject(200, "Collection display successfully", result));
@@ -1004,13 +1044,13 @@ const getAllCollectionForAdmin = catchAsync(async (req, res) => {
 
   // req.body.status = ["completed", "ready-to-syncup", "syncing", "ended"];
   // filtercolumn.push("status");
-  if (req.body.status ) {
+  if (req.body.status) {
     filtercolumn.push("status");
   }
   if (req.body.approved || req.body.approved === false) {
     filtercolumn.push("approved");
   }
-  
+
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
@@ -1039,10 +1079,10 @@ const getHideCollection = catchAsync(async (req, res) => {
   // let userAddress = req.userData.account.toLowerCase();
   var filtercolumn = [];
 
-  req.body.deletedAt = {$ne:null}
+  req.body.deletedAt = { $ne: null }
   filtercolumn.push("deletedAt");
 
-  req.body.hideByAdmin = {$ne:null}
+  req.body.hideByAdmin = { $ne: null }
   filtercolumn.push("hideByAdmin");
 
   if (req.body.status) {
@@ -1052,7 +1092,7 @@ const getHideCollection = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  
+
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -1072,12 +1112,12 @@ const getFailedCollection = catchAsync(async (req, res) => {
   // let userAddress = req.userData.account.toLowerCase();
   var filtercolumn = [];
 
-  req.body.deletedAt = {$ne:null}
+  req.body.deletedAt = { $ne: null }
   filtercolumn.push("deletedAt");
 
   // req.body.hideByAdmin = {$ne:null}
   // filtercolumn.push("hideByAdmin");
-  
+
   if (req.body.status) {
     filtercolumn.push("status");
   }
@@ -1089,7 +1129,7 @@ const getFailedCollection = catchAsync(async (req, res) => {
   if (req.body.networkId && req.body.networkName) {
     filtercolumn.push("networkId", "networkName");
   }
-  
+
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
 
@@ -1107,13 +1147,13 @@ const getFailedCollection = catchAsync(async (req, res) => {
 
 const hideMultipuleCollection = catchAsync(async (req, res) => {
   const userAddress = req.userData.account.toLowerCase();
-  const {collectionIds} = req.body
-  if(!collectionIds.length > 0 ){
+  const { collectionIds } = req.body
+  if (!collectionIds.length > 0) {
     return res
-    .status(400)
-    .send(new ResponseObject(400, "Please provide collection ids"));
+      .status(400)
+      .send(new ResponseObject(400, "Please provide collection ids"));
   }
-  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:new Date, hideByAdmin:userAddress})
+  await LaunchPadCollection.updateMany({ _id: collectionIds }, { deletedAt: new Date, hideByAdmin: userAddress })
   res
     .status(200)
     .send(new ResponseObject(200, "Collection hide successfully", collectionIds));
@@ -1121,13 +1161,13 @@ const hideMultipuleCollection = catchAsync(async (req, res) => {
 
 const unHideMultipuleCollection = catchAsync(async (req, res) => {
   const userAddress = req.userData.account.toLowerCase();
-  const {collectionIds} = req.body
-  if(!collectionIds.length > 0 ){
+  const { collectionIds } = req.body
+  if (!collectionIds.length > 0) {
     return res
-    .status(400)
-    .send(new ResponseObject(400, "Please provide collection ids"));
+      .status(400)
+      .send(new ResponseObject(400, "Please provide collection ids"));
   }
-  await LaunchPadCollection.updateMany({_id:collectionIds}, {deletedAt:null, unHideByAdmin:userAddress})
+  await LaunchPadCollection.updateMany({ _id: collectionIds }, { deletedAt: null, unHideByAdmin: userAddress })
   res
     .status(200)
     .send(new ResponseObject(200, "Collection unhide successfully", collectionIds));

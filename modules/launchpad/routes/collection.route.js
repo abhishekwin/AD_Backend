@@ -14,8 +14,7 @@ const {
   createWhiteListUser,
   updateWhiteListUser,
   createSignature,
-  uploadFile,
-  createCollectionPhase
+  uploadFile
 } = require("../controllers/index");
 
 const collectionController = require("../controllers/collection.controller");
@@ -31,8 +30,6 @@ router
     validate(createCollectionValidation),
     collectionController.createCollection
   );
-
-router.route("/create-collectionPhase").post(createCollectionPhase);  
 
 router.route("/create-whiteListedUser").post( checkToken, createWhiteListUser);
 router.route("/update-whiteListedUser").post( checkToken, updateWhiteListUser);

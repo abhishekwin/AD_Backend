@@ -6,8 +6,5 @@ module.exports = {
   ...require("./fileUpload.controller"),
   ...require("./nft.controller"),
   ...require("./admin.controller"),
-  ...require("./currency.controller.js"),
-  ...require("./collectionPhase.controller.js"),
-
-
+  ...require("./currency.controller.js")
 };

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { toJSON, paginate } = require("./plugins");
 
 const collectionPhaseSchema = mongoose.Schema(
   {
@@ -8,10 +9,9 @@ const collectionPhaseSchema = mongoose.Schema(
       trim: true,
     },
     collectionId: {
-      type: mongoose.Schema.Types.String,
+      type: mongoose.Schema.Types.ObjectId,
       require: true,
     },
-
     phase: {
       type: Number,
       require: true,
@@ -26,7 +26,6 @@ const collectionPhaseSchema = mongoose.Schema(
       require: true,
       lowercase: true,
     },
-
     mintCountPerUser: {
       type: Number,
       trim: true,
@@ -37,27 +36,8 @@ const collectionPhaseSchema = mongoose.Schema(
       trim: true,
       default: 0,
     },
-
-    currencyDetails: {
-      type: Array,
-      default: null,
-    },
-    currencyDetailsForWhiteListed: {
-      type: Array,
-      default: null,
-    },
-
-    whiteListStartTime: {
-      type: Date,
-
-      lowercase: true,
-    },
-    whiteListEndTime: {
-      type: Date,
-
-      lowercase: true,
-    },
-
+    // currencyDetails:[CurrencyDetailsSchema],
+    // currencyDetailsForWhiteListed: [CurrencyDetailsForWhiteListedSchema],
     isWhiteListedUser: {
       type: Boolean,
       default: false,
@@ -68,9 +48,26 @@ const collectionPhaseSchema = mongoose.Schema(
   }
 );
 
+
+collectionPhaseSchema.set("toJSON", { getters: true, virtuals: true });
+collectionPhaseSchema.plugin(toJSON);
+collectionPhaseSchema.plugin(paginate);
+
+// const CollectionCurrencyDetails = mongoose.model(
+//   "LaunchPadCollectionCurrencyDetails",
+//   CurrencyDetailsSchema
+// );
+
+// const CurrencyDetailsForWhiteListed= mongoose.model(
+//   "LaunchPadCurrencyDetailsForWhiteListed",
+//   CurrencyDetailsForWhiteListedSchema
+// );
+
 const CollectionPhase = mongoose.model(
-  "CollectionPhase",
+  "LaunchPadCollectionPhase",
   collectionPhaseSchema
 );
 
 module.exports = CollectionPhase;
+// module.exports = CollectionCurrencyDetails;
+// module.exports = CurrencyDetailsForWhiteListed;
