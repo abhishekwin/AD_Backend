@@ -273,15 +273,19 @@ const mintCountUpdateUsingCollectionEth = async () => {
 
 launchpadTransferEventCron();
 startCronForNftImage()
+createLaunchpadNfts(),
+failLaunchpadNfts(),
+bscMint(),
+ethMint(),
 // failLaunchpadNfts();
 // startCron();
 module.exports = {
-    createLaunchpadNfts,
-    failLaunchpadNfts,
-    bscMint,
-    ethMint,
-    mintCountUpdateUsingCollectionBsc,
-    mintCountUpdateUsingCollectionEth
+    // createLaunchpadNfts,
+    // failLaunchpadNfts,
+    // bscMint,
+    // ethMint,
+    // mintCountUpdateUsingCollectionBsc,
+    // mintCountUpdateUsingCollectionEth
 };
 
 

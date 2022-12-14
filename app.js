@@ -90,14 +90,14 @@ app.use(function onError(err, req, res, next) {
 
 cron.schedule('* * * * *', () => {
   console.log("---cron running---")
-  createLaunchpadNfts()
-  failLaunchpadNfts()
+  ///createLaunchpadNfts()
+  ///failLaunchpadNfts()
 });
 
 cron.schedule('*/10 * * * * *', () => {
   console.log("---mint cron running---")
-  bscMint()
-  ethMint()
+  ///bscMint()
+  ///ethMint()
   // mintCountUpdateUsingCollectionBsc()
   // mintCountUpdateUsingCollectionEth()
 });
