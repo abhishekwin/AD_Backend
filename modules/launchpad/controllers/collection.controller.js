@@ -16,7 +16,7 @@ const {
   LaunchPadMintHistory,
   LaunchPadCoolTime,
   LaunchPadAdminSetting,
-  LaunchPadCurrency
+  LaunchPadCurrency,
 } = require("../models");
 const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
@@ -85,6 +85,7 @@ const createNftWithTokenUri = async (data) => {
 }
 
 const createCollection = catchAsync(async (req, res) => {
+  // console.log(createCollection,">>>>>>>>>>>>>>>>>>");
   // const findCoolTime = await LaunchPadCoolTime.findOne({
   //   userAddress: req.userData.account.toLowerCase(),
   // });
@@ -108,14 +109,15 @@ const createCollection = catchAsync(async (req, res) => {
   // }
 
   //validation 
+  
   if(req.body.currencyDetails.length > 0){
     for (currencyDetail of req.body.currencyDetails) {
+      // console.log(currencyDetail,">><><><><><><<<");
       let result = await LaunchPadCurrency.findOne({
         name:currencyDetail.currency,
         address:currencyDetail.address,
         symbol:currencyDetail.symbol,
       })
-      
       if(!result){
         return res
         .status(400)
@@ -154,8 +156,18 @@ const createCollection = catchAsync(async (req, res) => {
   //     time: new Date(),
   //   });
   // }
+
+  // let collectionPhase = [];
+  // for (colPhase of req.body.CollectionPhase){
+  //   collectionPhase.push({phaseId,startTime,endTime,isWhiteListed})
+  // }
+  // await CollectionPhase.insertMany(collectionPhase)
+
+ 
   let WhiteListUser = [];
-  for (userAddress of req.body.WhiteListedUser) {
+  for (userAddress of req.body.WhiteListedUser ) {
+  
+
     WhiteListUser.push({ collectionId, userAddress });
   }
   await WhiteListedUser.insertMany(WhiteListUser);

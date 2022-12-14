@@ -6,10 +6,14 @@ const whiteListedUserSchema = mongoose.Schema(
       type: mongoose.Schema.Types.String,
       require: true,
     },
+    phaseId: {
+      type: mongoose.Schema.Types.String,
+      require: true,
+    },
     userAddress: {
       type: String,
       require: true,
-      lowercase: true
+      lowercase: true,
     },
   },
   {

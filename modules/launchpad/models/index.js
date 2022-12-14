@@ -11,4 +11,7 @@ module.exports.LaunchPadTopCreator = require('./launchpadTopCreator.model')
 module.exports.LaunchPadAdminSetting = require('./admin.model')
 module.exports.LaunchPadImageUploadLogs = require('./launchpadImageUploadLogs.model')
 module.exports.LaunchPadCurrency = require('./currency.model')
+module.exports.CollectionPhase = require('./collectionPhase.model')
+
+
 

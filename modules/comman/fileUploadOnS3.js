@@ -11,6 +11,7 @@ request = require('request');
 const { dirname } = require('path');
 const appDir = dirname(require.main.filename);
 
+
 mongoose.connect(process.env.DB_URL, ).then(() => {
     //logger.info('Connected to MongoDB');
   }).catch((e) =>{

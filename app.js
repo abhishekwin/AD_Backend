@@ -1,4 +1,6 @@
 const createError = require("http-errors");
+const mongoose = require('mongoose')
+mongoose.set('strictQuery', true);
 const path = require("path");
 const express = require("express");
 const cors = require("cors");

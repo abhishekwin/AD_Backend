@@ -6,6 +6,7 @@ const Users = require("../../models/userModel")
 module.exports = {
   checkToken: (req, res, next) => {
     const bearerHeaders = req.headers["authorization"];
+    
     if (typeof bearerHeaders !== "undefined") {
       const bearer = bearerHeaders.split(" ");
       const bearerToken = bearer[1];
@@ -26,6 +27,7 @@ module.exports = {
               success: false,
             });
           }
+          
           next();
         }
       });
@@ -39,6 +41,7 @@ module.exports = {
   },
   checkAdminToken: (req, res, next) => {
     const bearerHeaders = req.headers["authorization"];
+    console.log(bearerHeaders,">>>>>>>>>>>>>>>>");
     if (typeof bearerHeaders !== "undefined") {
       const bearer = bearerHeaders.split(" ");
       const bearerToken = bearer[1];
