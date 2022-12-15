@@ -88,7 +88,7 @@ const createNftWithUri = async (id, updateUri, data, failedNfts) => {
 };
 
 const createNftUsingCollectionFuncation = async () => {
-  console.log("-----create nft start-----")
+  //console.log("-----create nft start-----")
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
   if (data) {
     let failedNfts = [];

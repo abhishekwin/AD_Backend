@@ -277,8 +277,6 @@ const failLaunchpadNfts = async () => {
 
 launchpadTransferEventCron();
 startCronForNftImage()
-// createLaunchpadNfts(),
-// failLaunchpadNfts(),
 bscMint(),
 ethMint(),
 

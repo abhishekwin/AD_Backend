@@ -22,7 +22,7 @@ mongoose
 const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_BSC;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}, tokenId_gt: ${gt}, tokenId_lte: ${gt+100}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}, tokenId_gt: ${gt}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
@@ -127,7 +127,7 @@ const manageData = async (transferdata) => {
 };
 
 const launchpadTransferEventBsc = async (from = 0, gt = 0) => {
-  console.log("-----bsc mint cron-----")
+  //console.log("-----bsc mint cron-----")
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferBsc" })
   if (gt >= 100) {
     from = from
