@@ -127,7 +127,7 @@ const manageData = async (transferdata) => {
 };
 
 const launchpadTransferEventBsc = async (from = 0, gt = 0) => {
-  
+  console.log("-----bsc mint cron-----")
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferBsc" })
   if (gt >= 100) {
     from = from

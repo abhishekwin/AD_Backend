@@ -91,6 +91,7 @@ const createNftUsingCollectionFuncation = async () => {
   console.log("-----create nft start-----")
   const data = await LaunchPadCollection.findOne({ status: "ready-to-syncup" });
   if (data) {
+    console.log("collectionAddress", data.collectionAddress)
     let failedNfts = [];
     await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "syncing" })
     for (let step = 1; step <= data.maxSupply; step++) {

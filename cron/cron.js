@@ -238,7 +238,6 @@ const ethMint = async () => {
 }
 
 const createLaunchpadNfts = async () => {
-    console.log("-----create nft start-----")
     try {
         await createNftUsingCollectionFuncation();
     }
@@ -249,7 +248,6 @@ const createLaunchpadNfts = async () => {
 }
 
 const failLaunchpadNfts = async () => {
-    console.log("-----fail nft start------")
     try {
         await failNftUsingCollectionFuncation();
     }
@@ -279,10 +277,14 @@ const failLaunchpadNfts = async () => {
 
 launchpadTransferEventCron();
 startCronForNftImage()
-createLaunchpadNfts(),
-failLaunchpadNfts(),
-bscMint(),
-ethMint(),
+// createLaunchpadNfts(),
+// failLaunchpadNfts(),
+// bscMint(),
+// ethMint(),
+
+
+
+
 // failLaunchpadNfts();
 // startCron();
 module.exports = {
