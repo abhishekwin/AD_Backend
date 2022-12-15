@@ -279,8 +279,8 @@ launchpadTransferEventCron();
 startCronForNftImage()
 // createLaunchpadNfts(),
 // failLaunchpadNfts(),
-// bscMint(),
-// ethMint(),
+bscMint(),
+ethMint(),
 
 
 

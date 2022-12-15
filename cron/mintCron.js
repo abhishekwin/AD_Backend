@@ -22,27 +22,6 @@ const failLaunchpadNfts = async () => {
     }
 }
 
-
-const bscMint = async () => {
-    try {
-        await launchpadTransferEventBsc();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-    bscMint()
-}
-
-const ethMint = async () => {
-    try {
-        await launchpadTransferEventEthereum();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-    ethMint()
-}
-
 async function sleep(ms) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
@@ -56,5 +35,4 @@ async function cronRun(){
     cronRun()
 } 
 cronRun()
-bscMint()
-ethMint()
+
