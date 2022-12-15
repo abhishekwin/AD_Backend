@@ -22,7 +22,7 @@ mongoose
 const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_BSC;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    skip: ${gt}\n where: {timestamp_gt: ${from}, tokenId_gt: ${gt}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    skip: ${gt}\n where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
