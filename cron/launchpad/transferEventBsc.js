@@ -143,6 +143,7 @@ const launchpadTransferEventBsc = async (from = 0, gt = 0) => {
    
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
+      console.log("bsctransferdata", transferdata)
       await manageData(transferdata);
       if (transferdata.length >= 100) {
         gt = gt + 100;
