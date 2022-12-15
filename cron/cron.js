@@ -224,6 +224,7 @@ const bscMint = async () => {
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }
+    bscMint()
 }
 
 const ethMint = async () => {
@@ -233,6 +234,7 @@ const ethMint = async () => {
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }
+    ethMint()
 }
 
 const createLaunchpadNfts = async () => {
@@ -243,6 +245,7 @@ const createLaunchpadNfts = async () => {
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }
+    createLaunchpadNfts()
 }
 
 const failLaunchpadNfts = async () => {
@@ -253,25 +256,26 @@ const failLaunchpadNfts = async () => {
     catch (e) {
         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
     }
+    failLaunchpadNfts()
 }
 
-const mintCountUpdateUsingCollectionBsc = async () => {
-    try {
-        await launchpadMintCountTransferEventBsc()
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-}
+// const mintCountUpdateUsingCollectionBsc = async () => {
+//     try {
+//         await launchpadMintCountTransferEventBsc()
+//     }
+//     catch (e) {
+//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//     }
+// }
 
-const mintCountUpdateUsingCollectionEth = async () => {
-    try {
-        await launchpadMintCountTransferEventEthereum()
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-}
+// const mintCountUpdateUsingCollectionEth = async () => {
+//     try {
+//         await launchpadMintCountTransferEventEthereum()
+//     }
+//     catch (e) {
+//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//     }
+// }
 
 launchpadTransferEventCron();
 startCronForNftImage()
