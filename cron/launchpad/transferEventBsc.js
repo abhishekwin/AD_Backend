@@ -22,7 +22,7 @@ mongoose
 const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_BSC;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}, tokenId_gt: ${gt}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 1000\n    where: {timestamp_gt: ${from}, tokenId_gt: ${gt}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
@@ -55,6 +55,7 @@ const manageData = async (transferdata) => {
       });
       const index = parseInt(data.tokenId) - 1;
       let nft = findNft[index];
+      
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(
@@ -128,7 +129,7 @@ const manageData = async (transferdata) => {
 const launchpadTransferEventBsc = async (from = 0, gt = 0) => {
 console.log("-----bsc mint cron-----")
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferBsc" })
-  if (gt >= 100) {
+  if (gt >= 1000) {
     from = from
   } else if (transfereventDetails) {
     from = transfereventDetails.lastcrontime;
@@ -137,15 +138,17 @@ console.log("-----bsc mint cron-----")
   }
 
   try {
+    
     let transferdata = await transferFunctionQuery(from, gt);
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
       await manageData(transferdata);
-      if (transferdata.length >= 100) {
-        gt = gt + 100;
+      if (transferdata.length >= 1000) {
+        gt = gt + 1000;
         launchpadTransferEventBsc(from, gt)
       }
     }
+
   } catch (error) {
     console.log("error", error);
   }
