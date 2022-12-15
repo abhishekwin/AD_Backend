@@ -237,27 +237,27 @@ const ethMint = async () => {
     ethMint()
 }
 
-const createLaunchpadNfts = async () => {
-    console.log("-----create nft start-----")
-    try {
-        await createNftUsingCollectionFuncation();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-    createLaunchpadNfts()
-}
+// const createLaunchpadNfts = async () => {
+//     console.log("-----create nft start-----")
+//     try {
+//         await createNftUsingCollectionFuncation();
+//     }
+//     catch (e) {
+//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//     }
+//     createLaunchpadNfts()
+// }
 
-const failLaunchpadNfts = async () => {
-    console.log("-----fail nft start------")
-    try {
-        await failNftUsingCollectionFuncation();
-    }
-    catch (e) {
-        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    }
-    failLaunchpadNfts()
-}
+// const failLaunchpadNfts = async () => {
+//     console.log("-----fail nft start------")
+//     try {
+//         await failNftUsingCollectionFuncation();
+//     }
+//     catch (e) {
+//         // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+//     }
+//     failLaunchpadNfts()
+// }
 
 // const mintCountUpdateUsingCollectionBsc = async () => {
 //     try {
@@ -279,10 +279,12 @@ const failLaunchpadNfts = async () => {
 
 launchpadTransferEventCron();
 startCronForNftImage()
-createLaunchpadNfts(),
-failLaunchpadNfts(),
 bscMint(),
 ethMint(),
+
+// createLaunchpadNfts(),
+// failLaunchpadNfts(),
+
 // failLaunchpadNfts();
 // startCron();
 module.exports = {

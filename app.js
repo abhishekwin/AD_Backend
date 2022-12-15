@@ -8,7 +8,8 @@ require("./config/db.config");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { EventManager } = require("./models");
-const { startCron, createLaunchpadNfts, failLaunchpadNfts, bscMint, ethMint, mintCountUpdateUsingCollectionBsc, mintCountUpdateUsingCollectionEth } = require("./cron/cron");
+const { startCron, bscMint, ethMint, mintCountUpdateUsingCollectionBsc, mintCountUpdateUsingCollectionEth } = require("./cron/cron");
+const { createLaunchpadNfts, failLaunchpadNfts,  } = require("./cron/mintCron");
 const adminRouter = require("./routes/adminRoutes");
 const usersRouter = require("./routes/userRoutes");
 const uploadFileRoutes = require("./routes/uploadFileRoutes");
@@ -88,19 +89,19 @@ app.use(function onError(err, req, res, next) {
   res.end(res.sentry + "\n");
 });
 
-cron.schedule('* * * * *', () => {
-  console.log("---cron running---")
-  ///createLaunchpadNfts()
-  ///failLaunchpadNfts()
-});
+// cron.schedule('* * * * *', () => {
+//   console.log("---cron running---")
+//   ///createLaunchpadNfts()
+//   ///failLaunchpadNfts()
+// });
 
-cron.schedule('*/10 * * * * *', () => {
-  console.log("---mint cron running---")
-  ///bscMint()
-  ///ethMint()
-  // mintCountUpdateUsingCollectionBsc()
-  // mintCountUpdateUsingCollectionEth()
-});
+// cron.schedule('*/10 * * * * *', () => {
+//   console.log("---mint cron running---")
+//   ///bscMint()
+//   ///ethMint()
+//   // mintCountUpdateUsingCollectionBsc()
+//   // mintCountUpdateUsingCollectionEth()
+// });
 
 
 cron.schedule(`0 */${process.env.DB_BACKUP_START} * * *`, () => {
