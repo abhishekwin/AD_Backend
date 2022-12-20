@@ -9,6 +9,7 @@ const specialCharacter = require("../helpers/RegexHelper");
 const jwt_decode = require("jwt-decode");
 const pinataSDK = require("@pinata/sdk");
 const path = require("path");
+const _ = require('lodash');
 const pinata = pinataSDK(
   process.env.PINATAAPIKEY,
   process.env.PINATAAPISECRETAPIKEY
@@ -142,9 +143,9 @@ module.exports = {
     }
   },
   uploadMultiJsonData: async (req, res) => {
-    try {
-      
+    try {      
       let filedatas = getjson(req.file);
+      filedatas = await helpers.shuffle(filedatas);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
         if(uploadedData.count == filedatas.length){
