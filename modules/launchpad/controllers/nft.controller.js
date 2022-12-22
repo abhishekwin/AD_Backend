@@ -13,6 +13,8 @@ const path = require("path");
 const { Nft } = require("../services");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
 const { uploadDir } = require("../../../services/pinata");
+const axios = require("axios");
+const awsCdnUrl = process.env.AWS_CDN_URL
 
 const getjson = (file) => {
   const readableStreamForFile = fs.createReadStream(file.path);
@@ -345,6 +347,54 @@ const getNftAttributes = async (req, res) => {
   }
 };
 
+const getBaseWebDataUsingAxios = async (url, count = 0) => {
+  
+  let promise = new Promise(async function (resolve, reject) {
+    await axios.get(url)
+    .then(function (response) {
+      resolve(response.data)
+    })
+      .catch(function (error) {
+        console.log("error", error)
+        resolve(null)
+      })
+  });
+  return promise;
+};
+
+const getS3JsonFile = catchAsync(async (req, res) => {
+  const {tokenId, collectionId} = req.body
+  let creator = req.userData.account.toLowerCase();
+  const result = await LaunchPadNft.findOne({tokenId:tokenId, collectionId:collectionId, isMint:true, creator:creator })
+  if(!result){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Nft not found"));
+  }
+  const collectionDetails = await LaunchPadCollection.findOne({_id:collectionId, s3URIStatus:"completed"})
+  if(!collectionDetails){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "Nft not found"));
+  }
+  let jsonUrl = collectionDetails.s3URI;
+  let jsonData = null
+  if(jsonUrl){
+    let url = awsCdnUrl+jsonUrl+"/" +tokenId+ ".json";
+    jsonData = await getBaseWebDataUsingAxios(url)
+  }
+
+  if(!jsonData){
+    return res
+    .status(400)
+    .send(new ResponseObject(400, "JSON not found"));
+  }
+
+  res
+    .status(200)
+    .send(new ResponseObject(200, "JSON display successfully", jsonData));
+});
+
 const createStaticNft = catchAsync(async (req, res) => {
   const result = await LaunchPadNft.create(req.body)
   res
@@ -390,6 +440,7 @@ module.exports = {
   getNftList,
   getMyNftList,
   nftDetail,
+  getS3JsonFile
   // createStaticNft,
   // updateStaticNft,
   // updateManyStaticNft

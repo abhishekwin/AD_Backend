@@ -6,6 +6,9 @@ const multer = require("multer");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 const fs = require("fs")
+const {
+  getS3JsonFileValidation
+} = require("../validations/nft.validation");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -35,7 +38,7 @@ router.post("/get-nft-list", nftController.getNftList);
 router.post("/get-my-nft-list", checkToken,  nftController.getMyNftList);
 router.get("/get-nft-detail/:id", nftController.nftDetail);
 router.post("/get-nft-attributes", nftController.getNftAttributes);
-
+router.post("/get-s3-json-file", checkToken, validate(getS3JsonFileValidation), nftController.getS3JsonFile);
 // router.post("/create-static-nft", checkToken, nftController.createStaticNft);
 // router.post("/update-static-nft", checkToken, nftController.updateStaticNft);
 // router.post("/update-multi-static-nft", checkToken, nftController.updateManyStaticNft);
