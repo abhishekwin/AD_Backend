@@ -892,6 +892,7 @@ module.exports = {
       let { account_address } = req.body;
       /**Get user by wallet address */
       let userObject = await Users.find({
+        
         account: account_address.toLowerCase(),
       });
       if (!userObject.length) {

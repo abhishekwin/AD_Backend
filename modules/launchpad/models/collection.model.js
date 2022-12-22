@@ -237,6 +237,7 @@ collectionSchema.virtual('nftCount', {
   count: true
 });
 
+
 // collectionSchema.pre('find', function() {
 //     this.where({ deletedAt: null });
 // });
@@ -254,6 +255,7 @@ collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   }  
   return whiteListedUsers;
 });
+
 
 // add plugin that converts mongoose to json
 collectionSchema.set("toJSON", { getters: true, virtuals: true });

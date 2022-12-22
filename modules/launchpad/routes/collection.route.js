@@ -14,7 +14,7 @@ const {
   createWhiteListUser,
   updateWhiteListUser,
   createSignature,
-  uploadFile,
+  uploadFile
 } = require("../controllers/index");
 
 const collectionController = require("../controllers/collection.controller");

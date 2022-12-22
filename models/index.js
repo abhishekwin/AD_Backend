@@ -9,6 +9,8 @@ const CronManagerModel = require('./cronManagerModel');
 const UserFollower = require('./userFollowerModel');
 const ImageUploadLogs = require('./imageUploadLogsModel');
 
+
+
 module.exports = {
     CollectionNFTs,
     Users,
@@ -19,5 +21,6 @@ module.exports = {
     Bid,
     CronManagerModel,
     UserFollower,
-    ImageUploadLogs
+    ImageUploadLogs,
+  
 }

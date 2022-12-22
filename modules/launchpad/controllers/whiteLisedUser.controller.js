@@ -1,11 +1,20 @@
-const { WhiteListedUser, LaunchPadCollection, LaunchPadMintHistory } = require("../models/index");
+const { 
+  WhiteListedUser, 
+  LaunchPadCollection, 
+  LaunchPadMintHistory,
+  LaunchPadCollectionPhase 
+} = require("../models/index");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
+const moment = require('moment')
+const today = moment()
 
 exports.createWhiteListUser = async (req, res) => {
   try {
-    const { collectionId, userAddresses } = req.body;
+    const { collectionId, userAddresses, phaseId } = req.body;
+
     const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
+  
     if(!authenticateUser){
     return res
       .status(400)
@@ -17,6 +26,7 @@ exports.createWhiteListUser = async (req, res) => {
       await WhiteListedUser.create({
         collectionId,
         userAddress,
+        phaseId
       });
     }
     return res
@@ -33,7 +43,7 @@ exports.createWhiteListUser = async (req, res) => {
 
 exports.updateWhiteListUser = async (req, res) => {
   try {
-    const { collectionId, userAddresses } = req.body;
+    const { collectionId, userAddresses, userLevel } = req.body;
     const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
     if(!authenticateUser){
     return res
@@ -65,7 +75,8 @@ exports.createSignature = async (req, res) => {
     const {
       collectionId,
       collectionAddress,
-      networkId
+      networkId,
+      phase
     } = req.body;    
 
     const userAddress = req.userData.account
@@ -96,16 +107,13 @@ exports.createSignature = async (req, res) => {
     }
     const checkUser = await WhiteListedUser.findOne({
       userAddress,
-      collectionId,
+      collectionId
     });
     let isWhiteListed = true;
     if (!checkUser) {
       isWhiteListed = false;
     }
-    if(collectionId == "636516a98a16c7d1d9047474"){
-      isWhiteListed = true;
-    }
-
+    
     let launchpadFactoryAddress = "";
     if(networkId == process.env.ETHEREUM_NETWORK_ID){
       launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_ETHEREUM
@@ -113,12 +121,30 @@ exports.createSignature = async (req, res) => {
       launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_BSC
     }
 
+    phaseValidationFilter = {
+      collectionId:collectionId,
+      phase:phase,
+      startTime:{$gte: today.toDate()},
+    };
+    console.log(phaseValidationFilter)
+    let phaseValidation = await LaunchPadCollectionPhase.findOne(phaseValidationFilter);
+    console.log(
+      "phaseValidation", phaseValidation
+    )
+    if(!phaseValidation){
+      return res
+      .status(400)
+      .send(
+        new ResponseObject(400, "Not vailed user")
+      );
+    }
     const message = {
       collectionAddress,
       launchpadFactoryAddress,
       userAddress,
       nonce,
-      isWhiteListed
+      isWhiteListed,
+      phase
     };
     
     const generateSignature = await VerifySign(message);
