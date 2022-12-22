@@ -88,6 +88,17 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    s3URI: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    s3URIStatus: {
+      type: String,
+      enum: [null, "in-progress", "ready-to-syncup", "syncing", "completed"],
+      trim: true,
+      default: null,
+    },
     imageCover: {
       type: String,
       trim: true,
