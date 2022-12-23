@@ -50,6 +50,11 @@ const updateCollectionValidation = {
   }),
 };
 
+const getStatsWithMultiFilter = {
+  body: Joi.object().keys({
+    networkId: Joi.number().required()
+  }),
+}
 const topCreatorValidation = {
   body: Joi.object().keys({
     userAddresses: Joi.array().required(),
@@ -68,4 +73,5 @@ module.exports = {
   updateCollectionValidation,
   topCreatorValidation,
   collectionCreatorUsersValidation,
+  getStatsWithMultiFilter,
 };

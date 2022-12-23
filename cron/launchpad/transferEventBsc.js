@@ -55,7 +55,7 @@ const manageData = async (transferdata) => {
       });
       const index = parseInt(data.tokenId) - 1;
       let nft = findNft[index];
-      console.log("index", data.collection_address, "---", index)
+      
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(

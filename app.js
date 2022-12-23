@@ -10,16 +10,8 @@ require("./config/db.config");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { EventManager } = require("./models");
-<<<<<<< HEAD
-const { startCron } = require("./cron/cron");
-
-const { failLaunchpadNfts } = require("./cron/mintCron");
-
-
-=======
 const { startCron, bscMint, ethMint, mintCountUpdateUsingCollectionBsc, mintCountUpdateUsingCollectionEth } = require("./cron/cron");
 const { createLaunchpadNfts, failLaunchpadNfts,  } = require("./cron/mintCron");
->>>>>>> eb84b6671c8bd0926d24df779fe1099aa93435eb
 const adminRouter = require("./routes/adminRoutes");
 const usersRouter = require("./routes/userRoutes");
 const uploadFileRoutes = require("./routes/uploadFileRoutes");

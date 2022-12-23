@@ -149,7 +149,7 @@ const createCollection = catchAsync(async (req, res) => {
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
- 
+
   // cool time work start
 
   // if (findCoolTime) {
@@ -194,17 +194,17 @@ const createCollection = catchAsync(async (req, res) => {
   const whiteListUsers = []
   if (insertPhases && insertPhases.length > 0) {
     for (const iterator of insertPhases) {
-      let phaseresult =  await LaunchPadCollectionPhase.create(iterator) 
+      let phaseresult = await LaunchPadCollectionPhase.create(iterator)
       for (const currencyDetail of iterator.currencyDetails) {
-        let obj = {phaseId: phaseresult._id, ...currencyDetail}
+        let obj = { phaseId: phaseresult._id, ...currencyDetail }
         insertPhasesCurrencies.push(obj)
       }
       for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
-        let obj = {phaseId: phaseresult._id, ...whiteListedCurrencyDetail}
+        let obj = { phaseId: phaseresult._id, ...whiteListedCurrencyDetail }
         insertPhasesWhiteListedCurrencies.push(obj)
       }
       for (const userAddress of iterator.whiteListedUsers) {
-        whiteListUsers.push({userAddress, phaseId:phaseresult._id, collectionId})
+        whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
       }
     }
   }
@@ -771,6 +771,46 @@ const stashAllCollectionHeader = async (req, res) => {
   }
 };
 
+
+const getStatsWithMultiFilter = async (req, res) => {
+  try {
+    const { networkId } = req.body
+    let filter = { approved: true, deletedAt: null };
+    if (networkId) {
+      filter = { ...filter, networkId: networkId }
+    }
+    const launchPadCollection = await LaunchPadCollection.find(filter).populate([{
+      path: 'nfts'
+    }])
+
+    let response = [];
+    let count = 0;
+    for (const iterator of launchPadCollection) {
+      response.push({
+        contractName: iterator.contractName,
+        tokenURI: iterator.tokenURI,
+        imageCover: iterator.imageCover,
+        bannerImages: iterator.bannerImages
+      })
+    }
+
+    return res
+      .status(200)
+      .send(
+        new ResponseObject(
+          200,
+          "Get stash collection with filter",
+          response
+        )
+      );
+  } catch (err) {
+    console.log("err", err)
+    return res
+      .status(500)
+      .send(new ResponseObject(500, "Something Went Wrong"));
+  }
+};
+
 const topCreator = async (req, res) => {
   try {
     const getCollectionAddress = await LaunchPadTopCreator.find();
@@ -1203,5 +1243,6 @@ module.exports = {
   getFailedCollection,
   hideMultipuleCollection,
   unHideMultipuleCollection,
-  getAllCollectionForAdmin
+  getAllCollectionForAdmin,
+  getStatsWithMultiFilter
 };

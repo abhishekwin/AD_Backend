@@ -241,6 +241,13 @@ collectionSchema.virtual('userMintCount', {
   count: true
 });
 
+collectionSchema.virtual('nfts', {
+  ref: 'LaunchPadNft',
+  localField: '_id',
+  foreignField: 'collectionId',
+  justOne: false
+});
+
 collectionSchema.virtual('nftCount', {
   ref: 'LaunchPadNft',
   localField: '_id',

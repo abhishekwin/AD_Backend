@@ -5,7 +5,8 @@ const {
   createCollectionValidation,
   updateCollectionValidation,
   topCreatorValidation,
-  collectionCreatorUsersValidation
+  collectionCreatorUsersValidation,
+  getStatsWithMultiFilter
 } = require("../validations/collection.validation");
 const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
@@ -86,6 +87,11 @@ router
 router
   .route("/get-stash-all-collections-header")
   .get(collectionController.stashAllCollectionHeader);   
+
+router
+  .route("/get-top-stats-collection-with-multi-filter")
+  .post(validate(getStatsWithMultiFilter), collectionController.getStatsWithMultiFilter); 
+
 router
   .route("/get-top-creator")
   .get(collectionController.topCreator); 
