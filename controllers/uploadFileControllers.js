@@ -152,15 +152,20 @@ module.exports = {
       if(uploadedData){
         if(uploadedData.count == filedatas.length){
           const folderPath = uploadedData.folderPath;
-          const folderName = uploadedData.folderName          
+          const folderName = uploadedData.folderName  
+          const removeFolderPath = folderPath;
+          const removeFolderName = appRoot.path + "/" + req.file.path      
           let result = await uploadDir(folderPath);
-          // let s3UploadDirResult = await uploadDirToS3(folderPath, folderName)
+          let s3UploadDirResult = uploadDirToS3(folderPath, folderName, removeFolderPath, removeFolderName)
           result.s3BucketUrl =   "collection-nfts/" +folderName
-          fs.rmSync(folderPath, { recursive: true, force: true });
-          fs.rmSync(appRoot.path + "/" + req.file.path, {
-            recursive: true,
-            force: true,
-          });
+          // if(s3UploadDirResult){
+          //   fs.rmSync(folderPath, { recursive: true, force: true });
+          //   fs.rmSync(appRoot.path + "/" + req.file.path, {
+          //     recursive: true,
+          //     force: true,
+          //   });
+          // }
+         
           return res.status(200).json({
             data: result,
             status: 200,

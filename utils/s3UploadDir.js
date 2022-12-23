@@ -47,14 +47,19 @@ async function uploadFilesToS3(filesToUpload, dirPath){
       });
 }
 
-async function uploadDirToS3(upload, folderName) {
+async function uploadDirToS3(upload, folderName, removeFolderPath, removeFolderName) {
 //   if (!BUCKET || !KEY || !SECRET) {
 //     throw new Error('you must provide env. variables: [BUCKET, KEY, SECRET]');
 //   }
   const filesToUpload = await getFiles(path.resolve(__dirname, upload));
   const dirPath = 'collection-nfts/'+folderName
   const result = await uploadFilesToS3(filesToUpload, dirPath)
-  return {s3DirPath:dirPath}
+  fs.rmSync(removeFolderPath, { recursive: true, force: true });
+  fs.rmSync(removeFolderName, {
+    recursive: true,
+    force: true,
+  });
+  return true
 }
 
 module.exports = {
