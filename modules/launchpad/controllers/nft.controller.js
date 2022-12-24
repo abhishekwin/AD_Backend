@@ -363,14 +363,15 @@ const getBaseWebDataUsingAxios = async (url, count = 0) => {
 };
 
 const getS3JsonFile = catchAsync(async (req, res) => {
-  const {tokenId, collectionId} = req.body
+  const {tokenId, collectionAddress, networkId } = req.query
   let creator = req.userData.account.toLowerCase();
-  const result = await LaunchPadNft.findOne({tokenId:tokenId, collectionId:collectionId, isMint:true, creator:creator })
+  const result = await LaunchPadNft.findOne({tokenId:tokenId, collectionAddress:collectionAddress, isMint:true, creator:creator, networkId:networkId })
   if(!result){
     return res
     .status(400)
     .send(new ResponseObject(400, "Nft not found"));
   }
+  let collectionId = result.collectionId
   const collectionDetails = await LaunchPadCollection.findOne({_id:collectionId, s3URIStatus:"completed"})
   if(!collectionDetails){
     return res
@@ -392,7 +393,7 @@ const getS3JsonFile = catchAsync(async (req, res) => {
 
   res
     .status(200)
-    .send(new ResponseObject(200, "JSON display successfully", jsonData));
+    .send(jsonData);
 });
 
 const createStaticNft = catchAsync(async (req, res) => {
