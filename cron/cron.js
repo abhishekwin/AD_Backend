@@ -9,11 +9,6 @@ const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEther
 const {launchPadCreatedEventsBsc} = require('./launchpad/launchPadCreatedEventsBsc')
 const {launchPadCreatedEventsEthereum} = require('./launchpad/launchPadCreatedEventsEthereum')
 const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
-const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
-const {failNftUsingCollectionFuncation} = require('./launchpad/launchPadFailNftsUsingCollection')
-
-const {launchpadMintCountTransferEventBsc} = require('./launchpad/mintCountTransferEventBsc')
-const {launchpadMintCountTransferEventEthereum} = require('./launchpad/mintCountTransferEventEth')
 
 function sleep(ms) {
     return new Promise((resolve) => {
@@ -35,21 +30,6 @@ const startCronForNftImage = async () => {
 
 const launchpadTransferEventCron = async () => {
     
-    // try {
-    //     // console.log("start collection on sale event")
-    //     await launchpadTransferEventBsc();
-    // }
-    // catch (e) {
-    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    // } 
-    // try {
-    //     // console.log("start collection on sale event")
-    //     await launchpadTransferEventEthereum();
-    // }
-    // catch (e) {
-    //     // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
-    // } 
-
     try {
         // console.log("start collection on sale event")
         await launchPadCreatedEventsBsc();

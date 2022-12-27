@@ -14,7 +14,6 @@ const createCollectionValidation = {
     royalties: Joi.number().strict().required(),
     imageCover: Joi.string().required(),
     bannerImages: Joi.string().required(),
-    isWhiteListedUser: Joi.boolean().strict().required(),
     creator: Joi.string().required(),
     owner: Joi.string().required(),
     currency: Joi.string().optional(),

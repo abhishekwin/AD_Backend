@@ -53,15 +53,12 @@ collectionPhaseSchema.set("toJSON", { getters: true, virtuals: true });
 collectionPhaseSchema.plugin(toJSON);
 collectionPhaseSchema.plugin(paginate);
 
-// const CollectionCurrencyDetails = mongoose.model(
-//   "LaunchPadCollectionCurrencyDetails",
-//   CurrencyDetailsSchema
-// );
-
-// const CurrencyDetailsForWhiteListed= mongoose.model(
-//   "LaunchPadCurrencyDetailsForWhiteListed",
-//   CurrencyDetailsForWhiteListedSchema
-// );
+collectionPhaseSchema.virtual('currencyDetails', {
+  ref: 'LaunchPadCollectionCurrencyDetails',
+  localField: '_id',
+  foreignField: 'phaseId',
+  justOne: false
+});
 
 const CollectionPhase = mongoose.model(
   "LaunchPadCollectionPhase",

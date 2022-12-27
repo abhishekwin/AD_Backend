@@ -382,6 +382,12 @@ const getCollection = async (req, res) => {
       {
         path: "nftCount",
       },
+      {
+        path: "phases",
+        populate:[{
+          path: "currencyDetails",
+        }]
+      },
     ]).lean();
 
     if (result && result.isWhiteListed) {
