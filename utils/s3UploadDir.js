@@ -63,7 +63,7 @@ async function uploadDirToS3(upload, folderName, removeFolderPath, removeFolderN
     recursive: true,
     force: true,
   });
-  //await LaunchPadCollection.findOneAndUpdate({s3URI:dirPath},{s3URIStatus:"completed"})
+  await LaunchPadCollection.findOneAndUpdate({s3URI:dirPath},{s3URIStatus:"completed"})
   return true
 }
 
