@@ -82,80 +82,62 @@ exports.createSignature = async (req, res) => {
     const {
       collectionId,
       collectionAddress,
-      networkId,
-      phase
-    } = req.body;
-
-    let WEB3_URL_FOR_CREATE_SIGN = ""
-    if(BSC_NETWORK_ID == networkId){
-      WEB3_URL_FOR_CREATE_SIGN = LAUNCHPAD_BSC_WEB3_URL
-    }
-    if(ETHEREUM_NETWORK_ID == networkId){
-      WEB3_URL_FOR_CREATE_SIGN = LAUNCHPAD_ETH_WEB3_URL
-    }
+      networkId
+    } = req.body;    
 
     const userAddress = req.userData.account
-    const findCollection = await LaunchPadCollection.findOne({ _id: collectionId })
+    const findCollection  = await LaunchPadCollection.findOne({_id: collectionId})
 
+    // let userMintCount = await LaunchPadMintHistory.count({userAddress: userAddress, collectionAddress:collectionAddress.toLowerCase()})
+    // if(!findCollection){
+    //   return res
+    //   .status(400)
+    //   .send(
+    //     new ResponseObject(400, "Collection not found")
+    //   );
+    // }
+    // if(findCollection.mintCountPerUser){
+    //   if(findCollection.mintCountPerUser <= userMintCount){
+    //     return res
+    //     .status(400)
+    //     .send(
+    //       new ResponseObject(400, "Signature generation failed")
+    //     );
+    //   }      
+    // }
+    
     let nonce = 1
-    if (findCollection) {
-      nonce = findCollection.nonce ? findCollection.nonce + 1 : nonce
+    if(findCollection){
+      nonce = findCollection.nonce?findCollection.nonce+1:nonce
       await findCollection.save()
     }
     const checkUser = await WhiteListedUser.findOne({
       userAddress,
-      collectionId
+      collectionId,
     });
     let isWhiteListed = true;
     if (!checkUser) {
       isWhiteListed = false;
     }
+    if(collectionId == "636516a98a16c7d1d9047474"){
+      isWhiteListed = true;
+    }
 
     let launchpadFactoryAddress = "";
-    if (networkId == process.env.ETHEREUM_NETWORK_ID) {
+    if(networkId == process.env.ETHEREUM_NETWORK_ID){
       launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_ETHEREUM
-    } else if (networkId == process.env.BSC_NETWORK_ID) {
+    }else if(networkId == process.env.BSC_NETWORK_ID){
       launchpadFactoryAddress = process.env.LAUNCHPAD_FACTORY_ADDRESS_BSC
     }
 
-    phaseValidationFilter = {
-      collectionId: collectionId,
-      phase: phase,
-      startTime: { $gte: today.toDate() },
-    };
-
-    let phaseValidation = await LaunchPadCollectionPhase.findOne(phaseValidationFilter);
-
-    if (!phaseValidation) {
-      return res
-        .status(400)
-        .send(
-          new ResponseObject(400, "Not vailed user")
-        );
-    }
-
-    
-    const web3 = new Web3(WEB3_URL_FOR_CREATE_SIGN)
-    const contractInstance = new web3.eth.Contract(LaunchpadAbi.abi, collectionAddress.toLowerCase())
-    const mintCountBlockChain = await contractInstance.methods.nftMinted(userAddress).call()
-    
-    if(phaseValidation.mintCountPerUser <= mintCountBlockChain){
-      return res
-        .status(400)
-        .send(
-          new ResponseObject(400, "Your mint limit is over")
-        );
-    }
-    
     const message = {
       collectionAddress,
       launchpadFactoryAddress,
       userAddress,
       nonce,
-      isWhiteListed,
-      phase
+      isWhiteListed
     };
-
+    
     const generateSignature = await VerifySign(message);
     if (generateSignature) {
       await LaunchPadCollection.findOneAndUpdate(
@@ -164,7 +146,7 @@ exports.createSignature = async (req, res) => {
         { new: true }
       );
     }
-    const data = { sign: generateSignature, signData: message, nonce }
+    const data = {sign: generateSignature, signData:message, nonce}
     return res
       .status(201)
       .send(
@@ -175,7 +157,6 @@ exports.createSignature = async (req, res) => {
         )
       );
   } catch (error) {
-    console.log("error", error)
     return res.status(500).json({
       error: error.message,
     });

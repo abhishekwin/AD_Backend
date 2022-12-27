@@ -90,7 +90,6 @@ const createNftWithTokenUri = async (data) => {
 }
 
 const createCollection = catchAsync(async (req, res) => {
-  // console.log(createCollection,">>>>>>>>>>>>>>>>>>");
   // const findCoolTime = await LaunchPadCoolTime.findOne({
   //   userAddress: req.userData.account.toLowerCase(),
   // });
@@ -114,44 +113,40 @@ const createCollection = catchAsync(async (req, res) => {
   // }
 
   //validation 
-
-  if (req.body.currencyDetails && req.body.currencyDetails.length > 0) {
+  if(req.body.currencyDetails.length > 0){
     for (currencyDetail of req.body.currencyDetails) {
-      // console.log(currencyDetail,">><><><><><><<<");
       let result = await LaunchPadCurrency.findOne({
-        name: currencyDetail.currency,
-        address: currencyDetail.address,
-        symbol: currencyDetail.symbol,
+        name:currencyDetail.currency,
+        address:currencyDetail.address,
+        symbol:currencyDetail.symbol,
       })
-      if (!result) {
+      
+      if(!result){
         return res
-          .status(400)
-          .send(new ResponseObject(400, "Currency not exist"));
+        .status(400)
+        .send(new ResponseObject(400, "Currency not exist"));
       }
     }
   }
-  if (req.body.currencyDetailsForWhiteListed && req.body.currencyDetailsForWhiteListed.length > 0) {
+  if(req.body.currencyDetailsForWhiteListed.length > 0){
     for (currencyWhiteListedDetail of req.body.currencyDetailsForWhiteListed) {
       let result = await LaunchPadCurrency.findOne({
-        name: currencyWhiteListedDetail.currency,
-        address: currencyWhiteListedDetail.address,
-        symbol: currencyWhiteListedDetail.symbol,
+        name:currencyWhiteListedDetail.currency,
+        address:currencyWhiteListedDetail.address,
+        symbol:currencyWhiteListedDetail.symbol,
       })
-
-      if (!result) {
+      
+      if(!result){
         return res
-          .status(400)
-          .send(new ResponseObject(400, "Currency not exist"));
+        .status(400)
+        .send(new ResponseObject(400, "Currency not exist"));
       }
     }
   }
-
+ 
   req.body.creator = req.userData.account;
   const result = await Collection.createCollectionService(req.body);
   const collectionId = result._id;
-
-  // cool time work start
-
   // if (findCoolTime) {
   //   findCoolTime.collectionAddress = result.collectionAddress;
   //   findCoolTime.time = new Date();
@@ -164,54 +159,12 @@ const createCollection = catchAsync(async (req, res) => {
   //     time: new Date(),
   //   });
   // }
-
-  // let collectionPhase = [];
-  // for (colPhase of req.body.CollectionPhase){
-  //   collectionPhase.push({phaseId,startTime,endTime,isWhiteListed})
-  // }
-  // await CollectionPhase.insertMany(collectionPhase)
-
-  // cool time work end
-
-  let insertPhases = [];
-  for (phase of req.body.phases) {
-    insertPhases.push({
-      collectionId,
-      phase: phase.phase,
-      startTime: phase.startTime ? phase.startTime : null,
-      endTime: phase.endTime ? phase.endTime : null,
-      mintCountPerUser: phase.mintCountPerUser ? phase.mintCountPerUser : null,
-      mintCountPerTransaction: phase.mintCountPerTransaction ? phase.mintCountPerTransaction : null,
-      isWhiteListedUser: phase.isWhiteListedUser ? phase.isWhiteListedUser : false,
-      currencyDetails: phase.currencyDetails ? phase.currencyDetails : null,
-      currencyDetailsForWhiteListed: phase.currencyDetailsForWhiteListed ? phase.currencyDetailsForWhiteListed : null,
-      whiteListedUsers: phase.whiteListedUsers
-    });
+  let WhiteListUser = [];
+  for (userAddress of req.body.WhiteListedUser) {
+    WhiteListUser.push({ collectionId, userAddress });
   }
+  await WhiteListedUser.insertMany(WhiteListUser);
 
-  const insertPhasesCurrencies = []
-  const insertPhasesWhiteListedCurrencies = []
-  const whiteListUsers = []
-  if (insertPhases && insertPhases.length > 0) {
-    for (const iterator of insertPhases) {
-      let phaseresult = await LaunchPadCollectionPhase.create(iterator)
-      for (const currencyDetail of iterator.currencyDetails) {
-        let obj = { phaseId: phaseresult._id, ...currencyDetail }
-        insertPhasesCurrencies.push(obj)
-      }
-      for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
-        let obj = { phaseId: phaseresult._id, ...whiteListedCurrencyDetail }
-        insertPhasesWhiteListedCurrencies.push(obj)
-      }
-      for (const userAddress of iterator.whiteListedUsers) {
-        whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
-      }
-    }
-  }
-  await LaunchPadCollectionCurrencyDetails.insertMany(insertPhasesCurrencies)
-  await LaunchPadCollectionCurrencyDetailsForWhiteListed.insertMany(insertPhasesWhiteListedCurrencies)
-  await WhiteListedUser.insertMany(whiteListUsers);
-  //process.exit();
 
   res
     .status(200)
