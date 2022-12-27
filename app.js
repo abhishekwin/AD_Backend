@@ -29,9 +29,9 @@ const { dumpDataBase} = require("./cron/mongodbDump");
 let timeout = require('connect-timeout');
 
 
-Sentry.init({
-  dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095",
-});
+// Sentry.init({
+//   dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095",
+// });
 
 const port = parseInt(process.env.PORT || "8080");
 app.set("port", port);
