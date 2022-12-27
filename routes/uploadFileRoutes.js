@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { checkToken } = require("../middleware/auth");
 const { uploadUserPhoto } = require("../middleware/uploadfile");
+var timeout = require('connect-timeout')
 const {
   uploadFile,
   uploadJson,
@@ -28,6 +29,6 @@ const upload = multer({ storage })
 router.post("/uploadFile", upload.single("file"), uploadFile);
 
 router.post("/uploadJosn", uploadJson);
-router.post("/uploadMultiJsonData", upload.single("metadata"), uploadMultiJsonData);
+router.post("/uploadMultiJsonData", timeout('300s'), upload.single("metadata"), uploadMultiJsonData);
 router.post("/pinHash", pinHash);
 module.exports = router;

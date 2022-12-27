@@ -43,10 +43,9 @@ app.use(cors(), function (req, res, next) {
   next();
 });
 
-app.use(function(req, res, next) {
-  res.setTimeout(100000);
-  next();
-});
+app.use(haltOnTimedout)
+app.use(haltOnTimedout)
+
 app.use("/api", uploadFileRoutes);
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
@@ -108,6 +107,11 @@ cron.schedule(`0 */${process.env.DB_BACKUP_START} * * *`, () => {
 // cron.schedule('*/05 * * * * *', () => {
 //   //startCron()
 // });
+
+
+function haltOnTimedout (req, res, next) {
+  if (!req.timedout) next()
+}
 
 app.listen(port).on("error", function (err) {
   console.log("err", err);
