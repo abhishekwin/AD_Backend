@@ -147,7 +147,7 @@ module.exports = {
   uploadMultiJsonData: async (req, res) => {
     try {      
       let filedatas = getjson(req.file);
-      //filedatas = await helpers.shuffle(filedatas);
+      filedatas = await helpers.shuffle(filedatas);
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
         if(uploadedData.count == filedatas.length){

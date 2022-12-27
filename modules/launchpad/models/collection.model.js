@@ -255,6 +255,13 @@ collectionSchema.virtual('nftCount', {
   count: true
 });
 
+collectionSchema.virtual('phases', {
+  ref: 'LaunchPadCollectionPhase',
+  localField: '_id',
+  foreignField: 'collectionId',
+  justOne: false
+});
+
 
 // collectionSchema.pre('find', function() {
 //     this.where({ deletedAt: null });
