@@ -1213,6 +1213,24 @@ const unHideMultipuleCollection = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection unhide successfully", collectionIds));
 });
 
+const getBaseUri = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  let { networkId, collectionAddress } = req.body
+  collectionAddress = collectionAddress.toLowerCase()
+  let result = await LaunchPadCollection.findOne({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }).select('tokenURI')
+  if(!result){
+    return res
+      .status(400)
+      .send(new ResponseObject(400, "Collection not found"));
+  }
+  const response = {
+    baseUri:result.tokenURI
+  } 
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection unhide successfully", response));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -1244,5 +1262,6 @@ module.exports = {
   hideMultipuleCollection,
   unHideMultipuleCollection,
   getAllCollectionForAdmin,
-  getStatsWithMultiFilter
+  getStatsWithMultiFilter,
+  getBaseUri
 };

@@ -1082,7 +1082,7 @@ module.exports = {
       const token = await jwt.sign(
         { _id: user._id, account: user.account },
         process.env.SECRET,
-        { expiresIn: "300s" }
+        { expiresIn: "3600s" }
       );
       return res.status(200).json({
         data: { user, token },

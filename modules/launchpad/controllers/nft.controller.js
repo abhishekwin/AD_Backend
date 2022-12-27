@@ -364,10 +364,11 @@ const getBaseWebDataUsingAxios = async (url, count = 0) => {
 
 const getS3JsonFile = catchAsync(async (req, res) => {
 
-  let {tokenId, collectionAddress, networkId } = req.query
+  let {fileName, collectionAddress, networkId } = req.params
+  let tokenId = fileName.replace(".json", "")
   collectionAddress = collectionAddress.toLowerCase();
-  let creator = req.userData.account.toLowerCase();
-  const result = await LaunchPadNft.findOne({tokenId:tokenId, collectionAddress:collectionAddress, isMint:true, creator:creator, networkId:networkId })
+  //let creator = req.userData.account.toLowerCase();
+  const result = await LaunchPadNft.findOne({tokenId:tokenId, collectionAddress:collectionAddress, isMint:true, networkId:networkId })
   if(!result){
     return res
     .status(400)

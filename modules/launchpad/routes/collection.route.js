@@ -153,4 +153,8 @@ router
   .route("/unhide-multipule-collection")
   .post(checkToken, checkAdminToken, collectionController.unHideMultipuleCollection);
   
+  router
+  .route("/get-base-uri")
+  .post(checkToken, collectionController.getBaseUri);
+
 module.exports = router;
