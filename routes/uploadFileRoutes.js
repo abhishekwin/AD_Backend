@@ -29,6 +29,6 @@ const upload = multer({ storage })
 router.post("/uploadFile", upload.single("file"), uploadFile);
 
 router.post("/uploadJosn", uploadJson);
-router.post("/uploadMultiJsonData", timeout('300s'), upload.single("metadata"), uploadMultiJsonData);
+router.post("/uploadMultiJsonData", timeout('500s'), upload.single("metadata"), uploadMultiJsonData);
 router.post("/pinHash", pinHash);
 module.exports = router;
