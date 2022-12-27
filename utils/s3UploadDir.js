@@ -5,6 +5,9 @@ const AWS = require('aws-sdk');
 const readdir = require('recursive-readdir');
 require("dotenv").config({ path: "../.env" });
 const bucketName = process.env.AWS_S3_BUCKET
+const {
+  LaunchPadCollection
+} = require("../modules/launchpad/models");
 
 const { BUCKET, KEY, SECRET } = process.env;
 const s3 = new AWS.S3({
@@ -47,14 +50,20 @@ async function uploadFilesToS3(filesToUpload, dirPath){
       });
 }
 
-async function uploadDirToS3(upload, folderName) {
+async function uploadDirToS3(upload, folderName, removeFolderPath, removeFolderName) {
 //   if (!BUCKET || !KEY || !SECRET) {
 //     throw new Error('you must provide env. variables: [BUCKET, KEY, SECRET]');
 //   }
   const filesToUpload = await getFiles(path.resolve(__dirname, upload));
   const dirPath = 'collection-nfts/'+folderName
-  const result = await uploadFilesToS3(filesToUpload, dirPath)
-  return {s3DirPath:dirPath}
+  await uploadFilesToS3(filesToUpload, dirPath)
+  fs.rmSync(removeFolderPath, { recursive: true, force: true });
+  fs.rmSync(removeFolderName, {
+    recursive: true,
+    force: true,
+  });
+  await LaunchPadCollection.findOneAndUpdate({s3URI:dirPath},{s3URIStatus:"completed"})
+  return true
 }
 
 module.exports = {
