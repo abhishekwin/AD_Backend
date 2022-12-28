@@ -341,7 +341,7 @@ const getCollection = async (req, res) => {
           path: "currencyDetails",
         }]
       },
-    ]).lean();
+    ]).lean().select('-tokenURI');
 
     if (result && result.isWhiteListed) {
       if (result.endDate <= await getUTCDate()) {
