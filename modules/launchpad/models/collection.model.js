@@ -205,6 +205,10 @@ const collectionSchema = mongoose.Schema(
     failedNftsCheckCount:{
       type: Number,
       default: 0,
+    },
+    isReveal:{
+      type: Boolean,
+      default: false,
     }
   },
   {

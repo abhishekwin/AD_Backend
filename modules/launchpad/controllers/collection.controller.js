@@ -1182,6 +1182,7 @@ const getBaseUri = catchAsync(async (req, res) => {
       .status(400)
       .send(new ResponseObject(400, "Collection not found"));
   }
+  await LaunchPadCollection.findOneAndUpdate({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }, {isReveal:true})
   const response = {
     baseUri:result.tokenURI
   } 
