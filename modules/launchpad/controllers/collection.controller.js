@@ -837,7 +837,7 @@ const getLatestCollection = async (req, res) => {
         networkName: req.body.networkName
       }
     }
-    const lanchpadCollection = await LaunchPadCollection.find(filter).sort({ created_at: -1 }).limit(4);
+    const lanchpadCollection = await LaunchPadCollection.find(filter).select('-tokenURI').sort({ created_at: -1 }).limit(4);
     // let creator = lanchpadCollection.map((item) => {
     //   if (item.creator != null) {
     //     return item.creator;
