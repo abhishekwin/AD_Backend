@@ -52,6 +52,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api", tableQuery);
 
 app.use("/api/launchpad", routes);
+app.use("/meta-data", routes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
