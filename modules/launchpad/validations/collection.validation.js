@@ -67,10 +67,26 @@ const collectionCreatorUsersValidation = {
   }),
 };
 
+const getBaseUri = {
+  body: Joi.object().keys({
+    networkId:Joi.number().required(),
+    collectionAddress: Joi.string().required(),
+  }),
+};
+
+const updateBaseUriFlag = {
+  body: Joi.object().keys({
+    networkId:Joi.number().required(),
+    collectionAddress: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createCollectionValidation,
   updateCollectionValidation,
   topCreatorValidation,
   collectionCreatorUsersValidation,
   getStatsWithMultiFilter,
+  getBaseUri,
+  updateBaseUriFlag
 };

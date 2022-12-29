@@ -1182,13 +1182,23 @@ const getBaseUri = catchAsync(async (req, res) => {
       .status(400)
       .send(new ResponseObject(400, "Collection not found"));
   }
-  await LaunchPadCollection.findOneAndUpdate({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }, {isReveal:true})
   const response = {
     baseUri:result.tokenURI
   } 
   res
     .status(200)
-    .send(new ResponseObject(200, "Collection unhide successfully", response));
+    .send(new ResponseObject(200, "Base uri display successfully", response));
+});
+
+const updateBaseUriFlag = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  let { networkId, collectionAddress } = req.body
+  collectionAddress = collectionAddress.toLowerCase()
+  const result = await LaunchPadCollection.findOneAndUpdate({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }, {isReveal:true}, {new:true})
+  
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Collection updated successfully", result));
 });
 
 module.exports = {
@@ -1223,5 +1233,6 @@ module.exports = {
   unHideMultipuleCollection,
   getAllCollectionForAdmin,
   getStatsWithMultiFilter,
-  getBaseUri
+  getBaseUri,
+  updateBaseUriFlag
 };

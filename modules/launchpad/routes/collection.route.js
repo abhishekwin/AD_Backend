@@ -6,7 +6,9 @@ const {
   updateCollectionValidation,
   topCreatorValidation,
   collectionCreatorUsersValidation,
-  getStatsWithMultiFilter
+  getStatsWithMultiFilter,
+  getBaseUri,
+  updateBaseUriFlag
 } = require("../validations/collection.validation");
 const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
@@ -155,6 +157,10 @@ router
   
   router
   .route("/get-base-uri")
-  .post(checkToken, collectionController.getBaseUri);
+  .post(checkToken, validate(getBaseUri), collectionController.getBaseUri);
+
+  router
+  .route("/update-base-uri-flag")
+  .post(checkToken, validate(updateBaseUriFlag), collectionController.updateBaseUriFlag);
 
 module.exports = router;
