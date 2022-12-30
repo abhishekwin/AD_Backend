@@ -10,6 +10,9 @@ const {launchPadCreatedEventsBsc} = require('./launchpad/launchPadCreatedEventsB
 const {launchPadCreatedEventsEthereum} = require('./launchpad/launchPadCreatedEventsEthereum')
 const {launchpadCollectionEnd} = require('./launchpad/launchPadCollectionEnd')
 
+const { launchpadMintRangeBsc } = require("./launchpad/transferMintRangeBsc");
+const { launchpadMintRangeETH } = require("./launchpad/transferMintRangeEth");
+
 function sleep(ms) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
@@ -77,10 +80,38 @@ const ethMint = async () => {
     ethMint()
 }
 
+const bscMintRange = async () => {
+    let interval;
+    try {
+        await launchpadMintRangeBsc();
+        clearInterval(interval)
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+   bscMintRange()
+    
+}
+
+const ethMintRange = async () => {
+    let interval;
+    try {
+        await launchpadMintRangeETH();
+        clearInterval(interval)
+    }
+    catch (e) {
+        // console.log("&&&&&&&&&&&&&&&&&&& sold ", e)
+    }
+    ethMintRange()
+    
+}
+
+ethMintRange();
+bscMintRange();
 launchpadTransferEventCron();
 startCronForNftImage()
-bscMint(),
-ethMint(),
+bscMint();
+ethMint();
 
 // createLaunchpadNfts(),
 // failLaunchpadNfts(),

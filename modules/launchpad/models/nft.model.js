@@ -171,6 +171,36 @@ const nftSchema = mongoose.Schema(
     deletedAt:{
       type: Date,
       default: null,
+    },
+
+    subgraphRange: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    subgraphMintCurrency: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    subgraphMintTime: {
+      type: Number,
+      trim: true,
+      default: null
+    },
+    subgraphMintId: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    subgraphMintFee: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    isSubgraphMinted: {
+      type: Boolean,
+      default: false,
     }
   },
   {

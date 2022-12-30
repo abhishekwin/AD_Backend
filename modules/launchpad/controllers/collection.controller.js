@@ -7,6 +7,10 @@ const catchAsync = require("../../../utils/catchAsync");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
+const moment = require('moment')
+
+const { BSC_NETWORK_ID } = process.env;
+
 
 const {
   LaunchPadCollection,
@@ -20,7 +24,8 @@ const {
   LaunchPadCollectionPhase,
   LaunchPadCollectionCurrencyDetailsForWhiteListed,
   LaunchPadCollectionCurrencyDetails,
-  LaunchPadPinataUploadManager
+  LaunchPadPinataUploadManager,
+  LaunchPadMintRangeHistory
 } = require("../models");
 
 // const {LaunchPadCollectionPhase } = require("../models/collectionPhase.model");
@@ -28,6 +33,8 @@ const { Users } = require("../../../models");
 const { getAdminAddress } = require("../../helpers/adminHelper");
 const customPagination = require("../../comman/customPagination");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
+const { off } = require("../models/collection.model");
+const { getEthToUsdt } = require("../../comman/coincapmarket");
 
 
 const getBaseWebData = async (url) => {
@@ -783,26 +790,53 @@ const stashAllCollectionHeader = async (req, res) => {
 
 const getStatsWithMultiFilter = async (req, res) => {
   try {
-    const { networkId } = req.body
+    const { networkId, currency, time } = req.body
     let filter = { approved: true, deletedAt: null };
     if (networkId) {
-      filter = { ...filter, networkId: networkId }
+      filter = { ...filter, networkId: Number(networkId) }
     }
-    const launchPadCollection = await LaunchPadCollection.find(filter).populate([{
-      path: 'nfts'
-    }])
-
-    let response = [];
-    let count = 0;
-    for (const iterator of launchPadCollection) {
-      response.push({
-        contractName: iterator.contractName,
-        tokenURI: iterator.tokenURI,
-        imageCover: iterator.imageCover,
-        bannerImages: iterator.bannerImages
-      })
+    if (currency) {
+      // filter = { ...filter, currency: currency }
+    }
+    if(time?.from) {
+      filter = {...filter, subgraphMintTime: { $gte: time.from, $lte: time.to }}
+    } else {
+      filter = {...filter, subgraphMintTime: {$ne: null}}
+    }
+   
+    const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
+    const uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
+    const currencyData = await LaunchPadCurrency.find();
+    let collectionAddresses = [];
+    for (const iterator of uniqueCollectionAddress) {
+      let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator }).select("contractName imageCover bannerImages");
+      let floor = 0;
+      let volume = 0;
+      let globalSymbol = '';
+      for (const currency of currencyData) {
+        const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
+        if (collectionAddreeWithCurrency.length > 0) {
+          const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
+          let symbol = currency.symbol.toLowerCase()
+          if (currency === '0x0000000000000000000000000000000000000000') {
+            if (netId === parseInt(BSC_NETWORK_ID, 10)) {
+              symbol = 'bnb';
+            } else {
+              symbol = 'eth';
+            }
+          }
+          globalSymbol= symbol;
+          const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
+          floor += totalMintFee;
+          const usdValue = await getEthToUsdt(totalMintFee, symbol);
+          volume += usdValue.data?.[symbol]?.quote?.USD?.price || 0;
+        }
+      }
+      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol };
+      collectionAddresses = [ ...collectionAddresses, collectionAddress ];
     }
 
+    let response = collectionAddresses;
     return res
       .status(200)
       .send(

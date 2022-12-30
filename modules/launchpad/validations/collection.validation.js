@@ -51,9 +51,16 @@ const updateCollectionValidation = {
 
 const getStatsWithMultiFilter = {
   body: Joi.object().keys({
-    networkId: Joi.number().required()
+    networkId: Joi.string().valid("5", "97", ""),
+    currency: Joi.string().valid("ETH", "BNB", "SAFEMOON", "DOGE", "USDC", "AD", ""),
+    time: Joi.object().keys({
+      from: Joi.number().required(),
+      to: Joi.number().required()
+    }).required()
+    
   }),
-}
+};
+
 const topCreatorValidation = {
   body: Joi.object().keys({
     userAddresses: Joi.array().required(),

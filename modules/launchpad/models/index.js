@@ -15,6 +15,7 @@ module.exports.LaunchPadCollectionPhase = require('./collectionPhase.model')
 module.exports.LaunchPadCollectionCurrencyDetailsForWhiteListed = require('./collectionCurrencyDetailsForWhiteListed.model')
 module.exports.LaunchPadCollectionCurrencyDetails = require('./collectionCurrencyDetails.model')
 module.exports.LaunchPadPinataUploadManager = require('./launchPadPinataUploadManager.model')
+module.exports.LaunchPadMintRangeHistory = require("./launchpadMintrange.model")
 
 
 
