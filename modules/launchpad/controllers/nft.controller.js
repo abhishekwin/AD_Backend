@@ -263,7 +263,7 @@ const getMyNftList = async (req, res) => {
 const nftDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const getNftDetail = await LaunchPadNft.findOne({ _id: id });
+    const getNftDetail = await LaunchPadNft.findOne({ _id: id }).select('-tokenURI');;
     if (!getNftDetail) {
       return res.status(400).send(new ResponseObject(400, "nft is not found"));
     }

@@ -14,7 +14,8 @@ const getLaunchPadNftList = async (filter, options, req) => {
     const tableData = await LaunchPadNft.find(filter)
       .sort({ [sort_by_name]: sort_by_order })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .select('-tokenURI');
   
     const row_count = await LaunchPadNft.count(filter);
   
