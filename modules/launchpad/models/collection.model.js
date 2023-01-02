@@ -88,6 +88,17 @@ const collectionSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
+    s3URI: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    s3URIStatus: {
+      type: String,
+      enum: [null, "in-progress", "ready-to-syncup", "syncing", "completed"],
+      trim: true,
+      default: null,
+    },
     imageCover: {
       type: String,
       trim: true,
@@ -194,6 +205,10 @@ const collectionSchema = mongoose.Schema(
     failedNftsCheckCount:{
       type: Number,
       default: 0,
+    },
+    isReveal:{
+      type: Boolean,
+      default: false,
     }
   },
   {
@@ -230,12 +245,27 @@ collectionSchema.virtual('userMintCount', {
   count: true
 });
 
+collectionSchema.virtual('nfts', {
+  ref: 'LaunchPadNft',
+  localField: '_id',
+  foreignField: 'collectionId',
+  justOne: false
+});
+
 collectionSchema.virtual('nftCount', {
   ref: 'LaunchPadNft',
   localField: '_id',
   foreignField: 'collectionId',
   count: true
 });
+
+collectionSchema.virtual('phases', {
+  ref: 'LaunchPadCollectionPhase',
+  localField: '_id',
+  foreignField: 'collectionId',
+  justOne: false
+});
+
 
 // collectionSchema.pre('find', function() {
 //     this.where({ deletedAt: null });
@@ -254,6 +284,7 @@ collectionSchema.virtual('whiteListedUsersInArray').get(function () {
   }  
   return whiteListedUsers;
 });
+
 
 // add plugin that converts mongoose to json
 collectionSchema.set("toJSON", { getters: true, virtuals: true });

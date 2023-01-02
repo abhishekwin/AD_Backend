@@ -57,7 +57,7 @@ const manageData = async (transferdata) => {
      
       const index = parseInt(data.tokenId)-1;
       let nft = findNft[index];
-
+      console.log("eth-index", data.collection_address, "---", index)
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(
@@ -143,6 +143,7 @@ const launchpadTransferEventEthereum = async (from = 0, gt = 0) => {
     let transferdata = await transferFunctionQuery(from, gt);
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
+      console.log("ethtransferdata", transferdata)
       await manageData(transferdata);
       if (transferdata.length >= 100) {
         gt = gt + 100;

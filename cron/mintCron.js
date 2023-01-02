@@ -1,5 +1,3 @@
-const {launchpadTransferEventBsc} = require('./launchpad/transferEventBsc')
-const {launchpadTransferEventEthereum} = require('./launchpad/transferEventEthereum')
 const {createNftUsingCollectionFuncation} = require('./launchpad/launchPadCreateNftsUsingCollection')
 const {failNftUsingCollectionFuncation} = require('./launchpad/launchPadFailNftsUsingCollection')
 
@@ -35,6 +33,4 @@ async function cronRun(){
     cronRun()
 } 
 cronRun()
-
-
 

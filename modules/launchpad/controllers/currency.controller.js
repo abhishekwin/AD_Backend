@@ -30,6 +30,7 @@ const createCurrency = async (req, res) => {
 const getCurrency = async (req, res) => {
     try {
         const currencies = await LaunchPadCurrency.find().sort({ position: 1 })
+        console.log(currencies,"FFFFFFFFFFFFFF");
         return res
             .status(200)
             .send(new ResponseObject(200, "Get all Curreency", currencies));

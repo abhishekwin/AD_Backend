@@ -1,4 +1,6 @@
 const createError = require("http-errors");
+const mongoose = require('mongoose')
+mongoose.set('strictQuery', true);
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -21,15 +23,8 @@ const collectionERC721Abi = require("./config/collectionERC721.json");
 // const { webOnSaleEvent } = require('./cron/onsaleevent');
 // const { webOnTransferEvent } = require('./cron/onTransferEvent');
 const app = express();
-const Sentry = require("@sentry/node");
-const SentryTracing = require("@sentry/tracing");
 const { dumpDataBase} = require("./cron/mongodbDump");
 let timeout = require('connect-timeout');
-
-
-Sentry.init({
-  dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095",
-});
 
 const port = parseInt(process.env.PORT || "8080");
 app.set("port", port);
@@ -47,19 +42,17 @@ app.use(cors(), function (req, res, next) {
   );
   next();
 });
-app.use(Sentry.Handlers.requestHandler());
-// app.use(expressUpload());
 
-app.use(function(req, res, next) {
-  res.setTimeout(100000);
-  next();
-});
+app.use(haltOnTimedout)
+app.use(haltOnTimedout)
+
 app.use("/api", uploadFileRoutes);
 app.use("/api", usersRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api", tableQuery);
 
 app.use("/api/launchpad", routes);
+app.use("/meta-data", routes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -82,12 +75,12 @@ app.use(function (err, req, res, next) {
 console.log(`server start on port : ${port}`);
 
 // Optional fallthrough error handler
-app.use(function onError(err, req, res, next) {
-  // The error id is attached to `res.sentry` to be returned
-  // and optionally displayed to the user for support.
-  res.statusCode = 500;
-  res.end(res.sentry + "\n");
-});
+// app.use(function onError(err, req, res, next) {
+//   // The error id is attached to `res.sentry` to be returned
+//   // and optionally displayed to the user for support.
+//   res.statusCode = 500;
+//   res.end(res.sentry + "\n");
+// });
 
 // cron.schedule('* * * * *', () => {
 //   console.log("---cron running---")
@@ -112,10 +105,14 @@ cron.schedule(`0 */${process.env.DB_BACKUP_START} * * *`, () => {
 });
 
 
-app.use(Sentry.Handlers.errorHandler());
 // cron.schedule('*/05 * * * * *', () => {
 //   //startCron()
 // });
+
+
+function haltOnTimedout (req, res, next) {
+  if (!req.timedout) next()
+}
 
 app.listen(port).on("error", function (err) {
   console.log("err", err);

@@ -13,10 +13,12 @@ const path = require("path");
 const { Nft } = require("../services");
 const { specialCharacter } = require("../../../helpers/RegexHelper");
 const { uploadDir } = require("../../../services/pinata");
+const axios = require("axios");
+const awsCdnUrl = process.env.AWS_CDN_URL
 
 const getjson = (file) => {
   const readableStreamForFile = fs.createReadStream(file.path);
-  const jsonString = fs.readFileSync(appDir+"/public/files/" + file.originalname);
+  const jsonString = fs.readFileSync(appDir + "/public/files/" + file.originalname);
   const jsondata = JSON.parse(jsonString);
   return jsondata;
 };
@@ -35,10 +37,10 @@ const uploadMultiJsonToPinata = async (req, res) => {
       console.log("Directory created successfully!");
     });
 
-    let folderPath = appDir  + `/public/${randomNum}`;
+    let folderPath = appDir + `/public/${randomNum}`;
     for (const data of filedatas) {
       let fileUploadPath = appDir + `/public/${randomNum}/` + count + ".json";
-      fs.writeFile(fileUploadPath, JSON.stringify(data), function (err) {});
+      fs.writeFile(fileUploadPath, JSON.stringify(data), function (err) { });
       count++;
     }
 
@@ -149,7 +151,7 @@ const getNftList = async (req, res) => {
     let filtercolumn = [];
 
     req.body.collectionAddress = { $ne: null }
-    filtercolumn.push("collectionAddress"); 
+    filtercolumn.push("collectionAddress");
 
     if (req.body.isSale || req.body.isSale === false) {
       filtercolumn.push("isSale");
@@ -158,12 +160,12 @@ const getNftList = async (req, res) => {
     if (collectionId) {
       filtercolumn.push("collectionId");
     }
-    
+
     if (req.body.owner) {
       filtercolumn.push("owner");
     }
 
-   
+
     let isAdmin = false;
     if (loginUserAddress) {
       isAdmin = await getAdminAddress(loginUserAddress);
@@ -208,9 +210,9 @@ const getMyNftList = async (req, res) => {
     const { collectionId, owner, loginUserAddress } = req.body;
 
     let filtercolumn = [];
-    
+
     req.body.collectionAddress = { $ne: null }
-    filtercolumn.push("collectionAddress"); 
+    filtercolumn.push("collectionAddress");
     req.body.creator = req.userData.account.toLowerCase();
     filtercolumn.push("creator");
 
@@ -228,7 +230,7 @@ const getMyNftList = async (req, res) => {
     if (req.body.networkId && req.body.networkName) {
       filtercolumn.push("networkId", "networkName");
     }
-    
+
     if (req.body.searchText) {
       let search = await specialCharacter(req.body.searchText);
       search = new RegExp(".*" + search + ".*", "i");
@@ -261,7 +263,7 @@ const getMyNftList = async (req, res) => {
 const nftDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const getNftDetail = await LaunchPadNft.findOne({ _id: id });
+    const getNftDetail = await LaunchPadNft.findOne({ _id: id }).select('-tokenURI');;
     if (!getNftDetail) {
       return res.status(400).send(new ResponseObject(400, "nft is not found"));
     }
@@ -278,7 +280,7 @@ const nftDetail = async (req, res) => {
 const getNftAttributes = async (req, res) => {
   try {
     const { collectionId, nftId } = req.body;
-   
+
     if (!collectionId) {
       return res.status(400).send(new ResponseObject(400, "Collection id is required"));
     }
@@ -286,22 +288,22 @@ const getNftAttributes = async (req, res) => {
       return res.status(400).send(new ResponseObject(400, "NFT id is required"));
     }
 
-    const nftsAttributes = await LaunchPadNft.findOne({_id: nftId}).select("attributes");
+    const nftsAttributes = await LaunchPadNft.findOne({ _id: nftId }).select("attributes");
     if (!nftsAttributes) {
       return res.status(400).send(new ResponseObject(400, "NFT not found"));
     }
     const attributesArray = nftsAttributes.attributes
-    
-    let allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId, isMint: true}).select("attributes");
-    
+
+    let allNftsAttributes = await LaunchPadNft.find({ collectionId: collectionId, isMint: true }).select("attributes");
+
     // if(isVisible == false){
     //   allNftsAttributes = await LaunchPadNft.find({collectionId: collectionId}).select("attributes");
     // }
 
-    if(allNftsAttributes.length == 0 ){
+    if (allNftsAttributes.length == 0) {
       return res.status(400).send(new ResponseObject(400, "Data not found"));
     }
-    
+
     const newArray = []
     for (const iterator of allNftsAttributes) {
       const attributes = iterator.attributes
@@ -311,29 +313,29 @@ const getNftAttributes = async (req, res) => {
     }
     const result = Object.values(newArray.reduce((item, index) => {
       let key = `${index.trait_type}|${index.value}`;
-      if(!item[key]) item[key] = {...index, count: 1}
+      if (!item[key]) item[key] = { ...index, count: 1 }
       else item[key].count += 1;
       return item;
     }, {}))
 
     const otherResult = Object.values(newArray.reduce((item, index) => {
       let key = `${index.trait_type}`;
-      if(!item[key]) item[key] = {...index, count: 1}
+      if (!item[key]) item[key] = { ...index, count: 1 }
       else item[key].count += 1;
       return item;
     }, {}))
-    
-   
+
+
     let newAttributesArray = []
     for (const iterator of attributesArray) {
       let objWithCount = result.find(item => item.trait_type == iterator.trait_type);
       iterator.count = objWithCount.count
       let otherObjWithCount = otherResult.find(item => item.trait_type == iterator.trait_type);
       iterator.totalCount = otherObjWithCount.count
-      iterator.percentage = objWithCount.count/otherObjWithCount.count*100
+      iterator.percentage = objWithCount.count / otherObjWithCount.count * 100
       newAttributesArray.push(iterator)
     }
-    
+
     return res
       .status(200)
       .send(new ResponseObject(200, "Attributes display successfully", newAttributesArray));
@@ -345,6 +347,74 @@ const getNftAttributes = async (req, res) => {
   }
 };
 
+const getBaseWebDataUsingAxios = async (url, count = 0) => {
+
+  let promise = new Promise(async function (resolve, reject) {
+    await axios.get(url)
+      .then(function (response) {
+        resolve(response.data)
+      })
+      .catch(function (error) {
+        console.log("error", error)
+        resolve(null)
+      })
+  });
+  return promise;
+};
+
+const getS3JsonFile = catchAsync(async (req, res) => {
+  let { fileName, collectionAddress, networkId } = req.params
+  let tokenId = fileName.replace(".json", "")
+  collectionAddress = collectionAddress.toLowerCase();
+  //let creator = req.userData.account.toLowerCase();
+  const result = await LaunchPadNft.findOne({ tokenId: tokenId, collectionAddress: collectionAddress, isMint: true, networkId: networkId })
+  if (!result) {
+    return res
+      .status(400)
+      .send(new ResponseObject(400, "Nft not minted"));
+  }
+  let collectionId = result.collectionId
+
+  const collectionDetails = await LaunchPadCollection.findOne({ _id: collectionId }).select('s3URI s3URIStatus tokenURI')
+  if (!collectionDetails) {
+    return res
+      .status(400)
+      .send(new ResponseObject(400, "Collection nft not found"));
+  }
+  let jsonUrl = collectionDetails.s3URI;
+  let s3UriStatus = collectionDetails.s3URIStatus;
+  let isNew = true;
+  if (isNew) {
+    if (!s3UriStatus && s3UriStatus != "completed") {
+      return res
+        .status(400)
+        .send(new ResponseObject(400, "Nft not found"));
+    }
+  }
+  if (!jsonUrl) {
+    isNew = false;
+    jsonUrl = collectionDetails.tokenURI
+  }
+  let jsonData = null
+  if (jsonUrl) {
+    let url = jsonUrl + "/" + tokenId + ".json";
+    if (isNew) {
+      url = awsCdnUrl + jsonUrl + "/" + tokenId + ".json";
+    }
+    jsonData = await getBaseWebDataUsingAxios(url)
+  }
+
+  if (!jsonData) {
+    return res
+      .status(400)
+      .send(new ResponseObject(400, "JSON not found"));
+  }
+
+  res
+    .status(200)
+    .send(jsonData);
+});
+
 const createStaticNft = catchAsync(async (req, res) => {
   const result = await LaunchPadNft.create(req.body)
   res
@@ -353,7 +423,7 @@ const createStaticNft = catchAsync(async (req, res) => {
 });
 
 const updateStaticNft = catchAsync(async (req, res) => {
-  const result = await LaunchPadNft.findOneAndUpdate({_id:req.body.id}, req.body, {
+  const result = await LaunchPadNft.findOneAndUpdate({ _id: req.body.id }, req.body, {
     new: true
   })
   res
@@ -363,17 +433,17 @@ const updateStaticNft = catchAsync(async (req, res) => {
 
 const updateManyStaticNft = catchAsync(async (req, res) => {
   let filter = req.body.filter
-  if(!filter){
+  if (!filter) {
     return res.status(400).send(new ResponseObject(400, "Please provide update filter"));
   }
-  if(Object.keys(filter).length == 0){
+  if (Object.keys(filter).length == 0) {
     return res.status(400).send(new ResponseObject(400, "Please provide update filter"));
   }
 
   const results = await LaunchPadNft.find(filter);
   for (const iterator of results) {
-    if(iterator.collectionId == "6362d5d61c1ea0ed77686ff9"){
-      await LaunchPadNft.findOneAndUpdate({_id:iterator._id},{collectionId:req.body.collectionId});
+    if (iterator.collectionId == "6362d5d61c1ea0ed77686ff9") {
+      await LaunchPadNft.findOneAndUpdate({ _id: iterator._id }, { collectionId: req.body.collectionId });
     }
   }
   // const result = await LaunchPadNft.updateMany(filter, req.body, {
@@ -390,6 +460,7 @@ module.exports = {
   getNftList,
   getMyNftList,
   nftDetail,
+  getS3JsonFile
   // createStaticNft,
   // updateStaticNft,
   // updateManyStaticNft
