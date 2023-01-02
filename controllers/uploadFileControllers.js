@@ -17,7 +17,7 @@ const pinata = pinataSDK(
 );
 const fs = require("fs");
 const fsPromises = require('fs').promises; 
-const { uploadDir } = require("../services/pinata");
+const { uploadDir, uploadDirWithManager } = require("../services/pinata");
 const {uploadDirToS3} = require("../utils/s3UploadDir");
 const getjson = (file) => {
   const readableStreamForFile = fs.createReadStream(file.path);
@@ -154,10 +154,13 @@ module.exports = {
           const folderPath = uploadedData.folderPath;
           const folderName = uploadedData.folderName  
           const removeFolderPath = folderPath;
-          const removeFolderName = appRoot.path + "/" + req.file.path      
-          let result = await uploadDir(folderPath);
+          const removeFolderName = appRoot.path + "/" + req.file.path    
+          let uniqIdForPinata = uniqid()  
+          const userAddress = req.userData.account.toLowerCase();
+          let result = uploadDirWithManager(folderPath, uniqIdForPinata, userAddress);
           let s3UploadDirResult = uploadDirToS3(folderPath, folderName, removeFolderPath, removeFolderName)
-          result.s3BucketUrl =   "collection-nfts/" +folderName
+          result.s3BucketUrl =   "collection-nfts/" +folderName;
+          result.pinataUploadId =   uniqIdForPinata
           // if(s3UploadDirResult){
           //   fs.rmSync(folderPath, { recursive: true, force: true });
           //   fs.rmSync(appRoot.path + "/" + req.file.path, {

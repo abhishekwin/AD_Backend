@@ -26,7 +26,7 @@ async function uploadFilesToS3(filesToUpload, dirPath){
     return new Promise((resolve, reject) => {
         async.eachOfLimit(filesToUpload, 10, async.asyncify(async (file) => {
           const Key = file.replace(`${rootFolder}/`, '');
-          console.log("Key", Key)
+          //console.log("Key", Key)
           const fileName = Key.substring(Key.lastIndexOf('/')+1)
           return new Promise((res, rej) => {
             s3.upload({

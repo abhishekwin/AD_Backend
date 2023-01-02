@@ -19,7 +19,8 @@ const {
   LaunchPadCurrency,
   LaunchPadCollectionPhase,
   LaunchPadCollectionCurrencyDetailsForWhiteListed,
-  LaunchPadCollectionCurrencyDetails
+  LaunchPadCollectionCurrencyDetails,
+  LaunchPadPinataUploadManager
 } = require("../models");
 
 // const {LaunchPadCollectionPhase } = require("../models/collectionPhase.model");
@@ -1201,6 +1202,18 @@ const updateBaseUriFlag = catchAsync(async (req, res) => {
     .send(new ResponseObject(200, "Collection updated successfully", result));
 });
 
+
+const getPinataHash = catchAsync(async (req, res) => {
+  const userAddress = req.userData.account.toLowerCase();
+  let { uniqId } = req.body
+  
+  const result = await LaunchPadPinataUploadManager.findOne({ uniqId: uniqId, userAddress: userAddress})
+  
+  res
+    .status(200)
+    .send(new ResponseObject(200, "Hash display successfully", result));
+});
+
 module.exports = {
   createCollection,
   updateCollection,
@@ -1234,5 +1247,6 @@ module.exports = {
   getAllCollectionForAdmin,
   getStatsWithMultiFilter,
   getBaseUri,
-  updateBaseUriFlag
+  updateBaseUriFlag,
+  getPinataHash
 };

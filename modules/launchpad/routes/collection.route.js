@@ -8,7 +8,8 @@ const {
   collectionCreatorUsersValidation,
   getStatsWithMultiFilter,
   getBaseUri,
-  updateBaseUriFlag
+  updateBaseUriFlag,
+  getPinataHash
 } = require("../validations/collection.validation");
 const { createWhiteListedValidation } = require('../validations/whiteListed.validation')
 // const manageMessageValidation = require('./validations/collection.validation');
@@ -162,5 +163,10 @@ router
   router
   .route("/update-base-uri-flag")
   .post(checkToken, validate(updateBaseUriFlag), collectionController.updateBaseUriFlag);
+
+  router
+  .route("/get-pinata-hash")
+  .post(checkToken, validate(getPinataHash), collectionController.getPinataHash);
+
 
 module.exports = router;

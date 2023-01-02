@@ -81,6 +81,12 @@ const updateBaseUriFlag = {
   }),
 };
 
+const getPinataHash = {
+  body: Joi.object().keys({
+    uniqId:Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createCollectionValidation,
   updateCollectionValidation,
@@ -88,5 +94,6 @@ module.exports = {
   collectionCreatorUsersValidation,
   getStatsWithMultiFilter,
   getBaseUri,
-  updateBaseUriFlag
+  updateBaseUriFlag,
+  getPinataHash
 };

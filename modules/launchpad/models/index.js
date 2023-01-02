@@ -14,6 +14,7 @@ module.exports.LaunchPadCurrency = require('./currency.model')
 module.exports.LaunchPadCollectionPhase = require('./collectionPhase.model')
 module.exports.LaunchPadCollectionCurrencyDetailsForWhiteListed = require('./collectionCurrencyDetailsForWhiteListed.model')
 module.exports.LaunchPadCollectionCurrencyDetails = require('./collectionCurrencyDetails.model')
+module.exports.LaunchPadPinataUploadManager = require('./launchPadPinataUploadManager.model')
 
 
 
