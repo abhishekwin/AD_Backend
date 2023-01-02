@@ -18,7 +18,6 @@ async function uploadDirWithManager(folderPath, uniqIdForPinata, userAddress) {
     await LaunchPadPinataUploadManager.create({uniqId:uniqIdForPinata, status: "in-progress", userAddress:userAddress});
     let result = await uploadDir(folderPath, uniqIdForPinata, userAddress)
     if(result){
-        console.log("uniqIdForPinata", uniqIdForPinata, "----", {uniqId:uniqIdForPinata})
         await LaunchPadPinataUploadManager.findOneAndUpdate({uniqId:uniqIdForPinata},
             {status:"completed", pinataUploadHash:result}
         );
