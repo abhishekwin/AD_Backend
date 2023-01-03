@@ -805,7 +805,8 @@ const getStatsWithMultiFilter = async (req, res) => {
     }
    
     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
-    const uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
+    let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
+    uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
     const currencyData = await LaunchPadCurrency.find();
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
