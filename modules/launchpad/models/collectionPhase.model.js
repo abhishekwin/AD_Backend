@@ -60,6 +60,13 @@ collectionPhaseSchema.virtual('currencyDetails', {
   justOne: false
 });
 
+collectionPhaseSchema.virtual('whiteListedUser', {
+  ref: 'WhiteListedUser',
+  localField: '_id',
+  foreignField: 'phaseId',
+  justOne: false
+});
+
 const CollectionPhase = mongoose.model(
   "LaunchPadCollectionPhase",
   collectionPhaseSchema

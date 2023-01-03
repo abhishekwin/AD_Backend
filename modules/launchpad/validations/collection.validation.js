@@ -14,12 +14,11 @@ const createCollectionValidation = {
     royalties: Joi.number().strict().required(),
     imageCover: Joi.string().required(),
     bannerImages: Joi.string().required(),
-    isWhiteListedUser: Joi.boolean().strict().required(),
     creator: Joi.string().required(),
     owner: Joi.string().required(),
     currency: Joi.string().optional(),
     whitelistedFee: Joi.number().optional(),
-    WhiteListedUser: Joi.when("isWhiteListedUser", {
+    whiteListedUser: Joi.when("isWhiteListedUser", {
       is: true,
       then: Joi.array().required(),
     }),
@@ -39,6 +38,7 @@ const createCollectionValidation = {
     status: Joi.string().optional(),
     currencyDetails: Joi.array().optional(),
     currencyDetailsForWhiteListed: Joi.array().optional(),
+    phases:Joi.array().optional(),
   }),
 };
 
