@@ -22,7 +22,7 @@ mongoose
 const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_ETHEREUM;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    skip: ${gt}\n where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: asc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
@@ -57,7 +57,7 @@ const manageData = async (transferdata) => {
      
       const index = parseInt(data.tokenId)-1;
       let nft = findNft[index];
-
+      console.log("eth-index", data.collection_address, "---", index)
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(
@@ -129,12 +129,12 @@ const manageData = async (transferdata) => {
 
 };
 const launchpadTransferEventEthereum = async (from = 0, gt = 0) => {
-  console.log("-----eth mint cron-----")
+  //console.log("-----eth mint cron-----")
   let transfereventDetails = await EventManager.findOne({ name: "launchpadTransferEthereum" })
   if(gt >= 100){
     from = from
   }else if (transfereventDetails) {
-    from = transfereventDetails.lastcrontime;
+    from = transfereventDetails.lastcrontime-1;
   } else {
     await EventManager.create({ name: "launchpadTransferEthereum", lastcrontime: 0 })
   }
@@ -142,7 +142,7 @@ const launchpadTransferEventEthereum = async (from = 0, gt = 0) => {
   try {
     let transferdata = await transferFunctionQuery(from, gt);
     if (transferdata && transferdata.length > 0) {
-      transferdata = transferdata.reverse();
+      //transferdata = transferdata.reverse();
       await manageData(transferdata);
       if (transferdata.length >= 100) {
         gt = gt + 100;

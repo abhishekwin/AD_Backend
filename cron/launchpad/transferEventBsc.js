@@ -22,7 +22,7 @@ mongoose
 const transferFunctionQuery = async (from, gt) => {
   const url = LAUNCHPAD_SUBGRAPH_URL_BSC;
   const query = {
-    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    skip: ${gt}\n where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: desc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
+    query: `query MyQuery {\n  nftTransfers(\n    first: 100\n    skip: ${gt}\n where: {timestamp_gt: ${from}}\n    orderBy: timestamp\n    orderDirection: asc\n  ) {\n    id\n    to\n    timestamp\n    from\n    collection_address\n    tokenId\n  }\n}`,
     variables: null,
     operationName: "MyQuery",
     extensions: {
@@ -131,7 +131,7 @@ console.log("-----bsc mint cron-----")
   if (gt >= 100) {
     from = from
   } else if (transfereventDetails) {
-    from = transfereventDetails.lastcrontime;
+    from = transfereventDetails.lastcrontime-1;
   } else {
     await EventManager.create({ name: "launchpadTransferBsc", lastcrontime: 0 })
   }
@@ -139,7 +139,7 @@ console.log("-----bsc mint cron-----")
   try {
     let transferdata = await transferFunctionQuery(from, gt);
     if (transferdata && transferdata.length > 0) {
-      transferdata = transferdata.reverse();
+      //transferdata = transferdata.reverse();
       await manageData(transferdata);
       if (transferdata.length >= 100) {
         gt = gt + 100;
