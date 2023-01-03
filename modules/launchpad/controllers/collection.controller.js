@@ -796,7 +796,7 @@ const getStatsWithMultiFilter = async (req, res) => {
       filter = { ...filter, networkId: Number(networkId) }
     }
     if (currency) {
-      // filter = { ...filter, currency: currency }
+      filter = { ...filter, currency: currency }
     }
     if(time?.from) {
       filter = {...filter, subgraphMintTime: { $gte: time.from, $lte: time.to }}
@@ -818,7 +818,7 @@ const getStatsWithMultiFilter = async (req, res) => {
         if (collectionAddreeWithCurrency.length > 0) {
           const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
           let symbol = currency.symbol.toLowerCase()
-          if (currency === '0x0000000000000000000000000000000000000000') {
+          if (currency?.address === '0x0000000000000000000000000000000000000000') {
             if (netId === parseInt(BSC_NETWORK_ID, 10)) {
               symbol = 'bnb';
             } else {
