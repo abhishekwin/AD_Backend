@@ -40,6 +40,6 @@ router.get("/get-nft-detail/:id", nftController.nftDetail);
 router.post("/get-nft-attributes", nftController.getNftAttributes);
 router.get("/get-s3-json-file/:networkId/:collectionAddress/:fileName", validate(getS3JsonFileValidation), nftController.getS3JsonFile);
 // router.post("/create-static-nft", checkToken, nftController.createStaticNft);
-// router.post("/update-static-nft", checkToken, nftController.updateStaticNft);
+router.post("/update-static-nft", checkToken, nftController.updateStaticNft);
 // router.post("/update-multi-static-nft", checkToken, nftController.updateManyStaticNft);
 module.exports = router;

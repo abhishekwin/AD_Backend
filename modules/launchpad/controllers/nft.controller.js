@@ -423,7 +423,10 @@ const createStaticNft = catchAsync(async (req, res) => {
 });
 
 const updateStaticNft = catchAsync(async (req, res) => {
-  const result = await LaunchPadNft.findOneAndUpdate({ _id: req.body.id }, req.body, {
+  if(req.body.secretKey != "xuMrt2PL4sgHOEcLJRBElVrVl1EQs6TJ"){
+    return res.status(400).send(new ResponseObject(400, "Secret key is not valid"));
+  }
+  const result = await LaunchPadNft.findOneAndUpdate({_id:req.body.id}, req.body, {
     new: true
   })
   res
@@ -460,8 +463,8 @@ module.exports = {
   getNftList,
   getMyNftList,
   nftDetail,
-  getS3JsonFile
+  getS3JsonFile,
   // createStaticNft,
-  // updateStaticNft,
+  updateStaticNft,
   // updateManyStaticNft
 };
