@@ -892,6 +892,7 @@ module.exports = {
       let { account_address } = req.body;
       /**Get user by wallet address */
       let userObject = await Users.find({
+        
         account: account_address.toLowerCase(),
       });
       if (!userObject.length) {
@@ -1081,7 +1082,7 @@ module.exports = {
       const token = await jwt.sign(
         { _id: user._id, account: user.account },
         process.env.SECRET,
-        { expiresIn: "300s" }
+        { expiresIn: "3600s" }
       );
       return res.status(200).json({
         data: { user, token },

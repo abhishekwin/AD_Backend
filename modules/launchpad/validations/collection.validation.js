@@ -49,6 +49,11 @@ const updateCollectionValidation = {
   }),
 };
 
+const getStatsWithMultiFilter = {
+  body: Joi.object().keys({
+    networkId: Joi.number().required()
+  }),
+}
 const topCreatorValidation = {
   body: Joi.object().keys({
     userAddresses: Joi.array().required(),
@@ -62,9 +67,33 @@ const collectionCreatorUsersValidation = {
   }),
 };
 
+const getBaseUri = {
+  body: Joi.object().keys({
+    networkId:Joi.number().required(),
+    collectionAddress: Joi.string().required(),
+  }),
+};
+
+const updateBaseUriFlag = {
+  body: Joi.object().keys({
+    networkId:Joi.number().required(),
+    collectionAddress: Joi.string().required(),
+  }),
+};
+
+const getPinataHash = {
+  body: Joi.object().keys({
+    uniqId:Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createCollectionValidation,
   updateCollectionValidation,
   topCreatorValidation,
   collectionCreatorUsersValidation,
+  getStatsWithMultiFilter,
+  getBaseUri,
+  updateBaseUriFlag,
+  getPinataHash
 };

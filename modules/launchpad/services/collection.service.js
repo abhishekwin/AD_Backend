@@ -36,7 +36,7 @@ const getLaunchPadCollectionList = async (filter, options, req) => {
     ])
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit).select('-tokenURI');
 
   const row_count = await LaunchPadCollection.count(filter);
 
@@ -55,7 +55,7 @@ const getLaunchPadLiveCollectionList = async (filter, options, req) => {
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit).select('-tokenURI');
 
   const row_count = await LaunchPadCollection.count(filter);
 
@@ -75,7 +75,7 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit).select('-tokenURI');
 
   const row_count = await LaunchPadCollection.count(filter);
 
@@ -94,7 +94,7 @@ const getHideCollectionList = async (filter, options, req) => {
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit).select('-tokenURI');
 
   const row_count = await LaunchPadCollection.count(filter);
 
@@ -113,7 +113,7 @@ const getFailedCollectionList = async (filter, options, req) => {
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit).select('-tokenURI');
 
   const row_count = await LaunchPadCollection.count(filter);
 

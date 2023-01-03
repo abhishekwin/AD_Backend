@@ -1,22 +1,39 @@
-const { WhiteListedUser, LaunchPadCollection, LaunchPadMintHistory } = require("../models/index");
+const {
+  WhiteListedUser,
+  LaunchPadCollection,
+  LaunchPadMintHistory,
+  LaunchPadCollectionPhase
+} = require("../models/index");
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
+const moment = require('moment')
+const today = moment()
+let LAUNCHPAD_BSC_WEB3_URL = process.env.LAUNCHPAD_BSC_WEB3_URL;
+let LAUNCHPAD_ETH_WEB3_URL = process.env.LAUNCHPAD_ETH_WEB3_URL;
+let ETHEREUM_NETWORK_ID = process.env.ETHEREUM_NETWORK_ID
+let BSC_NETWORK_ID = process.env.BSC_NETWORK_ID;
+
+const Web3 = require("web3");
+const LaunchpadAbi = require("../../../config/launchpad/abi.json");
 
 exports.createWhiteListUser = async (req, res) => {
   try {
-    const { collectionId, userAddresses } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
-    if(!authenticateUser){
-    return res
-      .status(400)
-      .send(
-        new ResponseObject(400, "Invalid User")
-      );
+    const { collectionId, userAddresses, phaseId } = req.body;
+
+    const authenticateUser = await LaunchPadCollection.findOne({ creator: req.userData.account.toLowerCase() })
+
+    if (!authenticateUser) {
+      return res
+        .status(400)
+        .send(
+          new ResponseObject(400, "Invalid User")
+        );
     }
     for (const userAddress of userAddresses) {
       await WhiteListedUser.create({
         collectionId,
         userAddress,
+        phaseId
       });
     }
     return res
@@ -33,14 +50,14 @@ exports.createWhiteListUser = async (req, res) => {
 
 exports.updateWhiteListUser = async (req, res) => {
   try {
-    const { collectionId, userAddresses } = req.body;
-    const authenticateUser = await LaunchPadCollection.findOne({creator: req.userData.account.toLowerCase()})
-    if(!authenticateUser){
-    return res
-      .status(400)
-      .send(
-        new ResponseObject(400, "Invalid User")
-      );
+    const { collectionId, userAddresses, userLevel } = req.body;
+    const authenticateUser = await LaunchPadCollection.findOne({ creator: req.userData.account.toLowerCase() })
+    if (!authenticateUser) {
+      return res
+        .status(400)
+        .send(
+          new ResponseObject(400, "Invalid User")
+        );
     }
     await WhiteListedUser.deleteMany({ collectionId });
     let whiteListUser = [];

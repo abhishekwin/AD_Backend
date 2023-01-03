@@ -87,6 +87,7 @@ const createNftWithUri = async (id, updateUri, data, failedNfts) => {
 };
 
 const failNftUsingCollectionFuncation = async () => {
+    //console.log("-----check fail nft start------")
     const data = await LaunchPadCollection.findOne({
         failedNfts: { "$gt": 0 }, $or: [
             { failedNftsCheckCount: { "$lt": 3 } },

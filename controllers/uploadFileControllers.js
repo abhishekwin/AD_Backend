@@ -1,6 +1,5 @@
 const { CollectionNFTs, Users, Nfts, Nonce, History } = require("../models");
 const helpers = require("../helpers/helper");
-// const BleuFiNFT = require("../config/bleufi.json")
 const jwt = require("jsonwebtoken");
 const Web3 = require("web3");
 let WEB3_URL = process.env.WEB3_URL;
@@ -10,14 +9,16 @@ const jwt_decode = require("jwt-decode");
 const pinataSDK = require("@pinata/sdk");
 const path = require("path");
 const _ = require('lodash');
+const uniqid = require('uniqid'); 
+
 const pinata = pinataSDK(
   process.env.PINATAAPIKEY,
   process.env.PINATAAPISECRETAPIKEY
 );
 const fs = require("fs");
 const fsPromises = require('fs').promises; 
-const { uploadDir } = require("../services/pinata");
-
+const { uploadDir, uploadDirWithManager } = require("../services/pinata");
+const {uploadDirToS3} = require("../utils/s3UploadDir");
 const getjson = (file) => {
   const readableStreamForFile = fs.createReadStream(file.path);
   const jsonString = fs.readFileSync("./public/files/" + file.originalname);
@@ -25,6 +26,7 @@ const getjson = (file) => {
   return jsondata;
 };
 const appRoot = require("app-root-path");
+const { ProcessCredentials } = require("aws-sdk");
 
 function sleep() {
   return new Promise((resolve) => {
@@ -34,7 +36,7 @@ function sleep() {
 
 async function uploadFileInPublicFolder(filedatas) {
   let count = 1;
-  let randomNum = (Math.random() + 1).toString(36).substring(7);
+  let randomNum = uniqid();
   fs.mkdir(path.join("./public/", randomNum), (err) => {
     if (err) {
       return console.error(err);
@@ -49,7 +51,7 @@ async function uploadFileInPublicFolder(filedatas) {
     fsPromises.writeFile(fileUploadPath, content, function (err) {});
     count++;
   }  
-  return {folderPath, count:count-1}
+  return {folderPath, count:count-1, folderName:randomNum}
 }
 
 module.exports = {
@@ -149,19 +151,30 @@ module.exports = {
       let uploadedData = await uploadFileInPublicFolder(filedatas)
       if(uploadedData){
         if(uploadedData.count == filedatas.length){
-          const folderPath = uploadedData.folderPath;          
-          let result = await uploadDir(folderPath);
-            fs.rmSync(folderPath, { recursive: true, force: true });
-            fs.rmSync(appRoot.path + "/" + req.file.path, {
-              recursive: true,
-              force: true,
-            });
-            return res.status(200).json({
-              data: result,
-              status: 200,
-              success: true,
-              message: "Url sent",
-            });       
+          const folderPath = uploadedData.folderPath;
+          const folderName = uploadedData.folderName  
+          const removeFolderPath = folderPath;
+          const removeFolderName = appRoot.path + "/" + req.file.path    
+          let uniqIdForPinata = uniqid()  
+          const userAddress = req.userData.account.toLowerCase();
+          let result = uploadDirWithManager(folderPath, uniqIdForPinata, userAddress);
+          let s3UploadDirResult = uploadDirToS3(folderPath, folderName, removeFolderPath, removeFolderName)
+          result.s3BucketUrl =   "collection-nfts/" +folderName;
+          result.pinataUploadId =   uniqIdForPinata
+          // if(s3UploadDirResult){
+          //   fs.rmSync(folderPath, { recursive: true, force: true });
+          //   fs.rmSync(appRoot.path + "/" + req.file.path, {
+          //     recursive: true,
+          //     force: true,
+          //   });
+          // }
+         
+          return res.status(200).json({
+            data: result,
+            status: 200,
+            success: true,
+            message: "Url sent",
+          });       
         }else{
           return res.status(400).send({
             error: true,

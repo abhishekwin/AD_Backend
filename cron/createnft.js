@@ -15,11 +15,6 @@ mongoose.connect(process.env.DB_URL, ).then(() => {
     console.log("error", e)
 });
 
-const Sentry = require('@sentry/node');
-const SentryTracing = require('@sentry/tracing');
-
-Sentry.init({ dsn: "https://bda3b26009ae425c9eff059033784b69@o1187166.ingest.sentry.io/6307095" });
-
 // {
 //     collectionAddress: '0x348B405933efD67639628122c68F1728837df3A7',
 //     tokenId: '110',
@@ -48,7 +43,6 @@ const webTransferFunction = async (id, collection_id, web3callcount = 0)  => {
         let tokenURI = await contractInstance.methods.tokenURI(id).call()
         return tokenURI;
     }catch(e){
-        Sentry.captureException(e)
         console.error("Create error", e)
         web3callcount++;
         await sleep(DELAY_SECOUND);
@@ -102,7 +96,6 @@ const createNftData = async (tokenId, obj, collection_id) => {
             let data = await prepareData(tokenId, obj, collection_id);
             await Nfts.create(data); 
         }catch(e){
-            Sentry.captureException(e)
             console.error("Common create nft error", e)
         }        
     }     

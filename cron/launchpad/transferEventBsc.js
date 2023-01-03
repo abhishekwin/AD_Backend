@@ -55,6 +55,7 @@ const manageData = async (transferdata) => {
       });
       const index = parseInt(data.tokenId) - 1;
       let nft = findNft[index];
+      
       if (nft) {
         const id = nft._id;
         await LaunchPadNft.updateOne(
@@ -137,15 +138,19 @@ const launchpadTransferEventBsc = async (from = 0, gt = 0) => {
   }
 
   try {
+    
     let transferdata = await transferFunctionQuery(from, gt);
+   
     if (transferdata && transferdata.length > 0) {
       transferdata = transferdata.reverse();
+      console.log("bsctransferdata", transferdata)
       await manageData(transferdata);
       if (transferdata.length >= 100) {
         gt = gt + 100;
         launchpadTransferEventBsc(from, gt)
       }
     }
+
   } catch (error) {
     console.log("error", error);
   }
