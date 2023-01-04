@@ -134,7 +134,6 @@ exports.createSignature = async (req, res) => {
         );
     }
 
-    
     const web3 = new Web3(WEB3_URL_FOR_CREATE_SIGN)
     const contractInstance = new web3.eth.Contract(LaunchpadAbi.abi, collectionAddress.toLowerCase())
     const mintCountBlockChain = await contractInstance.methods.nftMinted(userAddress).call()
