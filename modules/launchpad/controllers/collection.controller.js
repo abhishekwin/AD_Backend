@@ -818,7 +818,7 @@ const getStatsWithMultiFilter = async (req, res) => {
         const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
         if (collectionAddreeWithCurrency.length > 0) {
           const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
-          let symbol = currency.symbol.toLowerCase()
+          let symbol = currency?.symbol.toLowerCase()
           if (currency?.address === '0x0000000000000000000000000000000000000000') {
             if (netId === parseInt(BSC_NETWORK_ID, 10)) {
               symbol = 'bnb';
