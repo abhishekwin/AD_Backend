@@ -36,6 +36,11 @@ const collectionPhaseSchema = mongoose.Schema(
       trim: true,
       default: 0,
     },
+    maxNftCap: {
+      type: Number,
+      trim: true,
+      default: 0,
+    },
     // currencyDetails:[CurrencyDetailsSchema],
     // currencyDetailsForWhiteListed: [CurrencyDetailsForWhiteListedSchema],
     isWhiteListedUser: {

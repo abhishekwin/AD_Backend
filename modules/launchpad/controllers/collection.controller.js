@@ -193,7 +193,8 @@ const createCollection = catchAsync(async (req, res) => {
       isWhiteListedUser: phase.isWhiteListedUser ? phase.isWhiteListedUser : false,
       currencyDetails: phase.currencyDetails ? phase.currencyDetails : null,
       currencyDetailsForWhiteListed: phase.currencyDetailsForWhiteListed ? phase.currencyDetailsForWhiteListed : null,
-      whiteListedUsers: phase.whiteListedUsers
+      whiteListedUsers: phase.whiteListedUsers,
+      maxNftCap:phase.maxNftCap
     });
   }
 
