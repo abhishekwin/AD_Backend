@@ -198,7 +198,6 @@ const createCollection = catchAsync(async (req, res) => {
   }
 
   const insertPhasesCurrencies = []
-  const insertPhasesWhiteListedCurrencies = []
   const whiteListUsers = []
   if (insertPhases && insertPhases.length > 0) {
     for (const iterator of insertPhases) {
@@ -210,13 +209,6 @@ const createCollection = catchAsync(async (req, res) => {
           insertPhasesCurrencies.push(obj)
         }
       }
-      
-      if(iterator.currencyDetailsForWhiteListed){
-        for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
-          let obj = { phaseId: phaseresult._id, ...whiteListedCurrencyDetail }
-          insertPhasesWhiteListedCurrencies.push(obj)
-        }
-      }
       if(iterator.whiteListedUsers){
         for (const userAddress of iterator.whiteListedUsers) {
           whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
@@ -226,7 +218,7 @@ const createCollection = catchAsync(async (req, res) => {
     }
   }
   await LaunchPadCollectionCurrencyDetails.insertMany(insertPhasesCurrencies)
-  await LaunchPadCollectionCurrencyDetailsForWhiteListed.insertMany(insertPhasesWhiteListedCurrencies)
+  //await LaunchPadCollectionCurrencyDetailsForWhiteListed.insertMany(insertPhasesWhiteListedCurrencies)
   await WhiteListedUser.insertMany(whiteListUsers);
   //process.exit();
 

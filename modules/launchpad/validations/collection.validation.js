@@ -37,7 +37,6 @@ const createCollectionValidation = {
     mintCountPerTransaction: Joi.number(),
     status: Joi.string().optional(),
     currencyDetails: Joi.array().optional(),
-    currencyDetailsForWhiteListed: Joi.array().optional(),
     phases:Joi.array().optional(),
   }),
 };
