@@ -203,17 +203,26 @@ const createCollection = catchAsync(async (req, res) => {
   if (insertPhases && insertPhases.length > 0) {
     for (const iterator of insertPhases) {
       let phaseresult = await LaunchPadCollectionPhase.create(iterator)
-      for (const currencyDetail of iterator.currencyDetails) {
-        let obj = { phaseId: phaseresult._id, ...currencyDetail }
-        insertPhasesCurrencies.push(obj)
+      
+      if(iterator.currencyDetails){
+        for (const currencyDetail of iterator.currencyDetails) {
+          let obj = { phaseId: phaseresult._id, ...currencyDetail }
+          insertPhasesCurrencies.push(obj)
+        }
       }
-      for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
-        let obj = { phaseId: phaseresult._id, ...whiteListedCurrencyDetail }
-        insertPhasesWhiteListedCurrencies.push(obj)
+      
+      if(iterator.currencyDetailsForWhiteListed){
+        for (const whiteListedCurrencyDetail of iterator.currencyDetailsForWhiteListed) {
+          let obj = { phaseId: phaseresult._id, ...whiteListedCurrencyDetail }
+          insertPhasesWhiteListedCurrencies.push(obj)
+        }
       }
-      for (const userAddress of iterator.whiteListedUsers) {
-        whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
+      if(iterator.whiteListedUsers){
+        for (const userAddress of iterator.whiteListedUsers) {
+          whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
+        }
       }
+      
     }
   }
   await LaunchPadCollectionCurrencyDetails.insertMany(insertPhasesCurrencies)
