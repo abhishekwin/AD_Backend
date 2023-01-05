@@ -7,11 +7,16 @@ const uniqid = require('uniqid');
 const createCurrency = async (req, res) => {
     try {
         const existSlug = await LaunchPadCurrency.findOne({ slug: req.body.slug })
-        console.log(existSlug)
         if (existSlug) {
             return res
-                .status(400)
-                .send(new ResponseObject(400, "Slug already exist", existSlug));
+            .status(400)
+            .send(new ResponseObject(400, "Slug already exist", existSlug));
+        }
+        const exist = await LaunchPadCurrency.findOne({ networkId: req.body.networkId, address: req.body.address })
+        if (exist) {
+            return res
+            .status(400)
+            .send(new ResponseObject(400, "Currency already exist")); 
         }
         const newCurrency = await LaunchPadCurrency.create(req.body)
         return res
@@ -30,7 +35,6 @@ const createCurrency = async (req, res) => {
 const getCurrency = async (req, res) => {
     try {
         const currencies = await LaunchPadCurrency.find().sort({ position: 1 })
-        console.log(currencies,"FFFFFFFFFFFFFF");
         return res
             .status(200)
             .send(new ResponseObject(200, "Get all Curreency", currencies));
@@ -102,7 +106,7 @@ const updateIsActiveCurrency = async (req, res) => {
 
     }
     catch (err) {
-        onsole.log("error", err)
+        console.log("error", err)
         return res
             .status(500)
             .send(new ResponseObject(500, "Something Went Wrong"));
@@ -142,7 +146,7 @@ const getCurrencyDetails = async (req, res) => {
             .status(200)
             .send(new ResponseObject(200, "Get currency detail by slug successfully", result))
     } catch (err) {
-        onsole.log("error", err)
+        console.log("error", err)
         return res
             .status(500)
             .send(new ResponseObject(500, "Something Went Wrong"));
@@ -158,7 +162,7 @@ const getCurrencyWithFilter = async (req, res) => {
             .status(200)
             .send(new ResponseObject(200, "Currency get sucessfully", result))
     } catch (err) {
-        onsole.log("error", err)
+        console.log("error", err)
         return res
             .status(500)
             .send(new ResponseObject(500, "Something Went Wrong"));
