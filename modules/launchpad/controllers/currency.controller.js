@@ -6,12 +6,7 @@ const uniqid = require('uniqid');
 
 const createCurrency = async (req, res) => {
     try {
-        const existSlug = await LaunchPadCurrency.findOne({ slug: req.body.slug })
-        if (existSlug) {
-            return res
-            .status(400)
-            .send(new ResponseObject(400, "Slug already exist", existSlug));
-        }
+       
         const exist = await LaunchPadCurrency.findOne({ networkId: req.body.networkId, address: req.body.address })
         if (exist) {
             return res
