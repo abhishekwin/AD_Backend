@@ -123,7 +123,7 @@ exports.createSignature = async (req, res) => {
       phase: phase,
       startTime: { $gte: today.toDate() },
     };
-
+    console.log("phaseValidationFilter", phaseValidationFilter)
     let phaseValidation = await LaunchPadCollectionPhase.findOne(phaseValidationFilter);
 
     if (!phaseValidation) {
@@ -146,6 +146,14 @@ exports.createSignature = async (req, res) => {
         );
     }
     
+    console.log("--", {
+      collectionAddress,
+      launchpadFactoryAddress,
+      userAddress,
+      nonce,
+      isWhiteListed,
+      phase
+    })
     const message = {
       collectionAddress,
       launchpadFactoryAddress,
