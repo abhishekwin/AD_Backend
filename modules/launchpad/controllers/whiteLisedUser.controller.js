@@ -134,17 +134,22 @@ exports.createSignature = async (req, res) => {
         );
     }
 
-    const web3 = new Web3(WEB3_URL_FOR_CREATE_SIGN)
-    const contractInstance = new web3.eth.Contract(LaunchpadAbi.abi, collectionAddress.toLowerCase())
-    const mintCountBlockChain = await contractInstance.methods.nftMinted(userAddress).call()
-    
-    if(phaseValidation.mintCountPerUser <= mintCountBlockChain){
-      return res
-        .status(400)
-        .send(
-          new ResponseObject(400, "Your mint limit is over")
-        );
+    try{
+      const web3 = new Web3(WEB3_URL_FOR_CREATE_SIGN)
+      const contractInstance = new web3.eth.Contract(LaunchpadAbi.abi, collectionAddress.toLowerCase())
+      const mintCountBlockChain = await contractInstance.methods.nftMinted(userAddress).call()
+      
+      if(phaseValidation.mintCountPerUser <= mintCountBlockChain){
+        return res
+          .status(400)
+          .send(
+            new ResponseObject(400, "Your mint limit is over")
+          );
+      }
+    }catch(e){
+      console.log("User mint count not found")
     }
+   
     
     console.log("--", {
       collectionAddress,
