@@ -5,7 +5,7 @@ const createWhiteListedValidation = {
     collectionId: Joi.string().required(),
     networkId: Joi.number().required(),
     collectionAddress: Joi.string().required(),
-    phase: Joi.number().required().allow(0),
+    phase: Joi.number().allow(0).required(),
   }),
 };
 
