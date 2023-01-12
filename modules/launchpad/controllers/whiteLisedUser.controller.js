@@ -7,7 +7,7 @@ const {
 const ResponseObject = require("../../../utils/ResponseObject");
 const { VerifySign } = require("../../comman/verifyUserWeb3");
 const moment = require('moment')
-const today = moment()
+
 let LAUNCHPAD_BSC_WEB3_URL = process.env.LAUNCHPAD_BSC_WEB3_URL;
 let LAUNCHPAD_ETH_WEB3_URL = process.env.LAUNCHPAD_ETH_WEB3_URL;
 let ETHEREUM_NETWORK_ID = process.env.ETHEREUM_NETWORK_ID
@@ -85,7 +85,7 @@ exports.createSignature = async (req, res) => {
       networkId,
       phase
     } = req.body;
-
+    const today = moment();
     let WEB3_URL_FOR_CREATE_SIGN = ""
     if(BSC_NETWORK_ID == networkId){
       WEB3_URL_FOR_CREATE_SIGN = LAUNCHPAD_BSC_WEB3_URL

@@ -812,10 +812,11 @@ const getStatsWithMultiFilter = async (req, res) => {
     const currencyData = await LaunchPadCurrency.find();
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
-      let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator }).select("contractName imageCover bannerImages");
+      let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator });
       let floor = 0;
       let volume = 0;
       let globalSymbol = '';
+      let currencyArr = [];
       for (const currency of currencyData) {
         const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
         if (collectionAddreeWithCurrency.length > 0) {
@@ -833,9 +834,10 @@ const getStatsWithMultiFilter = async (req, res) => {
           floor += totalMintFee;
           const usdValue = await getEthToUsdt(totalMintFee, symbol);
           volume += usdValue.data?.[symbol]?.quote?.USD?.price || 0;
+          currencyArr += [...currencyArr, symbol]
         }
       }
-      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol };
+      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencyArr };
       collectionAddresses = [ ...collectionAddresses, collectionAddress ];
     }
 
