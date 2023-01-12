@@ -816,7 +816,7 @@ const getStatsWithMultiFilter = async (req, res) => {
       let floor = 0;
       let volume = 0;
       let globalSymbol = '';
-      let currencyArr = [];
+      let currencySymbols = "";
       for (const currency of currencyData) {
         const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
         if (collectionAddreeWithCurrency.length > 0) {
@@ -830,14 +830,29 @@ const getStatsWithMultiFilter = async (req, res) => {
             }
           }
           globalSymbol= symbol;
-          const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
-          floor += totalMintFee;
-          const usdValue = await getEthToUsdt(totalMintFee, symbol);
-          volume += usdValue.data?.[symbol]?.quote?.USD?.price || 0;
-          currencyArr += [...currencyArr, symbol]
+          // const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
+          // floor += totalMintFee;
+          let usdtValue = 0;
+          if (collectionAddreeWithCurrency.length > 0) {
+            if (floor === 0) {
+              floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10);
+            }
+            for (let c = 0; c < collectionAddreeWithCurrency.length; c+=1) {
+              if (floor > parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)) {
+                floor = parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)
+              }
+              const calcUsdtValue = await getEthToUsdt(collectionAddreeWithCurrency[c].subgraphMintFee, symbol);
+              usdtValue += calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
+            }
+          }
+          // const usdValue = await getEthToUsdt(totalMintFee, symbol);
+          volume += usdtValue;
+          currencySymbols += `${symbol},`
         }
+        // collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
+        // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
       }
-      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencyArr };
+      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
       collectionAddresses = [ ...collectionAddresses, collectionAddress ];
     }
 
