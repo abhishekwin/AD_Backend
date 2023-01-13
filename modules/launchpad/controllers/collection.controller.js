@@ -8,8 +8,10 @@ const ResponseObject = require("../../../utils/ResponseObject");
 const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 const moment = require('moment')
+const Web3 = require("web3");
 
-const { BSC_NETWORK_ID } = process.env;
+const { BSC_NETWORK_ID, WEB3_URL } = process.env;
+// const web3 = new Web3(WEB3_URL);
 
 
 const {
@@ -805,11 +807,24 @@ const getStatsWithMultiFilter = async (req, res) => {
     } else {
       filter = {...filter, subgraphMintTime: {$ne: null}}
     }
-   
+    const ethToUsdt = {
+      eth: 0,
+      bnb: 0,
+      safemoon: 0,
+      ad: 0,
+    }
     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
     let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
     uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
     const currencyData = await LaunchPadCurrency.find();
+    const eth = await getEthToUsdt(1, 'eth');
+    const bnb = await getEthToUsdt(1, 'bnb');
+    const ad = await getEthToUsdt(1, 'ad');
+    const safemoon = await getEthToUsdt(1, 'safemoon');
+    ethToUsdt.eth  = eth.data?.["eth"]?.quote?.USD?.price;
+    ethToUsdt.bnb = bnb.data?.["bnb"]?.quote?.USD?.price;
+    ethToUsdt.ad = ad.data?.["ad"]?.quote?.USD?.price;
+    ethToUsdt.safemoon = safemoon.data?.["safemoon"]?.quote?.USD?.price;
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
       let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator });
@@ -819,6 +834,7 @@ const getStatsWithMultiFilter = async (req, res) => {
         let usdtValue = 0;
         let currencyDetail = {};
         let floorDetail = {};
+
         for (const currency of currencyData) {
           const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
           if (collectionAddreeWithCurrency.length > 0) {
@@ -836,13 +852,16 @@ const getStatsWithMultiFilter = async (req, res) => {
             // let uniquePriceVal = [...new Set(collectionAddreeWithCurrency.map(item => parseInt(item.subgraphMintFee, 10)))];
             const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
             // floor += totalMintFee;
-            const calcUsdtValue = await getEthToUsdt(totalMintFee, symbol);
-            usdtValue += calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
+            const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
+            // const calcUsdtValue = await getEthToUsdt(totalMintFee, symbol);
+            const calc = etherValue * ethToUsdt[symbol];
+            // console.log(":::: calc ::::", calc);
+            usdtValue += calc;
             if (floor < parseInt(usdtValue, 10)) {
               floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10)
             }
-            floorDetail[symbol] = `${usdtValue}`;
-            currencyDetail[symbol] = calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
+            floorDetail[symbol] = Web3.utils.fromWei(`${floor}`, 'ether') * ethToUsdt[symbol];
+            currencyDetail[symbol] = `${calc}`;
             
             // if (collectionAddreeWithCurrency.length > 0) {
             //   if (floor === 0) {
