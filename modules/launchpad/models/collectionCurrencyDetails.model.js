@@ -30,6 +30,10 @@ const CurrencyDetailsSchema = mongoose.Schema({
   symbol: {
     type: String,
     default:null
+  },
+  decimalValue: {
+    type: Number,
+    default:0
   }
 });
 
