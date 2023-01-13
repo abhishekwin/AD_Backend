@@ -8,7 +8,7 @@ const currencySchema = new mongoose.Schema(
             trim: true,
             default: null
         },
-        value: {
+        brokerage: {
             type: Number,
             default: null
         },
@@ -46,7 +46,6 @@ const currencySchema = new mongoose.Schema(
         },
         slug: {
             type: String,
-            required: true,
             default: null
         },
         isActive: {
