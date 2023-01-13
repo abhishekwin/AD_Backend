@@ -33,6 +33,14 @@ const getLaunchPadCollectionList = async (filter, options, req) => {
       {
         path: "nftCount",
       },
+      {
+        path: "phases",
+        populate: [{
+          path: "currencyDetails",
+        }, {
+          path: "whiteListedUser",
+        }]
+      }
     ])
     .sort({ [sort_by_name]: sort_by_order })
     .skip((page - 1) * limit)
@@ -48,12 +56,22 @@ const getLaunchPadCollectionList = async (filter, options, req) => {
 const getLaunchPadLiveCollectionList = async (filter, options, req) => {
   let page = options.page;
   let limit = options.limit;
-  let sort_by_name = options.sortBy?options.sortBy.name:"";
-  let sort_by_order = options.sortBy?options.sortBy.order:"";
+  let sort_by_name = options.sortBy ? options.sortBy.name : "";
+  let sort_by_order = options.sortBy ? options.sortBy.order : "";
 
-  //console.log("filter", filter)
+  // console.log("filter", filter)
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
+    .populate([
+      {
+        path: "phases",
+        populate: [{
+          path: "currencyDetails",
+        }, {
+          path: "whiteListedUser",
+        }]
+      },
+    ])
     .skip((page - 1) * limit)
     .limit(limit).select('-tokenURI');
 
@@ -74,6 +92,16 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
   let collectionIds = []
   const tableData = await LaunchPadCollection.find(filter)
     .sort({ [sort_by_name]: sort_by_order })
+    .populate([
+      {
+        path: "phases",
+        populate: [{
+          path: "currencyDetails",
+        }, {
+          path: "whiteListedUser",
+        }]
+      },
+    ])
     .skip((page - 1) * limit)
     .limit(limit).select('-tokenURI');
 
@@ -87,8 +115,8 @@ const getLaunchPadEndCollectionList = async (filter, options, req) => {
 const getHideCollectionList = async (filter, options, req) => {
   let page = options.page;
   let limit = options.limit;
-  let sort_by_name = options.sortBy?options.sortBy.name:"";
-  let sort_by_order = options.sortBy?options.sortBy.order:"";
+  let sort_by_name = options.sortBy ? options.sortBy.name : "";
+  let sort_by_order = options.sortBy ? options.sortBy.order : "";
 
   //console.log("filter", filter)
   const tableData = await LaunchPadCollection.find(filter)
@@ -106,8 +134,8 @@ const getHideCollectionList = async (filter, options, req) => {
 const getFailedCollectionList = async (filter, options, req) => {
   let page = options.page;
   let limit = options.limit;
-  let sort_by_name = options.sortBy?options.sortBy.name:"";
-  let sort_by_order = options.sortBy?options.sortBy.order:"";
+  let sort_by_name = options.sortBy ? options.sortBy.name : "";
+  let sort_by_order = options.sortBy ? options.sortBy.order : "";
 
   //console.log("filter", filter)
   const tableData = await LaunchPadCollection.find(filter)
