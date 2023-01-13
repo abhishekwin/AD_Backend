@@ -813,47 +813,51 @@ const getStatsWithMultiFilter = async (req, res) => {
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
       let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator });
-      let floor = 0;
-      let volume = 0;
-      let globalSymbol = '';
-      let currencySymbols = "";
-      for (const currency of currencyData) {
-        const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
-        if (collectionAddreeWithCurrency.length > 0) {
-          const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
-          let symbol = currency?.symbol.toLowerCase()
-          if (currency?.address === '0x0000000000000000000000000000000000000000') {
-            if (netId === parseInt(BSC_NETWORK_ID, 10)) {
-              symbol = 'bnb';
-            } else {
-              symbol = 'eth';
-            }
-          }
-          globalSymbol= symbol;
-          // const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
-          // floor += totalMintFee;
-          let usdtValue = 0;
+      if (collectionAddress) {
+        let floor = 0;
+        let volume = 0;
+        let globalSymbol = '';
+        let currencySymbols = "";
+        let usdtValue = 0;
+        for (const currency of currencyData) {
+          const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
           if (collectionAddreeWithCurrency.length > 0) {
-            if (floor === 0) {
-              floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10);
-            }
-            for (let c = 0; c < collectionAddreeWithCurrency.length; c+=1) {
-              if (floor > parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)) {
-                floor = parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)
+            const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
+            let symbol = currency?.symbol.toLowerCase()
+            if (currency?.address === '0x0000000000000000000000000000000000000000') {
+              if (netId === parseInt(BSC_NETWORK_ID, 10)) {
+                symbol = 'bnb';
+              } else {
+                symbol = 'eth';
               }
-              const calcUsdtValue = await getEthToUsdt(collectionAddreeWithCurrency[c].subgraphMintFee, symbol);
-              usdtValue += calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
             }
+            globalSymbol= symbol;
+            // const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
+            // floor += totalMintFee;
+            
+            if (collectionAddreeWithCurrency.length > 0) {
+              if (floor === 0) {
+                floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10);
+              }
+              for (let c = 0; c < collectionAddreeWithCurrency.length; c+=1) {
+                if (floor > parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)) {
+                  floor = parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)
+                }
+                const calcUsdtValue = await getEthToUsdt(collectionAddreeWithCurrency[c].subgraphMintFee, symbol);
+                usdtValue += calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
+              }
+            }
+            // const usdValue = await getEthToUsdt(totalMintFee, symbol);
+            volume += usdtValue;
+            currencySymbols += `${symbol},`
           }
-          // const usdValue = await getEthToUsdt(totalMintFee, symbol);
-          volume += usdtValue;
-          currencySymbols += `${symbol},`
+          // collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
+          // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
         }
-        // collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
-        // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
+        const collections = collectionAddress["_doc"];
+        collectionAddress = { collections, floor, volume, symbol: globalSymbol, currencySymbols };
+        collectionAddresses = [ ...collectionAddresses, collectionAddress ];
       }
-      collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
-      collectionAddresses = [ ...collectionAddresses, collectionAddress ];
     }
 
     let response = collectionAddresses;

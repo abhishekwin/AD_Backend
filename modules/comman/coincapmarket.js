@@ -12,6 +12,7 @@ return new Promise(async (resolve, reject) => {
     });
   } catch(ex) {
     response = null;
+    console.log("Error ++++++ ", ex)
     return reject(ex);
   }
   if (response) {
