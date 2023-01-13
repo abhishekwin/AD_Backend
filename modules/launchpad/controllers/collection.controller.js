@@ -862,7 +862,7 @@ const getStatsWithMultiFilter = async (req, res) => {
           // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
         }
         const collections = collectionAddress["_doc"];
-        collectionAddress = { collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorDetail };
+        collectionAddress = { ...collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorDetail };
         collectionAddresses = [ ...collectionAddresses, collectionAddress ];
       }
     }
