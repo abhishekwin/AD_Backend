@@ -120,8 +120,7 @@ exports.createSignature = async (req, res) => {
 
     phaseValidationFilter = {
       collectionId: collectionId,
-      phase: phase,
-      startTime: { $gte: today.toDate() },
+      phase: phase     
     };
     console.log("phaseValidationFilter", phaseValidationFilter)
     let phaseValidation = await LaunchPadCollectionPhase.findOne(phaseValidationFilter);
