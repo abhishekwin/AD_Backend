@@ -863,8 +863,9 @@ const getStatsWithMultiFilter = async (req, res) => {
             if (floor > etherValue) {
               floor = etherValue
             }
-            floorDetail[symbol] = floor;
-            currencyDetail[symbol] = `${calc}`;
+            floorDetail[symbol] = floor * ethToUsdt[symbol];
+            currencyDetail[symbol] = `${calc} `;
+            
             loopCount += 1;
             // if (collectionAddreeWithCurrency.length > 0) {
             //   if (floor === 0) {
@@ -880,6 +881,8 @@ const getStatsWithMultiFilter = async (req, res) => {
             // }
             // const usdValue = await getEthToUsdt(totalMintFee, symbol);
           }
+          currencyDetail["AD"] = `${usdtValue * ethToUsdt['ad'] } `;
+          floorDetail["AD"] = floor * ethToUsdt['ad'];
           // collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
           // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
         }
