@@ -886,6 +886,8 @@ const getStatsWithMultiFilter = async (req, res) => {
       }
     }
 
+    collectionAddresses.sort(a, b) = b.volume - a.volume;
+
     let response = collectionAddresses;
     return res
       .status(200)
