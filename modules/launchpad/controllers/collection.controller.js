@@ -834,7 +834,7 @@ const getStatsWithMultiFilter = async (req, res) => {
         let usdtValue = 0;
         let currencyDetail = {};
         let floorDetail = {};
-
+        let loopCount = 0;
         for (const currency of currencyData) {
           const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
           if (collectionAddreeWithCurrency.length > 0) {
@@ -856,13 +856,16 @@ const getStatsWithMultiFilter = async (req, res) => {
             // const calcUsdtValue = await getEthToUsdt(totalMintFee, symbol);
             const calc = etherValue * ethToUsdt[symbol];
             // console.log(":::: calc ::::", calc);
+            if (loopCount === 0) {
+              floor = etherValue
+            }
             usdtValue += calc;
-            if (floor < parseInt(usdtValue, 10)) {
-              floor = parseInt(usdtValue, 10)
+            if (floor > etherValue) {
+              floor = etherValue
             }
             floorDetail[symbol] = floor;
             currencyDetail[symbol] = `${calc}`;
-            
+            loopCount += 1;
             // if (collectionAddreeWithCurrency.length > 0) {
             //   if (floor === 0) {
             //     floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10);
