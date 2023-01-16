@@ -858,9 +858,9 @@ const getStatsWithMultiFilter = async (req, res) => {
             // console.log(":::: calc ::::", calc);
             usdtValue += calc;
             if (floor < parseInt(usdtValue, 10)) {
-              floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10)
+              floor = parseInt(usdtValue, 10)
             }
-            floorDetail[symbol] = Web3.utils.fromWei(`${floor}`, 'ether') * ethToUsdt[symbol];
+            floorDetail[symbol] = floor;
             currencyDetail[symbol] = `${calc}`;
             
             // if (collectionAddreeWithCurrency.length > 0) {
