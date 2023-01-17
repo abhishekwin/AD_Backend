@@ -9,7 +9,7 @@ const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 const moment = require('moment')
 const Web3 = require("web3");
-
+const today = moment();
 const { BSC_NETWORK_ID, WEB3_URL } = process.env;
 // const web3 = new Web3(WEB3_URL);
 
@@ -497,10 +497,10 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("$or");
   }
 
-  const today = moment();
   let phaseFilter = {
-     startTime: { $gt: await getUTCDate() }
+     startTime: { $gt: today.toDate() }
   }
+  console.log("upcoming - filter", phaseFilter)
   const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
 
 
@@ -510,7 +510,6 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
       collectionIds.push(iterator.collectionId)
     }
   }  
-  console.log("collectionIds", collectionIds)
   req.body._id = collectionIds;
   filtercolumn.push("_id");
 
@@ -560,13 +559,16 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //   search = new RegExp(".*" + search + ".*", "i");
   //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
   // }
-  const today = moment();
+ 
+  //await getUTCDate()
   let phaseFilter = {
-     startTime: { $lt: await getUTCDate() },
-    endTime: { $gt: await getUTCDate() },
-   // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
-   
+    startTime: { $lt: today.toDate() },
+    endTime: { $gt:  today.toDate()},
   }
+  console.log("live - phase filter", phaseFilter)
+  // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
+   
+  
   const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
 // console.log("phases", phases)
   let collectionIds = []

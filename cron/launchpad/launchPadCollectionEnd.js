@@ -21,7 +21,7 @@ const launchpadCollectionPhaseEnd = async () => {
   for (const iterator of launchpadCollections) {
     let isEnd = false
     for (const phase of iterator.phases) {
-      console.log("--", phase.endTime , "****", await getUTCDate())
+      //console.log("--", phase.endTime , "****", await getUTCDate())
       isEnd = false
       if(phase.endTime < await getUTCDate()){
         isEnd = true
