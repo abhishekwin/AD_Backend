@@ -880,14 +880,9 @@ const getStatsWithMultiFilter = async (req, res) => {
               }
             }
             globalSymbol= symbol;
-            // const totalCount = collectionAddreeWithCurrency.length;
-            // let uniquePriceVal = [...new Set(collectionAddreeWithCurrency.map(item => parseInt(item.subgraphMintFee, 10)))];
             const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
-            // floor += totalMintFee;
             const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
-            // const calcUsdtValue = await getEthToUsdt(totalMintFee, symbol);
             const calc = etherValue * ethToUsdt[symbol];
-            // console.log(":::: calc ::::", calc);
             if (loopCount === 0) {
               floor = etherValue
             }
@@ -895,25 +890,13 @@ const getStatsWithMultiFilter = async (req, res) => {
             if (floor > etherValue) {
               floor = etherValue
             }
-            floorDetail[symbol] = floor;
-            currencyDetail[symbol] = `${calc}`;
+            floorDetail[symbol] = floor * ethToUsdt[symbol];
+            currencyDetail[symbol] = `${calc} `;
+            
             loopCount += 1;
-            // if (collectionAddreeWithCurrency.length > 0) {
-            //   if (floor === 0) {
-            //     floor = parseInt(collectionAddreeWithCurrency[0].subgraphMintFee, 10);
-            //   }
-            //   for (let c = 0; c < collectionAddreeWithCurrency.length; c+=1) {
-            //     if (floor > parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)) {
-            //       floor = parseInt(collectionAddreeWithCurrency[c].subgraphMintFee, 10)
-            //     }
-            //     const calcUsdtValue = await getEthToUsdt(collectionAddreeWithCurrency[c].subgraphMintFee, symbol);
-            //     usdtValue += calcUsdtValue.data?.[symbol]?.quote?.USD?.price;
-            //   }
-            // }
-            // const usdValue = await getEthToUsdt(totalMintFee, symbol);
           }
-          // collectionAddress = { ...collectionAddress._doc, floor, volume, symbol: globalSymbol, currencySymbols };
-          // collectionAddresses = [ ...collectionAddresses, collectionAddress ];
+          // currencyDetail["AD"] = `${usdtValue * ethToUsdt['ad'] } `;
+          // floorDetail["AD"] = floor * ethToUsdt['ad'];
         }
         const collections = collectionAddress["_doc"];
         collectionAddress = { ...collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorDetail };
