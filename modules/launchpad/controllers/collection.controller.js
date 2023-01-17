@@ -487,8 +487,8 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("networkId", "networkName");
   }
 
-  req.body.startDate = { $gt: await getUTCDate() };
-  filtercolumn.push("startDate")
+  // req.body.startDate = { $gt: await getUTCDate() };
+  // filtercolumn.push("startDate")
 
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
@@ -496,6 +496,23 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     req.body.$or = [{ collectionName: search }, { symbol: search }];
     filtercolumn.push("$or");
   }
+
+  const today = moment();
+  let phaseFilter = {
+     startTime: { $gt: await getUTCDate() }
+  }
+  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+
+
+  let collectionIds = []
+  for (const iterator of phases) {
+    if(!collectionIds.includes(iterator.collectionId)){
+      collectionIds.push(iterator.collectionId)
+    }
+  }  
+  console.log("collectionIds", collectionIds)
+  req.body._id = collectionIds;
+  filtercolumn.push("_id");
 
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -543,9 +560,24 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //   search = new RegExp(".*" + search + ".*", "i");
   //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
   // }
-
-  // req.body.$or = orArray;
-  // filtercolumn.push("$or");
+  const today = moment();
+  let phaseFilter = {
+     startTime: { $lt: await getUTCDate() },
+    endTime: { $gt: await getUTCDate() },
+   // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
+   
+  }
+  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+// console.log("phases", phases)
+  let collectionIds = []
+  for (const iterator of phases) {
+    if(!collectionIds.includes(iterator.collectionId)){
+      collectionIds.push(iterator.collectionId)
+    }
+  }
+  
+  req.body._id = collectionIds;
+  filtercolumn.push("_id");
 
   let orArray = [
     {
