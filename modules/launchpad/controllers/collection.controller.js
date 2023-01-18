@@ -813,10 +813,11 @@ const getStatsWithMultiFilter = async (req, res) => {
       safemoon: 0,
       ad: 0,
     }
+    
     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
     let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
     // uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
-    const currencyData = await LaunchPadCurrency.find();
+    // const currencyData = await LaunchPadCurrency.find();
     const eth = await getEthToUsdt(1, 'eth');
     const bnb = await getEthToUsdt(1, 'bnb');
     const ad = await getEthToUsdt(1, 'ad');
@@ -827,7 +828,9 @@ const getStatsWithMultiFilter = async (req, res) => {
     ethToUsdt.safemoon = safemoon.data?.["safemoon"]?.quote?.USD?.price;
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
+
       let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator });
+      console.log("collectionAddress", collectionAddress)
       if (collectionAddress) {
         let floor = 0;
         let globalSymbol = '';
@@ -835,6 +838,7 @@ const getStatsWithMultiFilter = async (req, res) => {
         let currencyDetail = {};
         let floorDetail = {};
         let loopCount = 0;
+        const currencyData = collectionAddress?.currencyDetails;
         for (const currency of currencyData) {
           const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
           if (collectionAddreeWithCurrency.length > 0) {
@@ -851,17 +855,33 @@ const getStatsWithMultiFilter = async (req, res) => {
             const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
             const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
             const calc = etherValue * ethToUsdt[symbol];
-            if (loopCount === 0) {
-              floor = etherValue
-            }
+            // if (loopCount === 0) {
+            //   floor = etherValue
+            // }
             usdtValue += calc;
-            if (floor > etherValue) {
-              floor = etherValue
-            }
-            floorDetail[symbol] = floor * ethToUsdt[symbol];
+            // if (floor > etherValue) {
+            //   floor = etherValue
+            // }
+            // floorDetail[symbol] = floor * ethToUsdt[symbol];
             currencyDetail[symbol] = `${calc} `;
             
             loopCount += 1;
+          }
+          const currencyDetails = collectionAddress?.currencyDetails;
+          console.log(currencyDetails)
+          console.log("collectionAddress::", collectionAddress)
+          if (currencyDetails.length > 0) {
+            for(let c = 0; c < currencyDetails.length; c += 1) {
+              const usdt = parseFloat(currencyDetails[c].mintCost) * ethToUsdt[symbol]
+              if (c === 0) {
+                floor = usdt
+              }
+              if (floor > usdt) {
+                floor = usdt
+              }
+              const symbol = currencyDetails[c].symbol.toLowerCase()
+              floorDetail[symbol] = {[symbol]: currencyDetails[c].mintCost, usdt: parseFloat(currencyDetails[c].mintCost) * ethToUsdt[symbol]};
+            }
           }
           // currencyDetail["AD"] = `${usdtValue * ethToUsdt['ad'] } `;
           // floorDetail["AD"] = floor * ethToUsdt['ad'];
