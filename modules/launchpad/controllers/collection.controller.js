@@ -9,7 +9,7 @@ const { Collection } = require("../services");
 const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 const moment = require('moment')
 const Web3 = require("web3");
-
+const today = moment();
 const { BSC_NETWORK_ID, WEB3_URL } = process.env;
 // const web3 = new Web3(WEB3_URL);
 
@@ -487,8 +487,8 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("networkId", "networkName");
   }
 
-  req.body.startDate = { $gt: await getUTCDate() };
-  filtercolumn.push("startDate")
+  // req.body.startDate = { $gt: await getUTCDate() };
+  // filtercolumn.push("startDate")
 
   if (req.body.searchText) {
     let search = await specialCharacter(req.body.searchText);
@@ -496,6 +496,22 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     req.body.$or = [{ collectionName: search }, { symbol: search }];
     filtercolumn.push("$or");
   }
+
+  let phaseFilter = {
+     startTime: { $gt: today.toDate() }
+  }
+  console.log("upcoming - filter", phaseFilter)
+  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+
+
+  let collectionIds = []
+  for (const iterator of phases) {
+    if(!collectionIds.includes(iterator.collectionId)){
+      collectionIds.push(iterator.collectionId)
+    }
+  }  
+  req.body._id = collectionIds;
+  filtercolumn.push("_id");
 
   const filter = pick(req.body, filtercolumn);
   const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -543,9 +559,27 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //   search = new RegExp(".*" + search + ".*", "i");
   //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
   // }
-
-  // req.body.$or = orArray;
-  // filtercolumn.push("$or");
+ 
+  //await getUTCDate()
+  let phaseFilter = {
+    startTime: { $lt: today.toDate() },
+    endTime: { $gt:  today.toDate()},
+  }
+  console.log("live - phase filter", phaseFilter)
+  // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
+   
+  
+  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+// console.log("phases", phases)
+  let collectionIds = []
+  for (const iterator of phases) {
+    if(!collectionIds.includes(iterator.collectionId)){
+      collectionIds.push(iterator.collectionId)
+    }
+  }
+  
+  req.body._id = collectionIds;
+  filtercolumn.push("_id");
 
   let orArray = [
     {
