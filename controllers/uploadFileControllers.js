@@ -60,6 +60,7 @@ module.exports = {
       console.log(req.file.path)
       const readableStreamForFile = fs.createReadStream(req.file.path);
       const filename = __dirname + req.file.originalname;
+      
       pinata
         .pinFileToIPFS(readableStreamForFile)
         .then((result) => {
@@ -85,8 +86,9 @@ module.exports = {
           }
         })
         .catch((err) => {
+          console.log("err", err)
           return res.status(400).json({
-            data: null,
+            data: err,
             error: "Not Upload",
             status: 400,
             success: false,

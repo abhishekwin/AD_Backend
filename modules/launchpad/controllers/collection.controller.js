@@ -826,6 +826,153 @@ const stashAllCollectionHeader = async (req, res) => {
   }
 };
 
+// const getStatsWithMultiFilter = async (req, res) => {
+//   try {
+//     const { networkId, currency, time } = req.body
+//     let filter = { isMint: true, deletedAt: null };
+//     if (networkId) {
+//       filter = { ...filter, networkId: Number(networkId) }
+//     }
+//     if (currency) {
+//       filter = { ...filter, currency: currency }
+//     }
+//     if (time?.from) {
+//       filter = { ...filter, subgraphMintTime: { $gte: time.from, $lte: time.to } }
+//     } else {
+//       filter = { ...filter, subgraphMintTime: { $ne: null } }
+//     }
+//     const ethToUsdt = {
+//       eth: 0,
+//       bnb: 0,
+//       safemoon: 0,
+//       ad: 0,
+//     }
+
+//     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
+
+//     let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
+//     // uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
+//     // const currencyData = await LaunchPadCurrency.find();
+//     const eth = await getEthToUsdt(1, 'eth');
+//     const bnb = await getEthToUsdt(1, 'bnb');
+//     const ad = await getEthToUsdt(1, 'ad');
+//     const safemoon = await getEthToUsdt(1, 'safemoon');
+//     ethToUsdt.eth = eth.data?.[0]?.quote?.USD?.price;
+//     ethToUsdt.bnb = bnb.data?.[0]?.quote?.USD?.price;
+//     ethToUsdt.ad = ad.data?.[0]?.quote?.USD?.price;
+//     ethToUsdt.safemoon = safemoon.data?.[0]?.quote?.USD?.price;
+
+//     let collectionAddresses = [];
+//     for (const iterator of uniqueCollectionAddress) {
+//       let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator }).populate([
+//         {
+//           path: "phases",
+//           populate: [{
+//             path: "currencyDetails",
+//           }]
+//         }
+//       ]);
+//       if (collectionAddress) {
+//         let floor = 0;
+//         let globalSymbol = '';
+//         let usdtValue = 0;
+//         let currencyDetail = {};
+//         let floorDetail = [];
+//         let volumeDetail = [];
+//         let loopCount = 0;
+
+//         let allCurrencyArr = []
+//         let volumeArr = []
+
+//         //if(collectionAddress['phases'].length > 0){
+//           console.log("collectionAddress", collectionAddress['phases'])
+
+//           for (const phases of collectionAddress['phases']) {
+//             for (const currency of phases['currencyDetails']) {
+//               let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
+//               //console.log("ethToUsdt", ethToUsdt)
+//               const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
+//               allCurrencyArr.push({
+//                 mintCost: currency.mintCost,
+//                 usdt: usdtprice,
+//                 ad: convertUsdt * ethToUsdt["ad"],
+//                 bnb: convertUsdt * ethToUsdt["bnb"],
+//                 currency: currency.currency
+//               })
+
+
+//               //// valum
+
+//               const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address.toLowerCase() === item.subgraphMintCurrency.toLowerCase());
+//               console.log("collectionAddreeWithCurrency", collectionAddreeWithCurrency)
+//               if (collectionAddreeWithCurrency.length > 0) {
+//                 const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
+//                 let symbol = currency?.symbol.toLowerCase()
+//                 if (currency?.address === '0x0000000000000000000000000000000000000000') {
+//                   if (netId === parseInt(BSC_NETWORK_ID, 10)) {
+//                     symbol = 'bnb';
+//                   } else {
+//                     symbol = 'eth';
+//                   }
+//                 }
+//                 globalSymbol = symbol;
+//                 const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
+//                 const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
+//                 const calc = etherValue * ethToUsdt[symbol];
+//                 //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
+//                 volumeArr.push({ currency: currency.symbol, usdt: calc, ad: totalMintFee * ethToUsdt["ad"], bnb: totalMintFee * ethToUsdt["bnb"] })
+//               }
+//             }
+//           }
+//         //}
+
+//         floorDetail = allCurrencyArr
+//         let floorLowest = {}
+//         for (const lowestPrice of floorDetail) {
+//           floorLowest = {...lowestPrice}
+//           if(lowestPrice.usdt> floorLowest.usdt){
+//             floorLowest = {...lowestPrice}
+//           }
+//         }
+
+//         volumeDetail = volumeArr
+//         let volumeTotalSum = {
+//           usdt:0,
+//           ad: 0,
+//           bnb: 0
+//         }
+//         for (const volumesum of volumeDetail) {
+//           volumeTotalSum.usdt = volumeTotalSum.usdt + volumesum.usdt
+//           volumeTotalSum.ad = volumeTotalSum.ad + volumesum.ad
+//           volumeTotalSum.bnb = volumeTotalSum.bnb + volumesum.bnb
+//         }
+
+//         const collections = collectionAddress["_doc"];
+//         collectionAddress = { ...collections, floor,volume: usdtValue, symbol: globalSymbol, currencyDetail, floorLowest, floorDetail, volumeTotalSum, volumeDetail };
+//         collectionAddresses = [...collectionAddresses, collectionAddress];
+//       }
+//     }
+
+//     collectionAddresses.sort((collectionA, collectionB) => collectionB.volume - collectionA.volume);
+
+//     let response = collectionAddresses.slice(0, 100);
+//     return res
+//       .status(200)
+//       .send(
+//         new ResponseObject(
+//           200,
+//           "Get stash collection with filter",
+//           response
+//         )
+//       );
+//   } catch (err) {
+//     console.log("err", err)
+//     return res
+//       .status(500)
+//       .send(new ResponseObject(500, "Something Went Wrong"));
+//   }
+// };
+
 
 const getStatsWithMultiFilter = async (req, res) => {
   try {
@@ -849,9 +996,9 @@ const getStatsWithMultiFilter = async (req, res) => {
       ad: 0,
     }
 
+
     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
     let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
-
     // uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
     // const currencyData = await LaunchPadCurrency.find();
     const eth = await getEthToUsdt(1, 'eth');
@@ -882,48 +1029,13 @@ const getStatsWithMultiFilter = async (req, res) => {
         let volumeDetail = [];
         let loopCount = 0;
 
-
-        //  for (const currency of currencyData) {
-        //     const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
-        //     if (collectionAddreeWithCurrency.length > 0) {
-        //       const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
-        //       let symbol = currency?.symbol.toLowerCase()
-        //       if (currency?.address === '0x0000000000000000000000000000000000000000') {
-        //         if (netId === parseInt(BSC_NETWORK_ID, 10)) {
-        //           symbol = 'bnb';
-        //         } else {
-        //           symbol = 'eth';
-        //         }
-        //       }
-        //       globalSymbol= symbol;
-        //       const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
-        //       console.log("symbol", symbol)
-        //       // console.log("totalMintFee", totalMintFee, "---", collectionAddreeWithCurrency)
-        //      // const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
-        //      // const calc = etherValue * ethToUsdt[symbol];
-        //       // if (loopCount === 0) {
-        //       //   floor = etherValue
-        //       // }
-        //       //usdtValue += calc;
-        //       // if (floor > etherValue) {
-        //       //   floor = etherValue
-        //       // }
-        //       // floorDetail[symbol] = floor * ethToUsdt[symbol];
-        //       // currencyDetail[symbol] = `${calc} `;
-
-        //       // loopCount += 1;
-        //     }
-        //     const currencyDetails = collectionAddress?.currencyDetails;
-
-
-        //   }
-
         let allCurrencyArr = []
         let volumeArr = []
-        let count = 1
-        if(collectionAddress['phases'].length > 0){
+
+        //if(collectionAddress['phases'].length > 0){
+        //console.log("collectionAddress", collectionAddress['phases'])
+        if (collectionAddress['phases'].length > 0) {
           for (const phases of collectionAddress['phases']) {
-            let allusdtSum = 0
             for (const currency of phases['currencyDetails']) {
               let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
               //console.log("ethToUsdt", ethToUsdt)
@@ -938,9 +1050,7 @@ const getStatsWithMultiFilter = async (req, res) => {
   
   
               //// valum
-  
               const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address.toLowerCase() === item.subgraphMintCurrency.toLowerCase());
-  
               if (collectionAddreeWithCurrency.length > 0) {
                 const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
                 let symbol = currency?.symbol.toLowerCase()
@@ -956,43 +1066,44 @@ const getStatsWithMultiFilter = async (req, res) => {
                 const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
                 const calc = etherValue * ethToUsdt[symbol];
                 //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
-                allusdtSum = allusdtSum+calc
                 volumeArr.push({ currency: currency.symbol, usdt: calc, ad: totalMintFee * ethToUsdt["ad"], bnb: totalMintFee * ethToUsdt["bnb"] })
               }
             }
           }
+          //}
+  
+          floorDetail = allCurrencyArr
+          let floorLowest = {}
+          for (const lowestPrice of floorDetail) {
+            floorLowest = { ...lowestPrice }
+            if (lowestPrice.usdt > floorLowest.usdt) {
+              floorLowest = { ...lowestPrice }
+            }
+          }
+  
+          volumeDetail = volumeArr
+          let volumeTotalSum = {
+            usdt: 0,
+            ad: 0,
+            bnb: 0
+          }
+          for (const volumesum of volumeDetail) {
+            volumeTotalSum.usdt = volumeTotalSum.usdt + volumesum.usdt
+            volumeTotalSum.ad = volumeTotalSum.ad + volumesum.ad
+            volumeTotalSum.bnb = volumeTotalSum.bnb + volumesum.bnb
+          }
+  
+          const collections = collectionAddress["_doc"];
+          collectionAddress = { ...collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorLowest, floorDetail, volumeTotalSum, volumeDetail };
+          collectionAddresses = [...collectionAddresses, collectionAddress];
         }
         
-        floorDetail = allCurrencyArr
-        let floorLowest = {}
-        for (const lowestPrice of floorDetail) {
-          floorLowest = {...lowestPrice}
-          if(lowestPrice.usdt> floorLowest.usdt){
-            floorLowest = {...lowestPrice}
-          }
-        }
-
-        volumeDetail = volumeArr
-        let volumeTotalSum = {
-          usdt:0,
-          ad: 0,
-          bnb: 0
-        }
-        for (const volumesum of volumeDetail) {
-          volumeTotalSum.usdt = volumeTotalSum.usdt + volumesum.usdt
-          volumeTotalSum.ad = volumeTotalSum.ad + volumesum.ad
-          volumeTotalSum.bnb = volumeTotalSum.bnb + volumesum.bnb
-        }
-
-        const collections = collectionAddress["_doc"];
-        collectionAddress = { ...collections, floor,volume: usdtValue, symbol: globalSymbol, currencyDetail, floorLowest, floorDetail, volumeTotalSum, volumeDetail };
-        collectionAddresses = [...collectionAddresses, collectionAddress];
       }
     }
 
     collectionAddresses.sort((collectionA, collectionB) => collectionB.volume - collectionA.volume);
 
-    let response = collectionAddresses.slice(0, 10);
+    let response = collectionAddresses.slice(0, 100);
     return res
       .status(200)
       .send(
