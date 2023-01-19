@@ -196,7 +196,7 @@ const createCollection = catchAsync(async (req, res) => {
       currencyDetails: phase.currencyDetails ? phase.currencyDetails : null,
       currencyDetailsForWhiteListed: phase.currencyDetailsForWhiteListed ? phase.currencyDetailsForWhiteListed : null,
       whiteListedUsers: phase.whiteListedUsers,
-      maxNftCap:phase.maxNftCap
+      maxNftCap: phase.maxNftCap
     });
   }
 
@@ -205,19 +205,19 @@ const createCollection = catchAsync(async (req, res) => {
   if (insertPhases && insertPhases.length > 0) {
     for (const iterator of insertPhases) {
       let phaseresult = await LaunchPadCollectionPhase.create(iterator)
-      
-      if(iterator.currencyDetails){
+
+      if (iterator.currencyDetails) {
         for (const currencyDetail of iterator.currencyDetails) {
           let obj = { phaseId: phaseresult._id, ...currencyDetail }
           insertPhasesCurrencies.push(obj)
         }
       }
-      if(iterator.whiteListedUsers){
+      if (iterator.whiteListedUsers) {
         for (const userAddress of iterator.whiteListedUsers) {
           whiteListUsers.push({ userAddress, phaseId: phaseresult._id, collectionId })
         }
       }
-      
+
     }
   }
   await LaunchPadCollectionCurrencyDetails.insertMany(insertPhasesCurrencies)
@@ -368,6 +368,7 @@ const getCollection = async (req, res) => {
     const { id } = req.params;
     let { userAddress } = req.query;
     userAddress = userAddress.toLowerCase();
+    console.log("{ _id: id }", await LaunchPadCollection.findOne({ _id: id }))
     const resultFirst = await LaunchPadCollection.findOne({ _id: id }).populate([
       {
         path: "isWhiteListed",
@@ -396,9 +397,9 @@ const getCollection = async (req, res) => {
       },
       {
         path: "phases",
-        populate:[{
+        populate: [{
           path: "currencyDetails",
-        },{
+        }, {
           path: "whiteListedUser",
         }]
       },
@@ -498,18 +499,18 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
   }
 
   let phaseFilter = {
-     startTime: { $gt: today.toDate() }
+    startTime: { $gt: today.toDate() }
   }
   console.log("upcoming - filter", phaseFilter)
-  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+  const phases = await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
 
 
   let collectionIds = []
   for (const iterator of phases) {
-    if(!collectionIds.includes(iterator.collectionId)){
+    if (!collectionIds.includes(iterator.collectionId)) {
       collectionIds.push(iterator.collectionId)
     }
-  }  
+  }
   req.body._id = collectionIds;
   filtercolumn.push("_id");
 
@@ -559,25 +560,25 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //   search = new RegExp(".*" + search + ".*", "i");
   //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
   // }
- 
+
   //await getUTCDate()
   let phaseFilter = {
     startTime: { $lt: today.toDate() },
-    endTime: { $gt:  today.toDate()},
+    endTime: { $gt: today.toDate() },
   }
   console.log("live - phase filter", phaseFilter)
   // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
-   
-  
-  const phases= await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
-// console.log("phases", phases)
+
+
+  const phases = await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
+  // console.log("phases", phases)
   let collectionIds = []
   for (const iterator of phases) {
-    if(!collectionIds.includes(iterator.collectionId)){
+    if (!collectionIds.includes(iterator.collectionId)) {
       collectionIds.push(iterator.collectionId)
     }
   }
-  
+
   req.body._id = collectionIds;
   filtercolumn.push("_id");
 
@@ -829,17 +830,17 @@ const stashAllCollectionHeader = async (req, res) => {
 const getStatsWithMultiFilter = async (req, res) => {
   try {
     const { networkId, currency, time } = req.body
-    let filter = { approved: true, deletedAt: null };
+    let filter = { isMint: true, deletedAt: null };
     if (networkId) {
       filter = { ...filter, networkId: Number(networkId) }
     }
     if (currency) {
       filter = { ...filter, currency: currency }
     }
-    if(time?.from) {
-      filter = {...filter, subgraphMintTime: { $gte: time.from, $lte: time.to }}
+    if (time?.from) {
+      filter = { ...filter, subgraphMintTime: { $gte: time.from, $lte: time.to } }
     } else {
-      filter = {...filter, subgraphMintTime: {$ne: null}}
+      filter = { ...filter, subgraphMintTime: { $ne: null } }
     }
     const ethToUsdt = {
       eth: 0,
@@ -847,82 +848,145 @@ const getStatsWithMultiFilter = async (req, res) => {
       safemoon: 0,
       ad: 0,
     }
-    
+
     const launchPadMintRangeCollection = await LaunchPadNft.find(filter).sort({ subgraphMintTime: -1 });
     let uniqueCollectionAddress = [...new Set(launchPadMintRangeCollection.map(item => item.collectionAddress))];
+
     // uniqueCollectionAddress = uniqueCollectionAddress.slice(0, 10);
     // const currencyData = await LaunchPadCurrency.find();
     const eth = await getEthToUsdt(1, 'eth');
     const bnb = await getEthToUsdt(1, 'bnb');
     const ad = await getEthToUsdt(1, 'ad');
     const safemoon = await getEthToUsdt(1, 'safemoon');
-    ethToUsdt.eth  = eth.data?.["eth"]?.quote?.USD?.price;
-    ethToUsdt.bnb = bnb.data?.["bnb"]?.quote?.USD?.price;
-    ethToUsdt.ad = ad.data?.["ad"]?.quote?.USD?.price;
-    ethToUsdt.safemoon = safemoon.data?.["safemoon"]?.quote?.USD?.price;
+    ethToUsdt.eth = eth.data?.[0]?.quote?.USD?.price;
+    ethToUsdt.bnb = bnb.data?.[0]?.quote?.USD?.price;
+    ethToUsdt.ad = ad.data?.[0]?.quote?.USD?.price;
+    ethToUsdt.safemoon = safemoon.data?.[0]?.quote?.USD?.price;
+
     let collectionAddresses = [];
     for (const iterator of uniqueCollectionAddress) {
-
-      let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator });
-      console.log("collectionAddress", collectionAddress)
+      let collectionAddress = await LaunchPadCollection.findOne({ collectionAddress: iterator }).populate([
+        {
+          path: "phases",
+          populate: [{
+            path: "currencyDetails",
+          }]
+        }
+      ]);
       if (collectionAddress) {
         let floor = 0;
         let globalSymbol = '';
         let usdtValue = 0;
         let currencyDetail = {};
-        let floorDetail = {};
+        let floorDetail = [];
+        let volumeDetail = [];
         let loopCount = 0;
-        const currencyData = collectionAddress?.currencyDetails;
-        for (const currency of currencyData) {
-          const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
-          if (collectionAddreeWithCurrency.length > 0) {
-            const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
-            let symbol = currency?.symbol.toLowerCase()
-            if (currency?.address === '0x0000000000000000000000000000000000000000') {
-              if (netId === parseInt(BSC_NETWORK_ID, 10)) {
-                symbol = 'bnb';
-              } else {
-                symbol = 'eth';
+
+
+        //  for (const currency of currencyData) {
+        //     const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address === item.subgraphMintCurrency);
+        //     if (collectionAddreeWithCurrency.length > 0) {
+        //       const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
+        //       let symbol = currency?.symbol.toLowerCase()
+        //       if (currency?.address === '0x0000000000000000000000000000000000000000') {
+        //         if (netId === parseInt(BSC_NETWORK_ID, 10)) {
+        //           symbol = 'bnb';
+        //         } else {
+        //           symbol = 'eth';
+        //         }
+        //       }
+        //       globalSymbol= symbol;
+        //       const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
+        //       console.log("symbol", symbol)
+        //       // console.log("totalMintFee", totalMintFee, "---", collectionAddreeWithCurrency)
+        //      // const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
+        //      // const calc = etherValue * ethToUsdt[symbol];
+        //       // if (loopCount === 0) {
+        //       //   floor = etherValue
+        //       // }
+        //       //usdtValue += calc;
+        //       // if (floor > etherValue) {
+        //       //   floor = etherValue
+        //       // }
+        //       // floorDetail[symbol] = floor * ethToUsdt[symbol];
+        //       // currencyDetail[symbol] = `${calc} `;
+
+        //       // loopCount += 1;
+        //     }
+        //     const currencyDetails = collectionAddress?.currencyDetails;
+
+
+        //   }
+
+        let allCurrencyArr = []
+        let volumeArr = []
+        let count = 1
+        if(collectionAddress['phases'].length > 0){
+          for (const phases of collectionAddress['phases']) {
+            let allusdtSum = 0
+            for (const currency of phases['currencyDetails']) {
+              let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
+              //console.log("ethToUsdt", ethToUsdt)
+              const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
+              allCurrencyArr.push({
+                mintCost: currency.mintCost,
+                usdt: usdtprice,
+                ad: convertUsdt * ethToUsdt["ad"],
+                bnb: convertUsdt * ethToUsdt["bnb"],
+                currency: currency.currency
+              })
+  
+  
+              //// valum
+  
+              const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address.toLowerCase() === item.subgraphMintCurrency.toLowerCase());
+  
+              if (collectionAddreeWithCurrency.length > 0) {
+                const netId = parseInt(collectionAddreeWithCurrency[0].networkId, 10);
+                let symbol = currency?.symbol.toLowerCase()
+                if (currency?.address === '0x0000000000000000000000000000000000000000') {
+                  if (netId === parseInt(BSC_NETWORK_ID, 10)) {
+                    symbol = 'bnb';
+                  } else {
+                    symbol = 'eth';
+                  }
+                }
+                globalSymbol = symbol;
+                const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
+                const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
+                const calc = etherValue * ethToUsdt[symbol];
+                //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
+                allusdtSum = allusdtSum+calc
+                volumeArr.push({ currency: currency.symbol, usdt: calc, ad: totalMintFee * ethToUsdt["ad"], bnb: totalMintFee * ethToUsdt["bnb"] })
               }
             }
-            globalSymbol= symbol;
-            const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseInt(item.subgraphMintFee, 10), 0);
-            const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
-            const calc = etherValue * ethToUsdt[symbol];
-            // if (loopCount === 0) {
-            //   floor = etherValue
-            // }
-            usdtValue += calc;
-            // if (floor > etherValue) {
-            //   floor = etherValue
-            // }
-            // floorDetail[symbol] = floor * ethToUsdt[symbol];
-            currencyDetail[symbol] = `${calc} `;
-            
-            loopCount += 1;
           }
-          const currencyDetails = collectionAddress?.currencyDetails;
-          console.log(currencyDetails)
-          console.log("collectionAddress::", collectionAddress)
-          if (currencyDetails.length > 0) {
-            for(let c = 0; c < currencyDetails.length; c += 1) {
-              const usdt = parseFloat(currencyDetails[c].mintCost) * ethToUsdt[symbol]
-              if (c === 0) {
-                floor = usdt
-              }
-              if (floor > usdt) {
-                floor = usdt
-              }
-              const symbol = currencyDetails[c].symbol.toLowerCase()
-              floorDetail[symbol] = {[symbol]: currencyDetails[c].mintCost, usdt: parseFloat(currencyDetails[c].mintCost) * ethToUsdt[symbol]};
-            }
-          }
-          // currencyDetail["AD"] = `${usdtValue * ethToUsdt['ad'] } `;
-          // floorDetail["AD"] = floor * ethToUsdt['ad'];
         }
+        
+        floorDetail = allCurrencyArr
+        let floorLowest = {}
+        for (const lowestPrice of floorDetail) {
+          floorLowest = {...lowestPrice}
+          if(lowestPrice.usdt> floorLowest.usdt){
+            floorLowest = {...lowestPrice}
+          }
+        }
+
+        volumeDetail = volumeArr
+        let volumeTotalSum = {
+          usdt:0,
+          ad: 0,
+          bnb: 0
+        }
+        for (const volumesum of volumeDetail) {
+          volumeTotalSum.usdt = volumeTotalSum.usdt + volumesum.usdt
+          volumeTotalSum.ad = volumeTotalSum.ad + volumesum.ad
+          volumeTotalSum.bnb = volumeTotalSum.bnb + volumesum.bnb
+        }
+
         const collections = collectionAddress["_doc"];
-        collectionAddress = { ...collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorDetail };
-        collectionAddresses = [ ...collectionAddresses, collectionAddress ];
+        collectionAddress = { ...collections, floor,volume: usdtValue, symbol: globalSymbol, currencyDetail, floorLowest, floorDetail, volumeTotalSum, volumeDetail };
+        collectionAddresses = [...collectionAddresses, collectionAddress];
       }
     }
 
@@ -1352,15 +1416,15 @@ const getBaseUri = catchAsync(async (req, res) => {
   const userAddress = req.userData.account.toLowerCase();
   let { networkId, collectionAddress } = req.body
   collectionAddress = collectionAddress.toLowerCase()
-  let result = await LaunchPadCollection.findOne({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }).select('tokenURI')
-  if(!result){
+  let result = await LaunchPadCollection.findOne({ networkId: networkId, collectionAddress: collectionAddress, creator: userAddress }).select('tokenURI')
+  if (!result) {
     return res
       .status(400)
       .send(new ResponseObject(400, "Collection not found"));
   }
   const response = {
-    baseUri:result.tokenURI
-  } 
+    baseUri: result.tokenURI
+  }
   res
     .status(200)
     .send(new ResponseObject(200, "Base uri display successfully", response));
@@ -1370,8 +1434,8 @@ const updateBaseUriFlag = catchAsync(async (req, res) => {
   const userAddress = req.userData.account.toLowerCase();
   let { networkId, collectionAddress } = req.body
   collectionAddress = collectionAddress.toLowerCase()
-  const result = await LaunchPadCollection.findOneAndUpdate({ networkId: networkId, collectionAddress:collectionAddress, creator:userAddress }, {isReveal:true}, {new:true})
-  
+  const result = await LaunchPadCollection.findOneAndUpdate({ networkId: networkId, collectionAddress: collectionAddress, creator: userAddress }, { isReveal: true }, { new: true })
+
   res
     .status(200)
     .send(new ResponseObject(200, "Collection updated successfully", result));
@@ -1381,9 +1445,9 @@ const updateBaseUriFlag = catchAsync(async (req, res) => {
 const getPinataHash = catchAsync(async (req, res) => {
   const userAddress = req.userData.account.toLowerCase();
   let { uniqId } = req.body
-  
-  const result = await LaunchPadPinataUploadManager.findOne({ uniqId: uniqId, userAddress: userAddress})
-  
+
+  const result = await LaunchPadPinataUploadManager.findOne({ uniqId: uniqId, userAddress: userAddress })
+
   res
     .status(200)
     .send(new ResponseObject(200, "Hash display successfully", result));
