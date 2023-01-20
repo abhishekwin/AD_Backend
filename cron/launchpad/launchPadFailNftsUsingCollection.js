@@ -33,15 +33,15 @@ const getBaseWebDataUsingAxios = async (url, count = 0) => {
 
 const createNftWithUri = async (id, updateUri, data, failedNfts) => {
     await new Promise(async function (resolve, reject) {
-
+        await sleep(10000)
         let baseResponse = await getBaseWebDataUsingAxios(updateUri);
 
         if (baseResponse == null) {
-            await sleep(3000)
+            await sleep(10000)
             baseResponse = await getBaseWebDataUsingAxios(updateUri);
         }
         if (baseResponse == null) {
-            await sleep(3000)
+            await sleep(10000)
             baseResponse = await getBaseWebDataUsingAxios(updateUri);
         }
         if (baseResponse) {
@@ -90,7 +90,7 @@ const failNftUsingCollectionFuncation = async () => {
     //console.log("-----check fail nft start------")
     const data = await LaunchPadCollection.findOne({
         failedNfts: { "$gt": 0 }, $or: [
-            { failedNftsCheckCount: { "$lt": 3 } },
+            { failedNftsCheckCount: { "$lt": 6 } },
             { failedNftsCheckCount: { $exists: false } }
         ]
     });
@@ -105,7 +105,7 @@ const failNftUsingCollectionFuncation = async () => {
             failedNfts = nftCreated
         }
         
-        if(failedNfts.length > 0 && failedNftsCheckCount > 2){
+        if(failedNfts.length > 0 && failedNftsCheckCount > 6){
             await LaunchPadCollection.findOneAndUpdate({ _id: data._id }, { status: "failed", failedNfts: failedNfts })
         }else{
             if(failedNfts.length <= 0 ){
