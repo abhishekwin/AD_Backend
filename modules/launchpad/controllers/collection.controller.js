@@ -499,12 +499,14 @@ const upcomingCollectionList = catchAsync(async (req, res) => {
     filtercolumn.push("$or");
   }
 
+  // await getUTCDate()
+
   let phaseFilter = {
-    startTime: { $gt: today.toDate() }
+    startTime: { $gt: await getUTCDate() }
   }
   console.log("upcoming - filter", phaseFilter)
-  const phases = await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
 
+  const phases = await LaunchPadCollectionPhase.find(phaseFilter).select('collectionId');
 
   let collectionIds = []
   for (const iterator of phases) {
@@ -562,10 +564,11 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //   orArray.push(...[{ collectionName: search }, { symbol: search }]);
   // }
 
-  //await getUTCDate()
+  //await getUTCDate() today.toDate() 
+  console.log("await getUTCDate()", await getUTCDate())
   let phaseFilter = {
-    startTime: { $lt: today.toDate() },
-    endTime: { $gt: today.toDate() },
+    startTime: { $lt: await getUTCDate()},
+    endTime: { $gt: await getUTCDate()},
   }
   console.log("live - phase filter", phaseFilter)
   // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
