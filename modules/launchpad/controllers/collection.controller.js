@@ -10,6 +10,7 @@ const { getUTCDate, createUTCDate } = require("../../helpers/timezone")
 const moment = require('moment')
 const Web3 = require("web3");
 const today = moment();
+const ethers = require("ethers");
 const { BSC_NETWORK_ID, WEB3_URL } = process.env;
 // const web3 = new Web3(WEB3_URL);
 
@@ -1036,15 +1037,20 @@ const getStatsWithMultiFilter = async (req, res) => {
         //console.log("collectionAddress", collectionAddress['phases'])
         if (collectionAddress['phases'].length > 0) {
           for (const phases of collectionAddress['phases']) {
+            console.log("phases['currencyDetails']", phases['currencyDetails'])
             for (const currency of phases['currencyDetails']) {
-              let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
-              //console.log("ethToUsdt", ethToUsdt)
-              const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
-              allCurrencyArr.push({
+              // let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
+              // //console.log("ethToUsdt", ethToUsdt)
+              // const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
+              
+              usdtprice = ethers.utils.formatUnits( currency.mintCost.toString(), 6 )
+              let adValue = ethers.utils.formatUnits( currency.mintCost.toString(), 4 )
+              let bnbValue = ethers.utils.formatUnits( currency.mintCost.toString(), 18 )
+               allCurrencyArr.push({
                 mintCost: currency.mintCost,
                 usdt: usdtprice,
-                ad: convertUsdt * ethToUsdt["ad"],
-                bnb: convertUsdt * ethToUsdt["bnb"],
+                ad: adValue,
+                bnb:bnbValue,
                 currency: currency.currency
               })
   
@@ -1062,11 +1068,22 @@ const getStatsWithMultiFilter = async (req, res) => {
                   }
                 }
                 globalSymbol = symbol;
-                const totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
-                const etherValue = Web3.utils.fromWei(`${totalMintFee}`, 'ether');
-                const calc = etherValue * ethToUsdt[symbol];
+                let  totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
+                
+                // let currencyData = await LaunchPadCurrency.findOne({networkId:netId, address:currency.address});
+                // console.log("currencyData", currencyData)
+                // bnb = 18
+                // safmoon = 9
+                // ad =4
+                // eth =18 
+                //jh=18
+
+
+                let usdtValue = ethers.utils.formatUnits( totalMintFee.toString(), 6 )
+                let adValue = ethers.utils.formatUnits( totalMintFee.toString(), 4 )
+                let bnbValue = ethers.utils.formatUnits( totalMintFee.toString(), 18 )
                 //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
-                volumeArr.push({ currency: currency.symbol, usdt: calc, ad: totalMintFee * ethToUsdt["ad"], bnb: totalMintFee * ethToUsdt["bnb"] })
+                volumeArr.push({ currency: currency.symbol, usdt: usdtValue, ad: adValue * ethToUsdt["ad"], bnb: bnbValue * ethToUsdt["bnb"] })
               }
             }
           }
