@@ -567,8 +567,8 @@ const liveCollectionList = catchAsync(async (req, res) => {
   //await getUTCDate() today.toDate() 
   console.log("await getUTCDate()", await getUTCDate())
   let phaseFilter = {
-    startTime: { $lt: await getUTCDate()},
-    endTime: { $gt: await getUTCDate()},
+    startTime: { $lt: await getUTCDate() },
+    endTime: { $gt: await getUTCDate() },
   }
   console.log("live - phase filter", phaseFilter)
   // $and: [{ startTime: {$lt: today.toDate() } }, { endTime: { $gt: today.toDate() } }]
@@ -1040,24 +1040,27 @@ const getStatsWithMultiFilter = async (req, res) => {
         //console.log("collectionAddress", collectionAddress['phases'])
         if (collectionAddress['phases'].length > 0) {
           for (const phases of collectionAddress['phases']) {
-            console.log("phases['currencyDetails']", phases['currencyDetails'])
             for (const currency of phases['currencyDetails']) {
               // let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
               // //console.log("ethToUsdt", ethToUsdt)
               // const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
-              
-              usdtprice = ethers.utils.formatUnits( currency.mintCost.toString(), 6 )
-              let adValue = ethers.utils.formatUnits( currency.mintCost.toString(), 4 )
-              let bnbValue = ethers.utils.formatUnits( currency.mintCost.toString(), 18 )
-               allCurrencyArr.push({
-                mintCost: currency.mintCost,
-                usdt: usdtprice,
-                ad: adValue,
-                bnb:bnbValue,
-                currency: currency.currency
-              })
-  
-  
+              try {
+                usdtprice = ethers.utils.formatUnits(currency.mintCost.toString(), 6)
+                let adValue = ethers.utils.formatUnits(currency.mintCost.toString(), 4)
+                let bnbValue = ethers.utils.formatUnits(currency.mintCost.toString(), 18)
+                allCurrencyArr.push({
+                  mintCost: currency.mintCost,
+                  usdt: usdtprice,
+                  ad: adValue,
+                  bnb: bnbValue,
+                  currency: currency.currency
+                })
+              } catch (err) {
+                console.log("err", err)
+
+              }
+
+
               //// valum
               const collectionAddreeWithCurrency = launchPadMintRangeCollection.filter((item) => item.collectionAddress === iterator && currency.address.toLowerCase() === item.subgraphMintCurrency.toLowerCase());
               if (collectionAddreeWithCurrency.length > 0) {
@@ -1071,27 +1074,26 @@ const getStatsWithMultiFilter = async (req, res) => {
                   }
                 }
                 globalSymbol = symbol;
-                let  totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
-                
-                // let currencyData = await LaunchPadCurrency.findOne({networkId:netId, address:currency.address});
-                // console.log("currencyData", currencyData)
-                // bnb = 18
-                // safmoon = 9
-                // ad =4
-                // eth =18 
-                //jh=18
+                let totalMintFee = collectionAddreeWithCurrency.reduce((total, item) => total + parseFloat(item.subgraphMintFee), 0);
+
+                try {
+                  console.log("totalMintFee", totalMintFee)
+                  let usdtValue = ethers.utils.formatUnits(totalMintFee.toString(), 6)
+                  let adValue = ethers.utils.formatUnits(totalMintFee.toString(), 4)
+                  let bnbValue = ethers.utils.formatUnits(totalMintFee.toString(), 18)
+                  //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
+                  volumeArr.push({ currency: currency.symbol, usdt: usdtValue, ad: adValue * ethToUsdt["ad"], bnb: bnbValue * ethToUsdt["bnb"] })
+                } catch (err) {
+                  console.log("volumeArr", err)
+
+                }
 
 
-                let usdtValue = ethers.utils.formatUnits( totalMintFee.toString(), 6 )
-                let adValue = ethers.utils.formatUnits( totalMintFee.toString(), 4 )
-                let bnbValue = ethers.utils.formatUnits( totalMintFee.toString(), 18 )
-                //volumeArr.push({currency:currency.symbol, usdt:calc, ad:etherValue * ethToUsdt["ad"], bnb:etherValue * ethToUsdt["bnb"]})
-                volumeArr.push({ currency: currency.symbol, usdt: usdtValue, ad: adValue * ethToUsdt["ad"], bnb: bnbValue * ethToUsdt["bnb"] })
               }
             }
           }
           //}
-  
+
           floorDetail = allCurrencyArr
           let floorLowest = {}
           for (const lowestPrice of floorDetail) {
@@ -1100,7 +1102,7 @@ const getStatsWithMultiFilter = async (req, res) => {
               floorLowest = { ...lowestPrice }
             }
           }
-  
+
           volumeDetail = volumeArr
           let volumeTotalSum = {
             usdt: 0,
@@ -1112,12 +1114,12 @@ const getStatsWithMultiFilter = async (req, res) => {
             volumeTotalSum.ad = volumeTotalSum.ad + volumesum.ad
             volumeTotalSum.bnb = volumeTotalSum.bnb + volumesum.bnb
           }
-  
+
           const collections = collectionAddress["_doc"];
           collectionAddress = { ...collections, floor, volume: usdtValue, symbol: globalSymbol, currencyDetail, floorLowest, floorDetail, volumeTotalSum, volumeDetail };
           collectionAddresses = [...collectionAddresses, collectionAddress];
         }
-        
+
       }
     }
 
