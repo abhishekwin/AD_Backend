@@ -1037,8 +1037,6 @@ const getStatsWithMultiFilter = async (req, res) => {
         let allCurrencyArr = []
         let volumeArr = []
 
-        //if(collectionAddress['phases'].length > 0){
-        //console.log("collectionAddress", collectionAddress['phases'])
         if (collectionAddress['phases'].length > 0) {
           for (const phases of collectionAddress['phases']) {
             for (const currency of phases['currencyDetails']) {
