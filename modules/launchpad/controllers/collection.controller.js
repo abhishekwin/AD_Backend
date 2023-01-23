@@ -980,6 +980,7 @@ const stashAllCollectionHeader = async (req, res) => {
 
 const getStatsWithMultiFilter = async (req, res) => {
   try {
+
     const { networkId, currency, time } = req.body
     let filter = { isMint: true, deletedAt: null };
     if (networkId) {
@@ -1041,18 +1042,16 @@ const getStatsWithMultiFilter = async (req, res) => {
         if (collectionAddress['phases'].length > 0) {
           for (const phases of collectionAddress['phases']) {
             for (const currency of phases['currencyDetails']) {
-              // let convertUsdt = Web3.utils.fromWei(`${currency.mintCost}`, 'ether')
-              // //console.log("ethToUsdt", ethToUsdt)
-              // const usdtprice = convertUsdt * ethToUsdt[currency.symbol.toLowerCase()]
+              console.log("currency", currency)
               try {
-                usdtprice = ethers.utils.formatUnits(currency.mintCost.toString(), 6)
-                let adValue = ethers.utils.formatUnits(currency.mintCost.toString(), 4)
-                let bnbValue = ethers.utils.formatUnits(currency.mintCost.toString(), 18)
+                usdtprice =  currency.mintCost
+                let adValue =  currency.mintCost
+                let bnbValue = currency.mintCost
                 allCurrencyArr.push({
                   mintCost: currency.mintCost,
-                  usdt: usdtprice,
-                  ad: adValue,
-                  bnb: bnbValue,
+                  usdt: ethToUsdt[currency.symbol.toLowerCase()],
+                  ad: adValue * ethToUsdt.ad,
+                  bnb: bnbValue * ethToUsdt.bnb,
                   currency: currency.currency
                 })
               } catch (err) {
